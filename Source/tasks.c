@@ -64,8 +64,8 @@
 */
 
 //---------------------------------------------------
-#define cnt_address 0x80803000
-unsigned int *outbuf[10];
+//#define cnt_address 0x80803000
+//unsigned int *outbuf[10];
 //---------------------------------------------------
 
 
@@ -1464,21 +1464,21 @@ TCB_t * pxNewTCB;
 void vTaskStartScheduler( void )
 {
 BaseType_t xReturn;
-outbuf[0] = (unsigned int *) cnt_address;
+//outbuf[0] = (unsigned int *) cnt_address;
 
 	/* Add the idle task at the lowest priority. */
 	#if ( INCLUDE_xTaskGetIdleTaskHandle == 1 )
 	{
 		/* Create the idle task, storing its handle in xIdleTaskHandle so it can
 		be returned by the xTaskGetIdleTaskHandle() function. */
-		*outbuf[0] = 10;
+		//*outbuf[0] = 10;
     xReturn = xTaskCreate( prvIdleTask, "IDLE", tskIDLE_STACK_SIZE, ( void * ) NULL, ( tskIDLE_PRIORITY | portPRIVILEGE_BIT ), &xIdleTaskHandle ); /*lint !e961 MISRA exception, justified as it is not a redundant explicit cast to all supported compilers. */
    
 	}
 	#else
 	{
 		/* Create the idle task without storing its handle. */
-		*outbuf[0] = 20;
+		//*outbuf[0] = 20;
     xReturn = xTaskCreate( prvIdleTask, "IDLE", tskIDLE_STACK_SIZE, ( void * ) NULL, ( tskIDLE_PRIORITY | portPRIVILEGE_BIT ), NULL );  /*lint !e961 MISRA exception, justified as it is not a redundant explicit cast to all supported 
     compilers. */
 	}
@@ -1488,12 +1488,12 @@ outbuf[0] = (unsigned int *) cnt_address;
 	{
 		if( xReturn == pdPASS )
 		{
-       *outbuf[0] = 30;
+       //*outbuf[0] = 30;
 			xReturn = xTimerCreateTimerTask();
 		}
 		else
 		{
-			*outbuf[0] = 40;
+			//*outbuf[0] = 40;
       mtCOVERAGE_TEST_MARKER();
 		}
 	}
@@ -1501,14 +1501,14 @@ outbuf[0] = (unsigned int *) cnt_address;
 
 	if( xReturn == pdPASS )
 	{
-     *outbuf[0] = 50;
+     //*outbuf[0] = 50;
 		/* Interrupts are turned off here, to ensure a tick does not occur
 		before or during the call to xPortStartScheduler().  The stacks of
 		the created tasks contain a status word with interrupts switched on
 		so interrupts will automatically get re-enabled when the first task
 		starts to run. */
 		portDISABLE_INTERRUPTS();
-   *outbuf[0] = 60;
+   //*outbuf[0] = 60;
 		#if ( configUSE_NEWLIB_REENTRANT == 1 )
 		{
 			/* Switch Newlib's _impure_ptr variable to point to the _reent
@@ -1527,9 +1527,9 @@ outbuf[0] = (unsigned int *) cnt_address;
     
     
     
-    *outbuf[0] = 80;
+    //*outbuf[0] = 80;
     //xPortStartScheduler();
-		*outbuf[0] = 90;
+		//*outbuf[0] = 90;
     
     
     
@@ -1551,7 +1551,7 @@ outbuf[0] = (unsigned int *) cnt_address;
 		/* This line will only be reached if the kernel could not be started,
 		because there was not enough FreeRTOS heap to create the idle task
 		or the timer task. */
-    *outbuf[1] = 70;
+   // *outbuf[1] = 70;
 		configASSERT( xReturn );
 	}
 }

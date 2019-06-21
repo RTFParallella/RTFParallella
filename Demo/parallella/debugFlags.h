@@ -17,8 +17,6 @@
 #define DEBUG_FLAG 			7
 #define TICK_FLAG			8
 
-//unsigned int *outbuf[10];
-
 void outbuf_init(void );
 
 void traceRunningTask(unsigned taskNum);
@@ -28,12 +26,6 @@ void traceTaskPasses(unsigned taskNum, int currentPasses);
 void updateTick(void);
 
 void updateDebugFlag(int debugMessage);
-
-
-
-
-
-
 
 
 #endif /* DEMO_PARALLELLA_DEBUGFLAGS_H_ */

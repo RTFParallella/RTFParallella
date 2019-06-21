@@ -6,39 +6,18 @@
 #include "debugFlags.h"
 
 #define CyclesForTick (configCPU_CLOCK_HZ/configTICK_RATE_HZ - 50)
-
+//debugging
+//TODO core to core comms will use this
 unsigned int M[5] SECTION("shared_dram");
-
-
-
-
-
 //---------------------------------------------------
-#define cnt_address 0x80803000
-unsigned int *outbuf[10];
-//extern void sleepTimerFlagToggle();
-
-
-
-
-
 int globalDelta;
 //---------------------------------------------------
-
-
-
-
-
-/*-----------------------------------------------------------*/
-
 /* We require the address of the pxCurrentTCB variable, but don't want to know
 any details of its type. */
 typedef void TCB_t;
 extern volatile TCB_t * volatile pxCurrentTCB;
 
-
 extern void portRESTORE_CONTEXT();
-
 /*-----------------------------------------------------------*/
 
 /*
@@ -160,42 +139,30 @@ extern sighandler_t handlers[10];
  */
 BaseType_t xPortStartScheduler( void )
 {
-	outbuf[0] = (unsigned int *) cnt_address;
 	e_irq_attach(E_USER_INT, handlers[E_USER_INT]);
 	e_irq_mask(E_USER_INT, E_FALSE);
-	*outbuf[0] = 100;
 
 	e_irq_attach(E_TIMER0_INT, handlers[E_TIMER0_INT]);
 	e_irq_mask(E_TIMER0_INT, E_FALSE);
-	*outbuf[0] = 110;
 
 	e_irq_attach(E_MEM_FAULT, handlers[E_MEM_FAULT]);
 	e_irq_mask(E_MEM_FAULT, E_FALSE);
-	*outbuf[0] = 120;
+
 	e_irq_attach(E_SW_EXCEPTION, handlers[E_SW_EXCEPTION]);
 	e_irq_mask(E_SW_EXCEPTION, E_FALSE);
-	*outbuf[0] = 130;
+
 	e_irq_attach(E_MESSAGE_INT, handlers[E_MESSAGE_INT]);
 	e_irq_mask(E_MESSAGE_INT, E_FALSE);
-	//*outbuf[0] = 140;
-	//setMemprotectMask(0x0f);
-	//*outbuf[0] = 150;
+
 	vSetupTimer();
-	//*outbuf[0] = 160;
-
-
+	//condition left for debugging
 	if(globalDelta == 0){
 
-		//*outbuf[0] = 500;
 	}else{
-		//*outbuf[0] = 510;
+
 	}
-
-
-
 	/* Restore the context of the first task that is going to run. */
 	portRESTORE_CONTEXT();
-	*outbuf[0] = 170;
 	/* Should not get here. */
 	return pdTRUE;
 }
@@ -204,8 +171,6 @@ BaseType_t xPortStartScheduler( void )
 void vPortEndScheduler( void )
 {
 	/* Unmasks the timer1-interrupt, which is used for reoccurring scheduling */
-	outbuf[0] = (unsigned int *) cnt_address;
-	*outbuf[0] = 400;
 	e_irq_mask(E_TIMER1_INT, E_TRUE);
 }
 /*-----------------------------------------------------------*/
@@ -234,6 +199,8 @@ void vSetupTimer( void )
 	e_ctimer_set(E_CTIMER_1, E_CTIMER_MAX);
 
 	//We are never to early, case is taken on startup
+
+	//debugging
 	if(delta < 0){
 
 		delta=0;
@@ -272,7 +239,6 @@ void vInterruptCentral( void ) {
 	switch (interrupt_mode) {
 	case E_TIMER0_INT:
 		vSetupTimer();
-		//*outbuf[8] = xTaskGetTickCount();
 		updateTick();
 		xTaskIncrementTick();
 		vTaskSwitchContext();
