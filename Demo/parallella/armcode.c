@@ -3,6 +3,9 @@
 #include <string.h>
 #include <unistd.h>
 #include <e-hal.h> //hardware abstraction library
+
+#define READ_PRECISION_US 1000
+
 int main()
 {
 	//counters for row and colum, cored id and loop counter
@@ -42,17 +45,17 @@ int main()
 		taskMessage = message[6];
 		//only print new status if a different task has been selected
 		//if (/*(taskMessage == 1 || taskMessage == 2|| taskMessage == 3) &&*/ prevtaskMessage!=taskMessage){
-		prevtaskMessage = taskMessage;
+		//prevtaskMessage = taskMessage;
 		fprintf(stderr,"task 1 %3u||", message[2]);
 		fprintf(stderr,"task 2 %3u||", message[0]);
 		fprintf(stderr,"task 3 %3u||", message[4]);
 		fprintf(stderr,"task holding core %2u||", message[6]);
 		fprintf(stderr,"debug flag %4u||", message[7]);
-		fprintf(stderr,"iteration prv task %2d||", ((  pollLoopCounter)-(    prevpollLoopCounter)));
+		//fprintf(stderr,"iteration prv task %2d||", ((  pollLoopCounter)-(    prevpollLoopCounter)));
 		fprintf(stderr, "tick %3d",message[8]+1);
-		prevpollLoopCounter = pollLoopCounter;
+		//prevpollLoopCounter = pollLoopCounter;
 		fprintf(stderr,"\n");
-		usleep(1000);
+		usleep(READ_PRECISION_US);
 		//	}
 	}
 	fprintf(stderr,"----------------------------------------------\n");
