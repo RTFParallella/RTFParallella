@@ -7,7 +7,7 @@ CC=e-gcc
 CFLAGS=-I.
 FREERTOSSRC=../../Source
 INCLUDES= -g -I$(FREERTOSSRC)/include -I$(FREERTOSSRC)/portable/GCC/Epiphany -I.
-DEPS = $(FREERTOSSRC)/portable/GCC/Epiphany/portmacro.h Makefile FreeRTOSConfig.h c2c.h debugFlags.h
+DEPS = $(FREERTOSSRC)/portable/GCC/Epiphany/portmacro.h Makefile FreeRTOSConfig.h c2c.h debugFlags.h AmaltheaConverter.h
 #Epiphany SDK dependencies
 ESDK=${EPIPHANY_HOME}
 ELIBS=${ESDK}/tools/host.armv7l/lib
@@ -23,7 +23,7 @@ run: armcode main.elf
 	@echo build status : successful
 
 #rule for every device target
-%.elf: $(ELDF) tasks.o queue.o list.o port.o portasm.o heap_1.o c2c.o debugFlags.o %.o
+%.elf: $(ELDF) tasks.o queue.o list.o port.o portasm.o heap_1.o c2c.o debugFlags.o AmaltheaConverter.o %.o
 	$(CC) -g -T$< -Wl,--gc-sections -o $@ $(filter-out $<,$^) -le-lib
 
 #host target

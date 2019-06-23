@@ -30,9 +30,9 @@ bool timeDone= false;
 int firstTime=0;
 //Task handles
 //function declaration
-void hi(void *pvParameters);
-void hi2(void *pvParameters);
-void hi3(void *pvParameters);
+void task5ms(void *pvParameters);
+void task10ms(void *pvParameters);
+void task20ms(void *pvParameters);
 void sleepTimerMs(int ticks);
 void timer1init();
 void __attribute__ ((interrupt)) sleepTimerFlagToggle();
@@ -73,9 +73,9 @@ int main(void) {
 	vSchedulerInit();
   
 
-	vSchedulerPeriodicTaskCreate(hi, "t1", configMINIMAL_STACK_SIZE, &c1, 1, NULL, 0, 5, 2, 5);
-	vSchedulerPeriodicTaskCreate(hi2, "t2", configMINIMAL_STACK_SIZE, &c2, 2, NULL, 0, 10, 4, 10);
-	vSchedulerPeriodicTaskCreate(hi3, "t3", configMINIMAL_STACK_SIZE, &c3, 3, NULL, 0, 20, 5, 20);
+	vSchedulerPeriodicTaskCreate(task5ms, "t1", configMINIMAL_STACK_SIZE, &c1, 1, NULL, 0, 5, 2, 5);
+	vSchedulerPeriodicTaskCreate(task10ms, "t2", configMINIMAL_STACK_SIZE, &c2, 2, NULL, 0, 10, 4, 10);
+	vSchedulerPeriodicTaskCreate(task20ms, "t3", configMINIMAL_STACK_SIZE, &c3, 3, NULL, 0, 20, 5, 20);
   
   
   
@@ -89,7 +89,7 @@ int main(void) {
 	return EXIT_SUCCESS;
 }
 //task 5ms handler and helper functions
-void hi(void *pvParameters){
+void task5ms(void *pvParameters){
   TickType_t xLastWakeTime;
   for(;;){
      *outbuf[6] =1;
@@ -104,7 +104,7 @@ void hi(void *pvParameters){
 }
 
 
-void hi2(void *pvParameters){
+void task10ms(void *pvParameters){
   TickType_t xLastWakeTime;
   for(;;){
     *outbuf[6] =2;
@@ -118,7 +118,7 @@ void hi2(void *pvParameters){
 	}
 }
 
-void hi3(void *pvParameters){
+void task20ms(void *pvParameters){
   TickType_t xLastWakeTime;
   for(;;){
     *outbuf[6] =3;

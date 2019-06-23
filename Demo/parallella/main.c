@@ -9,18 +9,59 @@
 #include "queue.h"
 //utility imports
 #include "debugFlags.h"
+#include "AmaltheaConverter.h"
 //---------------------------------------------
 //time units in processor cycles
 #define _1MS 700000
 #define _1US 700
 //---------------------------------------------
 //Task handlers
-void hi(void *pvParameters);
-void hi2(void *pvParameters);
-void hi3(void *pvParameters);
+void task5ms(void *pvParameters);
+void task10ms(void *pvParameters);
+void task20ms(void *pvParameters);
 //sleep function
 void sleepTimerMs(int ticks,int taskNum);
 //---------------------------------------------
+void handler5ms(){
+/*	updateDebugFlag(700);
+	sleepTimerMs(2,1);
+	passes1++;
+	traceRunningTask(0);
+	traceTaskPasses(1,passes1);*/
+}
+void handler10ms(){
+	/*updateDebugFlag(800);
+	sleepTimerMs(3,2);
+	passes2++;
+	traceTaskPasses(2,passes2);
+	traceRunningTask(0);*/
+
+}
+void handler20ms(){
+
+}
+//-------
+void cIn5ms(){
+
+}
+void cIn10ms(){
+
+}
+void cIn20ms(){
+
+}
+//-------
+void cOut5ms(){
+
+}
+void cOut10ms(){
+
+}
+void cOut20ms(){
+
+}
+//-------
+
 //task recurrence counters
 int passes1 = 0;
 int passes2 = 0;
@@ -29,15 +70,20 @@ int passes3 = 0;
 int main(void) {
 	//initialize output buffer for debug messages
 	outbuf_init();
-	xTaskCreate( hi, "T1", 0x200, NULL, 3, NULL );
-	xTaskCreate( hi2,"T2", 0x200, NULL, 2, NULL );
-	xTaskCreate( hi3,"T3", 0x200, NULL, 1, NULL );
+	//createAmaltheaTask()
+
+
+
+
+	xTaskCreate( task5ms, "T1", 0x200, NULL, 3, NULL );
+	xTaskCreate( task10ms,"T2", 0x200, NULL, 2, NULL );
+	xTaskCreate( task20ms,"T3", 0x200, NULL, 1, NULL );
 	vTaskStartScheduler();
 	return EXIT_SUCCESS;
 }
 //---------------------------------------------
 //task 5ms handler
-void hi(void *pvParameters){
+void task5ms(void *pvParameters){
 	TickType_t xLastWakeTime = xTaskGetTickCount();
 	for(;;){
 		updateDebugFlag(700);
@@ -51,7 +97,7 @@ void hi(void *pvParameters){
 }
 //---------------------------------------------
 //task 10ms handler
-void hi2(void *pvParameters){
+void task10ms(void *pvParameters){
 	TickType_t xLastWakeTime = xTaskGetTickCount();
 	for(;;){
 		updateDebugFlag(800);
@@ -65,7 +111,7 @@ void hi2(void *pvParameters){
 }
 //---------------------------------------------
 //task 20ms handler
-void hi3(void *pvParameters){
+void task20ms(void *pvParameters){
 	TickType_t xLastWakeTime = xTaskGetTickCount();
 	for(;;){
 		updateDebugFlag(899);
