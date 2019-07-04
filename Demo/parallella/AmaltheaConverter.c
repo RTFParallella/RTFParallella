@@ -22,15 +22,26 @@ AmaltheaTask createAmaltheaTask(void *taskHandler,void *cInHandler,void *cOutHan
 	}
 }
 
-void generalizedRTOSTak(AmaltheaTask *task){
-	portTickType xLastWakeTime = xTaskGetTickCount();
+void generalizedRTOSTak(AmaltheaTask task){
+	TickType_t xLastWakeTime = xTaskGetTickCount();
 	for (;;){
 		//execute cIn
-		task->cInHandler();
-		task->taskHandler();
-		task->cOutHandler();
-		vTaskDelayUntil( &xLastWakeTime, task->period);
+		task.cInHandler();
+		task.taskHandler();
+		task.cOutHandler();
+		vTaskDelayUntil( &xLastWakeTime, task.period);
 	}
+	/*TickType_t xLastWakeTime = xTaskGetTickCount();
+		for (;;){
+			//traceTaskStatus(1,task->executionTime);
+			//execute cIn
+			//task->cInHandler();
+			//task->taskHandler();
+			sleepTimerMs(task->executionTime,task->executionTime);
+			//task->cOutHandler();
+			traceTaskStatus(0,task->executionTime);
+			vTaskDelayUntil( &xLastWakeTime, task->period);
+		}*/
 }
 
 /*

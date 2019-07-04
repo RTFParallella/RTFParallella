@@ -3,8 +3,27 @@
 #include <string.h>
 #include <unistd.h>
 #include <e-hal.h> //hardware abstraction library
+#include <time.h>   /* Needed for struct timespec */
 
 #define READ_PRECISION_US 1000
+
+int nsleep(long miliseconds)
+{
+   struct timespec req, rem;
+
+   if(miliseconds > 999)
+   {
+        req.tv_sec = (int)(miliseconds / 1000);                            /* Must be Non-Negative */
+        req.tv_nsec = (miliseconds - ((long)req.tv_sec * 1000)) * 1000000; /* Must be in range of 0 to 999999999 */
+   }
+   else
+   {
+        req.tv_sec = 0;                         /* Must be Non-Negative */
+        req.tv_nsec = miliseconds * 900000;    /* Must be in range of 0 to 999999999 */
+   }
+
+   return nanosleep(&req , &rem);
+}
 
 int main()
 {
@@ -43,6 +62,11 @@ int main()
 		message[3] = 0;
 		e_read(&dev,0,0,addr, &message, sizeof(message));
 		taskMessage = message[6];
+		//skip printing if a a tick is missed
+		/*if (message[8]> pollLoopCounter){
+			fprintf(stderr,"missed tick %3u||\n", message[8]);
+			continue;
+		}*/
 		//only print new status if a different task has been selected
 		//if (/*(taskMessage == 1 || taskMessage == 2|| taskMessage == 3) &&*/ prevtaskMessage!=taskMessage){
 		//prevtaskMessage = taskMessage;
@@ -56,6 +80,7 @@ int main()
 		//prevpollLoopCounter = pollLoopCounter;
 		fprintf(stderr,"\n");
 		usleep(READ_PRECISION_US);
+		//nsleep(1);
 		//	}
 	}
 	fprintf(stderr,"----------------------------------------------\n");

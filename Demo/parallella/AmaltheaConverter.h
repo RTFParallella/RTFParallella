@@ -26,7 +26,7 @@ AmaltheaTask createAmaltheaTask(void *taskHandler,void *cInHandler,void *cOutHan
 
 //void createRTOSTask(AmaltheaTask *task);
 
-void generalizedRTOSTak(AmaltheaTask *task);
+void generalizedRTOSTak(AmaltheaTask task);
 
 
 #endif /* DEMO_PARALLELLA_AMALTHEACONVERTER_H_ */
