@@ -7,21 +7,15 @@
 
 #define READ_PRECISION_US 1000
 
-int nsleep(long miliseconds)
-{
+int nsleep(long miliseconds){
    struct timespec req, rem;
-
-   if(miliseconds > 999)
-   {
+   if(miliseconds > 999){
         req.tv_sec = (int)(miliseconds / 1000);                            /* Must be Non-Negative */
         req.tv_nsec = (miliseconds - ((long)req.tv_sec * 1000)) * 1000000; /* Must be in range of 0 to 999999999 */
-   }
-   else
-   {
+   } else {
         req.tv_sec = 0;                         /* Must be Non-Negative */
         req.tv_nsec = miliseconds * 900000;    /* Must be in range of 0 to 999999999 */
    }
-
    return nanosleep(&req , &rem);
 }
 
@@ -58,7 +52,7 @@ int main()
 	int taskMessage;
 	int prevtaskMessage;
 	int prevpollLoopCounter = 0;
-	for (pollLoopCounter=0;pollLoopCounter<=30;pollLoopCounter++){
+	for (pollLoopCounter=0;pollLoopCounter<=40;pollLoopCounter++){
 		message[3] = 0;
 		e_read(&dev,0,0,addr, &message, sizeof(message));
 		taskMessage = message[6];
@@ -67,21 +61,14 @@ int main()
 			fprintf(stderr,"missed tick %3u||\n", message[8]);
 			continue;
 		}*/
-		//only print new status if a different task has been selected
-		//if (/*(taskMessage == 1 || taskMessage == 2|| taskMessage == 3) &&*/ prevtaskMessage!=taskMessage){
-		//prevtaskMessage = taskMessage;
 		fprintf(stderr,"task 1 %3u||", message[2]);
 		fprintf(stderr,"task 2 %3u||", message[0]);
 		fprintf(stderr,"task 3 %3u||", message[4]);
 		fprintf(stderr,"task holding core %2u||", message[6]);
 		fprintf(stderr,"debug flag %4u||", message[7]);
-		//fprintf(stderr,"iteration prv task %2d||", ((  pollLoopCounter)-(    prevpollLoopCounter)));
-		fprintf(stderr, "tick %3d",message[8]+1);
-		//prevpollLoopCounter = pollLoopCounter;
+		fprintf(stderr, "tick %3d",message[8]);
 		fprintf(stderr,"\n");
 		usleep(READ_PRECISION_US);
-		//nsleep(1);
-		//	}
 	}
 	fprintf(stderr,"----------------------------------------------\n");
 	e_close(&dev);
@@ -90,5 +77,4 @@ int main()
 	//----------------------------------------------------------------------------
 	fprintf(stderr,"demo complete \n ");
 	return 0;
-
 }

@@ -1,7 +1,5 @@
 //epiphany imports
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include "e_lib.h"
 //freeRTOS imports
 #include "FreeRTOS.h"
