@@ -250,10 +250,13 @@ void vInterruptCentral( void ) {
 		vTaskSwitchContext();
 		break;
 	case E_MESSAGE_INT: //message, triggered externally for message transmission
+		//a message received
+		updateDebugFlag(404);
 		irqMsg();
 		break;
 	case E_MEM_FAULT: // written to read-only memory
-		while(1);
+		updateDebugFlag(2222);
+		//while(1);
 		break;
 	default:
 		break;

@@ -8,7 +8,8 @@
 #ifndef DEMO_PARALLELLA_DEBUGFLAGS_H_
 #define DEMO_PARALLELLA_DEBUGFLAGS_H_
 
-#define cnt_address 0x80803000
+#define cnt_address 	0x80807000
+#define cnt_address_2 	0x80903000
 
 #define TASK1_FLAG			2
 #define TASK2_FLAG 			0

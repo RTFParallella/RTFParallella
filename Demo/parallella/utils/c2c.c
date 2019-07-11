@@ -1,7 +1,8 @@
+#include "utils/c2c.h"
+
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
-#include "c2c.h"
 #include <e-lib.h>
 
 extern int M[5];

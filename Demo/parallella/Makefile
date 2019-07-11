@@ -6,8 +6,9 @@ CC=e-gcc
 #FreeRTOS dependencies
 CFLAGS=-I.
 FREERTOSSRC=../../Source
+UTILSSRC=/utils
 INCLUDES= -g -I$(FREERTOSSRC)/include -I$(FREERTOSSRC)/portable/GCC/Epiphany -I.
-DEPS = $(FREERTOSSRC)/portable/GCC/Epiphany/portmacro.h Makefile FreeRTOSConfig.h c2c.h debugFlags.h AmaltheaConverter.h taskCode.h ParallellaUtils.h
+DEPS = $(FREERTOSSRC)/portable/GCC/Epiphany/portmacro.h Makefile FreeRTOSConfig.h $(UTILSSRC)/c2c.h $(UTILSSRC)/debugFlags.h $(UTILSSRC)/AmaltheaConverter.h $(UTILSSRC)/taskCode.h $(UTILSSRC)/ParallellaUtils.h
 #Epiphany SDK dependencies
 ESDK=${EPIPHANY_HOME}
 ELIBS=${ESDK}/tools/host.armv7l/lib
@@ -31,7 +32,7 @@ armcode: armcode.c $(DEPS)
 	$(LCC) $< -o $@  -I ${EINCS} -L ${ELIBS} -lpal -le-hal -le-loader -lpthread
 #clean target
 clean:
-	rm -f *.o *.srec *.elf
+	rm -f *.o *.srec *.elf armcode
 
 .SECONDARY:
 %.o: %.c $(DEPS)
