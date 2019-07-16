@@ -17,6 +17,8 @@
 void handler5ms();
 void handler10ms();
 void handler20ms();
+void handler10msCore2();
+void handler20msCore2();
 //-------
 //declare cIn/Out operations
 //to be set up from the amalthea model during

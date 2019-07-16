@@ -31,24 +31,7 @@ void generalizedRTOSTak(AmaltheaTask task){
 		task.cOutHandler();
 		vTaskDelayUntil( &xLastWakeTime, task.period);
 	}
-	/*TickType_t xLastWakeTime = xTaskGetTickCount();
-		for (;;){
-			//traceTaskStatus(1,task->executionTime);
-			//execute cIn
-			//task->cInHandler();
-			//task->taskHandler();
-			sleepTimerMs(task->executionTime,task->executionTime);
-			//task->cOutHandler();
-			traceTaskStatus(0,task->executionTime);
-			vTaskDelayUntil( &xLastWakeTime, task->period);
-		}*/
 }
-
-/*
-void createRTOSTask(AmaltheaTask *task){
-	xTaskCreate(generalizedRTOSTak,"T1",configMINIMAL_STACK_SIZE,&task,4,NULL);
-}
-*/
 
 
 

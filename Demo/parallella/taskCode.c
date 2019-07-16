@@ -17,8 +17,10 @@
 int passes1 = 0;
 int passes2 = 0;
 int passes3 = 0;
+int passes4 = 0;
+int passes5 = 0;
 
-
+//extern unsigned int shared_label1;
 
 
 //define tasks and copy operations here
@@ -48,6 +50,29 @@ void handler20ms(){
 	traceTaskPasses(3,passes3);
 
 }
+
+void handler10msCore2(){
+	updateDebugFlag(899);
+	sleepTimerMs(5,4);
+	passes4++;
+	//shared_label1 = shared_label_to_read;
+	traceRunningTask(0);
+	traceTaskPasses(2,passes4);
+
+}
+
+void handler20msCore2(){
+	updateDebugFlag(899);
+	sleepTimerMs(7,5);
+	passes5++;
+	traceRunningTask(0);
+	traceTaskPasses(3,passes5);
+}
+
+
+
+
+
 //-------
 void cIn5ms(){
 
