@@ -71,7 +71,7 @@ int main()
 	int prevtaskMessage;
 	int prevpollLoopCounter = 0;
 	unsigned int chainLatencyEndIndicator = 0;
-	unsigned int chainLatencyStartIndicator = 0;
+	unsigned int chainLatencyStartIndicator = 10e6;
 	for (pollLoopCounter=0;pollLoopCounter<=40;pollLoopCounter++){
 		message[3] = 0;
 		e_read(&dev,0,0,addr, &message, sizeof(message));

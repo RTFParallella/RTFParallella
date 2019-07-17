@@ -102,3 +102,47 @@ void registerForSlot(unsigned slot, QueueHandle_t handler) {
 void createReceiver() {
     setupInterrupt();
 }
+
+
+
+unsigned int *outbuf_dstr_shared[10];
+
+int core_write_mutex=0;
+
+void shared_labels_init_core(){
+	//shared buffer in core memory
+	outbuf_dstr_shared[0] = (unsigned int *) dstr_mem_offset;
+	outbuf_dstr_shared[1] = outbuf_dstr_shared[0] + 1;
+	outbuf_dstr_shared[2] = outbuf_dstr_shared[1] + 1;
+	outbuf_dstr_shared[3] = outbuf_dstr_shared[2] + 1;
+	outbuf_dstr_shared[4] = outbuf_dstr_shared[3] + 1;
+	outbuf_dstr_shared[5] = outbuf_dstr_shared[4] + 1;
+	outbuf_dstr_shared[6] = outbuf_dstr_shared[5] + 1;
+	outbuf_dstr_shared[7] = outbuf_dstr_shared[6] + 1;
+	outbuf_dstr_shared[8] = outbuf_dstr_shared[7] + 1;
+	//initialize buffer
+	int i;
+	//timer1init();
+	for (i=0;i<9;i++){
+		*outbuf_dstr_shared[i] =0;
+	}
+}
+
+void core_shared_space_inti(){
+
+
+}
+
+uint8_t shared_label_write_core	(unsigned row,unsigned col,int label_indx,int payload){
+	uint8_t retval=NULL;
+	//*outbuf_dstr_shared[label_indx] = payload;
+
+}
+
+unsigned int shared_label_read_core (unsigned row, unsigned col, int label_indx){
+
+}
+
+
+
+

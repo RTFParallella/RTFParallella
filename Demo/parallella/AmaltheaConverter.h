@@ -20,7 +20,6 @@ typedef struct{
 	void(* cOutHandler)();
 }AmaltheaTask;
 
-#define NUM_TASKS 3
 
 //choose communication semantics
 //#define use_LET_COMM_SEMANTICS

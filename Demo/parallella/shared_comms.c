@@ -10,7 +10,6 @@
 unsigned int *outbuf_shared[10];
 
 void shared_labels_init(){
-	//debug interface in shared memory
 	outbuf_shared[0] = (unsigned int *) shared_mem_section;
 	outbuf_shared[1] = outbuf_shared[0] + 1;
 	outbuf_shared[2] = outbuf_shared[1] + 1;
