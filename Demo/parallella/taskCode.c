@@ -23,6 +23,10 @@ int passes5 = 0;
 //extern unsigned int shared_label1;
 
 
+
+int shared_label_1;
+int shared_label_2 = 97;
+
 //define tasks and copy operations here
 //-------
 void handler5ms(){
@@ -53,7 +57,7 @@ void handler20ms(){
 
 void handler10msCore2(){
 	updateDebugFlag(899);
-	sleepTimerMs(5,4);
+	sleepTimerMs(3,4);
 	passes4++;
 	//shared_label1 = shared_label_to_read;
 	traceRunningTask(0);
@@ -75,7 +79,7 @@ void handler20msCore2(){
 
 //-------
 void cIn5ms(){
-
+	//shared_label_2 = shared_label_read(0);
 }
 void cIn10ms(){
 
@@ -83,13 +87,32 @@ void cIn10ms(){
 void cIn20ms(){
 
 }
+
+void cIn10msCore2(){
+	shared_label_1 = shared_label_read(0);
+
+}
+void cIn20msCore2(){
+
+}
+
 //-------
 void cOut5ms(){
-
+	uint8_t x;
+	shared_label_2++;
+	x = shared_label_write(0,shared_label_2);
 }
 void cOut10ms(){
-
+	//shared_label_write(0,2);
 }
 void cOut20ms(){
+
+}
+void cOut10msCore2(){
+	shared_label_1++;
+	uint8_t x;
+	x = shared_label_write(1,shared_label_1);
+}
+void cOut20msCore2(){
 
 }

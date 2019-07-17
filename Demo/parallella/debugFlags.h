@@ -10,8 +10,6 @@
 
 #define cnt_address 	0x3000
 
-#define shared_mem_section	0x01000000
-
 #define TASK1_FLAG			2
 #define TASK2_FLAG 			0
 #define TASK3_FLAG 			4
@@ -22,8 +20,6 @@
 #define TICK_FLAG			8
 
 void outbuf_init(void );
-
-void shared_labels_init();
 
 void traceRunningTask(unsigned taskNum);
 

@@ -12,15 +12,6 @@
 
 unsigned int *outbuf[10];
 
-//define shared labels
-unsigned int *shared_label1;
-unsigned int *shared_label2;
-
-
-void shared_labels_init(){
-	shared_label1 = (unsigned int *) shared_mem_section;
-	shared_label2 = shared_label1 + 1;
-}
 /*
  * initialize output buffer with the addresses to array elements
  */

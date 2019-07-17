@@ -23,7 +23,7 @@ run: armcode main.elf main_2.elf
 	@echo build status : successful
 
 #rule for every device target
-%.elf: $(ELDF) tasks.o queue.o list.o port.o portasm.o heap_1.o c2c.o debugFlags.o AmaltheaConverter.o taskCode.o ParallellaUtils.o %.o
+%.elf: $(ELDF) tasks.o queue.o list.o port.o portasm.o heap_1.o c2c.o debugFlags.o AmaltheaConverter.o taskCode.o ParallellaUtils.o shared_comms.o %.o
 	$(CC) -g -T$< -Wl,--gc-sections -o $@ $(filter-out $<,$^) -le-lib
 
 

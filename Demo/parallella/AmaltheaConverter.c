@@ -22,8 +22,24 @@ AmaltheaTask createAmaltheaTask(void *taskHandler,void *cInHandler,void *cOutHan
 	}
 }
 
+
+#ifdef use_LET_COMM_SEMANTICS
 void generalizedRTOSTak(AmaltheaTask task){
 	TickType_t xLastWakeTime = xTaskGetTickCount();
+	//task.cInHandler();
+	for (;;){
+		//execute cIn
+		task.cInHandler();
+		task.taskHandler();
+		vTaskDelayUntil( &xLastWakeTime, task.period);
+		task.cOutHandler();
+	}
+}
+#elif
+
+void generalizedRTOSTak(AmaltheaTask task){
+	TickType_t xLastWakeTime = xTaskGetTickCount();
+	//task.cInHandler();
 	for (;;){
 		//execute cIn
 		task.cInHandler();
@@ -32,6 +48,15 @@ void generalizedRTOSTak(AmaltheaTask task){
 		vTaskDelayUntil( &xLastWakeTime, task.period);
 	}
 }
+
+#endif
+
+
+
+
+
+
+
 
 
 

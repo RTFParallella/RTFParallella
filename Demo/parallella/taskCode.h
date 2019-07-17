@@ -12,6 +12,8 @@
 #include "queue.h"
 #include "debugFlags.h"
 #include "ParallellaUtils.h"
+#include "shared_comms.h"
+
 //declare taskHandler functions
 
 void handler5ms();
@@ -26,9 +28,13 @@ void handler20msCore2();
 void cIn5ms();
 void cIn10ms();
 void cIn20ms();
+void cIn10msCore2();
+void cIn20msCore2();
 //-------
 void cOut5ms();
 void cOut10ms();
 void cOut20ms();
+void cOut10msCore2();
+void cOut20msCore2();
 
 #endif /* DEMO_PARALLELLA_TASKCODE_H_ */
