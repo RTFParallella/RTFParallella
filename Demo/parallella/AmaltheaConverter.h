@@ -23,7 +23,7 @@ typedef struct{
 #define NUM_TASKS 3
 
 //choose communication semantics
-#define use_LET_COMM_SEMANTICS 0	//1--> LET, 0--> implicit
+//#define use_LET_COMM_SEMANTICS
 
 AmaltheaTask createAmaltheaTask(void *taskHandler,void *cInHandler,void *cOutHandler,unsigned int period,unsigned int deadline, unsigned int WCET);
 
