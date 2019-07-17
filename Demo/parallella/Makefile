@@ -33,7 +33,7 @@ armcode: armcode.c $(DEPS)
 	$(LCC) $< -o $@  -I ${EINCS} -L ${ELIBS} -lpal -le-hal -le-loader -lpthread
 #clean target
 clean:
-	rm -f *.o *.srec *.elf
+	rm -f *.o *.srec *.elf armcode
 
 .SECONDARY:
 %.o: %.c $(DEPS)
