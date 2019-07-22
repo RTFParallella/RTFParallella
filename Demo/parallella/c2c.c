@@ -1,8 +1,4 @@
-#include "FreeRTOS.h"
-#include "task.h"
-#include "queue.h"
-#include "c2c.h"
-#include <e-lib.h>
+
 //#include <e-hal.h>
 
 /*
@@ -103,8 +99,8 @@ void createReceiver() {
     setupInterrupt();
 }
 */
-
-
+#include  "c2c.h"
+#include "e-lib.h"
 
 unsigned int *outbuf_dstr_shared[10];
 //e_mem_t emem_dst[16];
@@ -141,13 +137,86 @@ void core_shared_space_inti(){
 uint8_t shared_label_write_core	(unsigned row,unsigned col,int label_indx,int payload){
 	//uint8_t retval=NULL;
 	//*outbuf_dstr_shared[label_indx] = payload;
-	unsigned int buf = 0;
+	//unsigned int buf = 0;
+	unsigned int *addr;
+	unsigned int* addr_base;
+	//addr = outbuf_dstr_shared[label_indx];
+	//e_get_global_address(row, col,&addr);
+	addr_base = get_base_address_core(row,col);
+	//addr = (get_base_address_core(row, col)) | outbuf_dstr_shared[label_indx];
+	addr = (unsigned int*) ((unsigned ) addr_base | (unsigned)outbuf_dstr_shared[label_indx]);
+
+	//addr = (unsigned int *) (unsigned)addr_base | (char)outbuf_dstr_shared[label_indx];
+	*addr = payload;
+	//addr = payload;
+	//e_shm_get_shmtable();
 	//e_write()
 }
 
 unsigned int shared_label_read_core (unsigned row, unsigned col, int label_indx){
-	return *outbuf_dstr_shared[label_indx];
+	unsigned int *addr;
+	//addr = outbuf_dstr_shared[label_indx];
+	unsigned int* addr_base;
+	//addr = outbuf_dstr_shared[label_indx];
+	//e_get_global_address(row, col,&addr);
+	addr_base = get_base_address_core(row,col);
+	//addr = (get_base_address_core(row, col)) | outbuf_dstr_shared[label_indx];
+	addr = (unsigned int*) ((unsigned ) addr_base | (unsigned)outbuf_dstr_shared[label_indx]);
+	//e_get_global_address(row, col,addr);
+	return *addr;
 }
+
+
+unsigned int get_base_address_core(int row, int col){
+	if(row ==0 ){
+		if (col == 0){
+			return 0x80800000;
+		} else if (col ==1){
+			return 0x80900000;
+		}else if (col == 2){
+			return 0x80A00000;
+		}else if (col == 3){
+			return 0x80B00000;
+		}
+	} else if(row ==1 ){
+		if (col == 0){
+			return 0x84800000;
+		} else if (col ==1){
+			return 0x84900000;
+		}else if (col == 2){
+			return 0x84A00000;
+		}else if (col == 3){
+			return 0x84B00000;
+		}
+	} else if(row ==2 ){
+		if (col == 0){
+			return 0x88800000;
+		} else if (col ==1){
+			return 0x88900000;
+		}else if (col == 2){
+			return 0x88A00000;
+		}else if (col == 3){
+			return 0x88B00000;
+		}
+	} else if(row ==3 ){
+		if (col == 0){
+			return 0x8C800000;
+		} else if (col ==1){
+			return 0x8C900000;
+		}else if (col == 2){
+			return 0x8CA00000;
+		}else if (col == 3){
+			return 0x8CB00000;
+		}
+	}
+
+
+}
+
+
+
+
+
 
 
 

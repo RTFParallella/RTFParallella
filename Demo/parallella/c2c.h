@@ -8,6 +8,8 @@
 #endif
 
 
+//#include "c2c.h"
+
 
 /*
 
@@ -21,6 +23,7 @@ void registerForSlot(unsigned slot, QueueHandle_t handler);
 void createReceiver();
 
 */
+#include <stdint.h>
 #define dstr_mem_offset 0x4000
 
 void shared_labels_init_core();
@@ -31,6 +34,7 @@ uint8_t shared_label_write_core	(unsigned row,unsigned col,int label_indx,int pa
 
 unsigned int shared_label_read_core(unsigned row, unsigned col, int label_indx);
 
+unsigned int get_base_address_core(int row, int col);
 
 
 

@@ -10,11 +10,13 @@
 #include "AmaltheaConverter.h"
 #include "taskCode.h"
 #include "shared_comms.h"
+#include "c2c.h"
 //---------------------------------------------
 int main(void) {
 	//initialize output buffer for debug messages
 	outbuf_init();
 	shared_labels_init();
+	shared_labels_init_core();
 	//create Amalthea task objects
 	AmaltheaTask t5ms =  createAmaltheaTask(handler5ms,cIn5ms,cOut5ms,5,5,2);
 	AmaltheaTask t10ms = createAmaltheaTask(handler10ms,cIn10ms,cOut10ms,10,10,3);

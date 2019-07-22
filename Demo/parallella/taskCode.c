@@ -59,7 +59,6 @@ void handler10msCore2(){
 	//shared_label1 = shared_label_to_read;
 	traceRunningTask(0);
 	traceTaskPasses(2,passes4);
-
 }
 
 void handler20msCore2(){
@@ -86,7 +85,7 @@ void cIn20ms(){
 }
 
 void cIn10msCore2(){
-	shared_label_1 = shared_label_read(0);
+	shared_label_1 = shared_label_read_core(1,0,0);
 }
 void cIn20msCore2(){
 
@@ -94,7 +93,7 @@ void cIn20msCore2(){
 
 //-------
 void cOut5ms(){
-	shared_label_write(0,shared_label_2);
+	shared_label_write_core(1,0,0,shared_label_2);
 }
 void cOut10ms(){
 	//shared_label_write(0,2);

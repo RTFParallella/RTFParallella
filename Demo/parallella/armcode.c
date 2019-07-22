@@ -6,6 +6,7 @@
 #include <time.h>   /* Needed for struct timespec */
 #include "debugFlags.h"
 #include "shared_comms.h"
+#include "c2c.h"
 #define READ_PRECISION_US 1000
 
 int nsleep(long miliseconds){
@@ -23,6 +24,9 @@ int nsleep(long miliseconds){
 int main()
 {
 	unsigned int shared_label_to_read[10];
+
+	unsigned int shared_label_core_00[10];
+	unsigned int shared_label_core_10[10];
 	//unsigned int shared_label_to_read1;
 	//shared_label_to_read = (unsigned int *) shared_mem_section;
 	//counters for row and colum, cored id and loop counter
@@ -33,6 +37,7 @@ int main()
 	e_return_stat_t result;
 	unsigned int message[9];
 	unsigned int message2[9];
+
 	//long  message2;
 	int loop;
 	int addr;
@@ -80,7 +85,9 @@ int main()
 		message[3] = 0;
 		//e_write(&emem, 0, 0, (0x0000), (void *) &(shared_label_to_read[0]), sizeof(shared_label_to_read));
 		e_read(&dev,0,0,addr, &message, sizeof(message));
+		e_read(&dev,0,0,dstr_mem_offset, &shared_label_core_00, sizeof(shared_label_core_00));
 		e_read(&dev,1,0,addr, &message2, sizeof(message2));
+		e_read(&dev,1,0,dstr_mem_offset, &shared_label_core_10, sizeof(shared_label_core_10));
 		e_read(&emem,0,0,0x00, &shared_label_to_read, sizeof(shared_label_to_read));
 		if (message[8]!= message2[8] ){
 			//fprintf(stderr,"NIS->");
@@ -91,18 +98,20 @@ int main()
 		//fprintf(stderr, "tick2 %3d||",message2[8]+1);
 		fprintf(stderr,"THC(1,0) %2u||", message2[6]);
 		fprintf(stderr,"L_5ms0->10ms1 %2c||", shared_label_to_read[0]);
-		fprintf(stderr,"L_10ms1->Out %2c||", shared_label_to_read[1]);
+		fprintf(stderr,"L_10ms1->Out %2c||"	, shared_label_to_read[1]);
+		fprintf(stderr,"C_5ms0->10ms1 %2c||", shared_label_core_00[0]);
+		fprintf(stderr,"C_10ms1->Out %2c||"	, shared_label_core_10[0]);
 		if ((message[8]+1)%5 == 0){
-			fprintf(stderr,"<== chainIn");
+			//fprintf(stderr,"<== chainIn");
 			lat1 = message[8];
 		}
 		if (shared_label_to_read[0] != chainLatencyStartIndicator && shared_label_to_read[0]!= 0){
 			chainLatencyStartIndicator = shared_label_to_read[0];
-			fprintf(stderr,"<== T_5ms0_cOut");
+			//fprintf(stderr,"<== T_5ms0_cOut");
 		}
 		if (shared_label_to_read[1] != chainLatencyEndIndicator && shared_label_to_read[1]>1){
 			chainLatencyEndIndicator = shared_label_to_read[1];
-			fprintf(stderr,"<== T_10ms1_cOut %d", message[8]-lat1);
+			//fprintf(stderr,"<== T_10ms1_cOut %d", message[8]-lat1);
 		}
 		fprintf(stderr,"\n");
 		//usleep(READ_PRECISION_US);

@@ -13,6 +13,7 @@
 #include "debugFlags.h"
 #include "ParallellaUtils.h"
 #include "shared_comms.h"
+#include "c2c.h"
 
 //declare taskHandler functions
 
