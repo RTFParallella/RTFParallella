@@ -7,6 +7,10 @@
   typedef C2C_MSG_TYPE c2c_msg_t;
 #endif
 
+
+
+/*
+
 typedef struct{
   c2c_msg_t msg;
   int src;
@@ -16,6 +20,7 @@ void sendMsgTo(c2c_msg_t msg, unsigned row, unsigned col, unsigned slot);
 void registerForSlot(unsigned slot, QueueHandle_t handler);
 void createReceiver();
 
+*/
 #define dstr_mem_offset 0x4000
 
 void shared_labels_init_core();

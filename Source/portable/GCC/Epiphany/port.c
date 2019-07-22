@@ -252,7 +252,7 @@ void vInterruptCentral( void ) {
 	case E_MESSAGE_INT: //message, triggered externally for message transmission
 		//a message received
 		updateDebugFlag(404);
-		irqMsg();
+		//irqMsg();
 		break;
 	case E_MEM_FAULT: // written to read-only memory
 		updateDebugFlag(2222);

@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+echo "Parallella remote Script version 1.0"
+echo "welcome to the world of tomorrow"
+
+#Board connection parameters
+HOST_NAME=172.22.167.10
+HOST_USER=parallella
+PORT=22
+HOST_OFFLOAD_PATH="~/boardExec"
+
+#SSH key file
+KEY=~/.ssh/key
+#path and file name inputs
+DEPOLYMENT_BINARY=${1?Error: no host binary given}
+
+echo "---------------------------------------"
+echo "Running program $HOST_BINARY"
+echo "***************************************"
+#run the binaries remotely on parallella
+ssh $HOST_NAME -p$PORT -l$HOST_USER -i$KEY "EPIPHANY_HOME=/opt/adapteva/esdk && . $EPIPHANY_HOME/setup.sh && cd $HOST_OFFLOAD_PATH && ./$DEPOLYMENT_BINARY"
+echo "***************************************"
+echo "done"

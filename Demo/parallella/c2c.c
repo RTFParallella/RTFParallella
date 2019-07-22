@@ -3,7 +3,9 @@
 #include "queue.h"
 #include "c2c.h"
 #include <e-lib.h>
+//#include <e-hal.h>
 
+/*
 extern int M[5];
 
 
@@ -69,16 +71,14 @@ void sendMsgTo(c2c_msg_t msg, unsigned row, unsigned col, unsigned slot)
     
     
     
-//    int slotsLeft = getSlotsLeft(dst);
-//    if (slotsLeft!=0){
-//      sendToAddress(message.data,*dst+(slotsLeft*sizeof(message));
-//    
-//    }else {
-//      while(slotsLeft==0){
-//        slotsLeft = getSlotsLeft(dst);
-//      }
-//      sendToAddress(message.data,*dst+(slotsLeft*sizeof(message));
-//    }
+    int slotsLeft = getSlotsLeft(dst);
+    if (slotsLeft!=0){
+      sendToAddress(msg.data,*dst+(slotsLeft*sizeof(msg)));
+    }else {
+      while(slotsLeft==0){
+        slotsLeft = getSlotsLeft(dst);
+      }
+    }
     
     
     
@@ -102,11 +102,12 @@ void registerForSlot(unsigned slot, QueueHandle_t handler) {
 void createReceiver() {
     setupInterrupt();
 }
+*/
 
 
 
 unsigned int *outbuf_dstr_shared[10];
-
+//e_mem_t emem_dst[16];
 int core_write_mutex=0;
 
 void shared_labels_init_core(){
@@ -122,10 +123,14 @@ void shared_labels_init_core(){
 	outbuf_dstr_shared[8] = outbuf_dstr_shared[7] + 1;
 	//initialize buffer
 	int i;
-	//timer1init();
 	for (i=0;i<9;i++){
 		*outbuf_dstr_shared[i] =0;
 	}
+	//define distributed memory section in Epi range
+	//e_alloc(&emem[1], dstr_mem_offset , sizeof(outbuf_dstr_shared));
+
+
+
 }
 
 void core_shared_space_inti(){
@@ -134,13 +139,14 @@ void core_shared_space_inti(){
 }
 
 uint8_t shared_label_write_core	(unsigned row,unsigned col,int label_indx,int payload){
-	uint8_t retval=NULL;
+	//uint8_t retval=NULL;
 	//*outbuf_dstr_shared[label_indx] = payload;
-
+	unsigned int buf = 0;
+	//e_write()
 }
 
 unsigned int shared_label_read_core (unsigned row, unsigned col, int label_indx){
-
+	return *outbuf_dstr_shared[label_indx];
 }
 
 

@@ -7,9 +7,6 @@
 
 #include "taskCode.h"
 
-
-
-
 /* define global variables to be
  * accessed through a specific task (context)
  */
@@ -79,7 +76,7 @@ void handler20msCore2(){
 
 //-------
 void cIn5ms(){
-	//shared_label_2 = shared_label_read(0);
+	shared_label_2 = 97 + passes1;
 }
 void cIn10ms(){
 
@@ -90,7 +87,6 @@ void cIn20ms(){
 
 void cIn10msCore2(){
 	shared_label_1 = shared_label_read(0);
-
 }
 void cIn20msCore2(){
 
@@ -98,9 +94,7 @@ void cIn20msCore2(){
 
 //-------
 void cOut5ms(){
-	uint8_t x;
-	shared_label_2++;
-	x = shared_label_write(0,shared_label_2);
+	shared_label_write(0,shared_label_2);
 }
 void cOut10ms(){
 	//shared_label_write(0,2);
@@ -110,8 +104,7 @@ void cOut20ms(){
 }
 void cOut10msCore2(){
 	shared_label_1++;
-	uint8_t x;
-	x = shared_label_write(1,shared_label_1);
+	shared_label_write(1,shared_label_1);
 }
 void cOut20msCore2(){
 

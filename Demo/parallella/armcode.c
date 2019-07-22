@@ -72,29 +72,41 @@ int main()
 	int prevpollLoopCounter = 0;
 	unsigned int chainLatencyEndIndicator = 0;
 	unsigned int chainLatencyStartIndicator = 10e6;
+	unsigned int lat1 = 0;
+	int label_to_feed_in = 97;
 	for (pollLoopCounter=0;pollLoopCounter<=40;pollLoopCounter++){
+		//label_to_feed_in++;
+		//shared_label_to_read[9] = label_to_feed_in;
 		message[3] = 0;
+		//e_write(&emem, 0, 0, (0x0000), (void *) &(shared_label_to_read[0]), sizeof(shared_label_to_read));
 		e_read(&dev,0,0,addr, &message, sizeof(message));
 		e_read(&dev,1,0,addr, &message2, sizeof(message2));
 		e_read(&emem,0,0,0x00, &shared_label_to_read, sizeof(shared_label_to_read));
+		if (message[8]!= message2[8] ){
+			//fprintf(stderr,"NIS->");
+		}
 		taskMessage = message[6];
-		fprintf(stderr, "tick1 %3d||",message[8]+1);
-		fprintf(stderr,"task holding core1 %2u||", message[6]);
-		fprintf(stderr, "tick2 %3d||",message2[8]+1);
-		fprintf(stderr,"task holding core2 %2u||", message2[6]);
-		fprintf(stderr,"shared label %2c||", shared_label_to_read[0]);
-		fprintf(stderr,"shared label1 %2c||", shared_label_to_read[1]);
-		if (shared_label_to_read[0] != chainLatencyStartIndicator){
+		fprintf(stderr, "tick %3d||",message[8]+1);
+		fprintf(stderr,"THC(0,0) %2u||", message[6]);
+		//fprintf(stderr, "tick2 %3d||",message2[8]+1);
+		fprintf(stderr,"THC(1,0) %2u||", message2[6]);
+		fprintf(stderr,"L_5ms0->10ms1 %2c||", shared_label_to_read[0]);
+		fprintf(stderr,"L_10ms1->Out %2c||", shared_label_to_read[1]);
+		if ((message[8]+1)%5 == 0){
+			fprintf(stderr,"<== chainIn");
+			lat1 = message[8];
+		}
+		if (shared_label_to_read[0] != chainLatencyStartIndicator && shared_label_to_read[0]!= 0){
 			chainLatencyStartIndicator = shared_label_to_read[0];
-			fprintf(stderr,"<== chain start");
+			fprintf(stderr,"<== T_5ms0_cOut");
 		}
 		if (shared_label_to_read[1] != chainLatencyEndIndicator && shared_label_to_read[1]>1){
 			chainLatencyEndIndicator = shared_label_to_read[1];
-			fprintf(stderr,"<== chain end");
+			fprintf(stderr,"<== T_10ms1_cOut %d", message[8]-lat1);
 		}
 		fprintf(stderr,"\n");
-		usleep(READ_PRECISION_US);
-		//nsleep(1);
+		//usleep(READ_PRECISION_US);
+		nsleep(1);
 	}
 	fprintf(stderr,"----------------------------------------------\n");
 	e_close(&dev);
