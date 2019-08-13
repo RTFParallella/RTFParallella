@@ -11,6 +11,9 @@
 #include "debugFlags.h"
 #include "FreeRTOS.h"
 #include "task.h"
+#include <stdarg.h>
+
+
 
 
 AmaltheaTask createAmaltheaTask(void *taskHandler,void *cInHandler,void *cOutHandler,unsigned int period,unsigned int deadline, unsigned int WCET){
@@ -24,12 +27,26 @@ AmaltheaTask createAmaltheaTask(void *taskHandler,void *cInHandler,void *cOutHan
 }
 
 unsigned int calculateStackSize(int labelBitCount, int labelCount){
-	return 20 + ((labelBitCount*labelBitCount)/PLATFORM_WORD_LENGTH);
+	return ((labelBitCount*labelCount)/PLATFORM_WORD_LENGTH);
+}
+
+void createRTOSTask(AmaltheaTask* task, int priority, int label_size, int labelCount){
+	//task.period;
+	/*int priority;
+	if (task->period==5){
+		priority = 3;
+	}else if (task->period==10){
+		priority = 2;
+	}else {
+		priority = 1;
+	}*/
+	int stack_size = calculateStackSize(label_size,labelCount)+ configMINIMAL_STACK_SIZE;
+	xTaskCreate(generalizedRTOSTak	,"Task"	,stack_size,	&(*task)	,priority,NULL);
 }
 
 
 #ifdef use_LET_COMM_SEMANTICS
-void generalizedRTOSTak(AmaltheaTask task){
+void generalizedRTOSTak(AmaltheaTask *task){
 	TickType_t xLastWakeTime = xTaskGetTickCount();
 	//task.cInHandler();
 	for (;;){

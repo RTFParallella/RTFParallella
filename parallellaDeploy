@@ -9,7 +9,7 @@ PORT=22
 HOST_OFFLOAD_PATH="~/boardExec"
 
 #SSH key file
-KEY=~/.ssh/key
+KEY=~/.ssh/id_rsa
 #path and file name inputs
 DEPOLYMENT_BINARY=${1?Error: no host binary given}
 

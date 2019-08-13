@@ -10,6 +10,8 @@
 
 #define PLATFORM_WORD_LENGTH 32
 
+#define numTasks 3
+
 //task typedef
 typedef struct{
 	unsigned isDone;
@@ -28,7 +30,7 @@ typedef struct{
 
 AmaltheaTask createAmaltheaTask(void *taskHandler,void *cInHandler,void *cOutHandler,unsigned int period,unsigned int deadline, unsigned int WCET);
 
-//void createRTOSTask(AmaltheaTask *task);
+void createRTOSTask(AmaltheaTask* task, int priority, int label_size, int labelCount);
 
 unsigned int calculateStackSize(int labelBitCount, int labelCount);
 
