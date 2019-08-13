@@ -19,7 +19,9 @@ int passes5 = 0;
 
 //extern unsigned int shared_label1;
 
+int label5_10_00;
 
+int label5_10_00_copy1;
 
 int shared_label_1;
 int shared_label_2 = 97;
@@ -27,6 +29,7 @@ int shared_label_2 = 97;
 //define tasks and copy operations here
 //-------
 void handler5ms(){
+	int localLabel;
 	updateDebugFlag(700);
 	sleepTimerMs(2,1);
 	passes1++;
@@ -75,6 +78,7 @@ void handler20msCore2(){
 
 //-------
 void cIn5ms(){
+	label5_10_00_copy1 = label5_10_00;
 	shared_label_2 = 97 + passes1;
 }
 void cIn10ms(){
@@ -93,6 +97,7 @@ void cIn20msCore2(){
 
 //-------
 void cOut5ms(){
+	label5_10_00 = label5_10_00_copy1;
 	shared_label_write_core(1,0,0,shared_label_2);
 }
 void cOut10ms(){

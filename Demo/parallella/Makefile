@@ -1,6 +1,6 @@
 EPIPHANY_HOME=/opt/adapteva/esdk
 #host compiler path
-LCC=/opt/linaro/gcc-linaro-7.2.1-2017.11-x86_64_arm-linux-gnueabihf/bin/arm-linux-gnueabihf-gcc
+LCC=/opt/gcc-linaro-7.2.1-2017.11-x86_64_arm-linux-gnueabihf/bin/arm-linux-gnueabihf-gcc
 #device compiler path
 CC=e-gcc
 #FreeRTOS dependencies

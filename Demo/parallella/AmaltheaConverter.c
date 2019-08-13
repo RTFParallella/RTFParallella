@@ -12,6 +12,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
+
 AmaltheaTask createAmaltheaTask(void *taskHandler,void *cInHandler,void *cOutHandler,unsigned int period,unsigned int deadline, unsigned int WCET){
 	if (WCET >= period){
 		AmaltheaTask retValNull = {0,0,NULL,0,0,0,NULL,NULL};
@@ -20,6 +21,10 @@ AmaltheaTask createAmaltheaTask(void *taskHandler,void *cInHandler,void *cOutHan
 		AmaltheaTask retVal = {0,0,taskHandler,WCET,deadline,period,cInHandler,cOutHandler};
 		return retVal;
 	}
+}
+
+unsigned int calculateStackSize(int labelBitCount, int labelCount){
+	return 20 + ((labelBitCount*labelBitCount)/PLATFORM_WORD_LENGTH);
 }
 
 

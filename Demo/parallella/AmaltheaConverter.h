@@ -8,6 +8,8 @@
 #ifndef DEMO_PARALLELLA_AMALTHEACONVERTER_H_
 #define DEMO_PARALLELLA_AMALTHEACONVERTER_H_
 
+#define PLATFORM_WORD_LENGTH 32
+
 //task typedef
 typedef struct{
 	unsigned isDone;
@@ -27,6 +29,8 @@ typedef struct{
 AmaltheaTask createAmaltheaTask(void *taskHandler,void *cInHandler,void *cOutHandler,unsigned int period,unsigned int deadline, unsigned int WCET);
 
 //void createRTOSTask(AmaltheaTask *task);
+
+unsigned int calculateStackSize(int labelBitCount, int labelCount);
 
 void generalizedRTOSTak(AmaltheaTask task);
 

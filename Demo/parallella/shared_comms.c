@@ -27,6 +27,12 @@ void shared_labels_init(){
 	}
 }
 
+/*void shared_labels_init_multi(){
+
+}*/
+
+
+
 uint8_t shared_label_write(int label_indx,int payload){
 	uint8_t retval=NULL;
 	*outbuf_shared[label_indx] = payload;
