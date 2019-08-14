@@ -32,9 +32,9 @@ int main(void) {
 		}
 	}*/
 	//create RTOS task from templates
-	createRTOSTask(&t5ms,3,16,10);
-	createRTOSTask(&t10ms,2,16,10);
-	createRTOSTask(&t20ms,1,16,10);
+	createRTOSTask(&t5ms,3,2,16,10,8,10);
+	createRTOSTask(&t10ms,2,2,16,10,8,10);
+	createRTOSTask(&t20ms,1,2,16,10,8,10);
 
 	/*xTaskCreate(generalizedRTOSTak	,"t5ms"	,configMINIMAL_STACK_SIZE,	&t5ms	,3,NULL);
 	xTaskCreate(generalizedRTOSTak	,"t10ms",configMINIMAL_STACK_SIZE,	&t10ms	,2,NULL);

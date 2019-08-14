@@ -30,23 +30,21 @@ unsigned int calculateStackSize(int labelBitCount, int labelCount){
 	return ((labelBitCount*labelCount)/PLATFORM_WORD_LENGTH);
 }
 
-void createRTOSTask(AmaltheaTask* task, int priority, int label_size, int labelCount){
-	//task.period;
-	/*int priority;
-	if (task->period==5){
-		priority = 3;
-	}else if (task->period==10){
-		priority = 2;
-	}else {
-		priority = 1;
-	}*/
-	int stack_size = calculateStackSize(label_size,labelCount)+ configMINIMAL_STACK_SIZE;
+void createRTOSTask(AmaltheaTask* task, int priority, int argCount, ...){
+	//cycle through the stack arguments and add the needed numbers to the stack
+	int stack_size = 0;
+	for (int i=3;i<=argCount+2;i+=2){
+		stack_size = calculateStackSize(i,i+1);
+	}
+	//make sure the stack size is at least big enough to run the task.
+	stack_size += configMINIMAL_STACK_SIZE;
+	//create the RTOS task with the generalized form
 	xTaskCreate(generalizedRTOSTak	,"Task"	,stack_size,	&(*task)	,priority,NULL);
 }
 
 
 #ifdef use_LET_COMM_SEMANTICS
-void generalizedRTOSTak(AmaltheaTask *task){
+void generalizedRTOSTak(AmaltheaTask task){
 	TickType_t xLastWakeTime = xTaskGetTickCount();
 	//task.cInHandler();
 	for (;;){
