@@ -95,7 +95,7 @@ int main()
 		taskMessage = message[6];
 		fprintf(stderr, "tick %3d||",message[8]+1);
 		fprintf(stderr,"THC(0,0) %2u||", message[6]);
-		//fprintf(stderr, "tick2 %3d||",message2[8]+1);
+		fprintf(stderr, "tick2 %3d||",message2[8]+1);
 		fprintf(stderr,"THC(1,0) %2u||", message2[6]);
 		fprintf(stderr,"L_5ms0->10ms1 %2c||", shared_label_to_read[0]);
 		fprintf(stderr,"L_10ms1->Out %2c||"	, shared_label_to_read[1]);

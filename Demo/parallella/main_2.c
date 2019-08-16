@@ -23,8 +23,10 @@ int main(void) {
 	AmaltheaTask t40ms = createAmaltheaTask(handler20msCore2,cIn20msCore2,cOut20msCore2,20,20,10);
 	//create RTOS task from templates
 	//xTaskCreate(generalizedRTOSTak	,"t5ms"	,configMINIMAL_STACK_SIZE,	&t5ms	,3,NULL);
-	xTaskCreate(generalizedRTOSTak	,"t21ms",configMINIMAL_STACK_SIZE,	&t20ms	,3,NULL);
-	xTaskCreate(generalizedRTOSTak	,"t41ms",configMINIMAL_STACK_SIZE,	&t40ms	,2,NULL);
+	createRTOSTask(&t20ms,2,0);
+	createRTOSTask(&t40ms,1,0);
+	/*xTaskCreate(generalizedRTOSTak	,"t21ms",configMINIMAL_STACK_SIZE,	&t20ms	,3,NULL);
+	xTaskCreate(generalizedRTOSTak	,"t41ms",configMINIMAL_STACK_SIZE,	&t40ms	,2,NULL);*/
 	vTaskStartScheduler();
 	return EXIT_SUCCESS;
 }

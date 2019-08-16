@@ -39,7 +39,7 @@ void createRTOSTask(AmaltheaTask* task, int priority, int argCount, ...){
 	//make sure the stack size is at least big enough to run the task.
 	stack_size += configMINIMAL_STACK_SIZE;
 	//create the RTOS task with the generalized form
-	xTaskCreate(generalizedRTOSTak	,"Task"	,stack_size,	&(*task)	,priority,NULL);
+	xTaskCreate(generalizedRTOSTak	,"Task"	,configMINIMAL_STACK_SIZE/*stack_size*/,	&(*task)	,priority,NULL);
 }
 
 
