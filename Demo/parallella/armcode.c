@@ -69,6 +69,16 @@ int main()
 		fprintf(stderr,"Error Loading the Epiphany Application 1 %i\n", result);
 	}
 	e_start_group(&dev);
+	fprintf(stderr,"Legend: \n");
+	fprintf(stderr,"--------\n");
+	fprintf(stderr," Tick				 -> RTOS tick \n");
+	fprintf(stderr," THC 				 -> Task Holding Core(row, column) \n");
+	fprintf(stderr," L 					 -> Local core memory \n");
+	fprintf(stderr," F 					 -> Foreign memory (DRAM) \n");
+	fprintf(stderr,"(L,row,column,indx)  -> Label of index _indx_ on Local core memory(row, column) \n");
+	fprintf(stderr,"----------------------------------------------\n");
+
+
 	fprintf(stderr,"RFTP demo started \n");
 	addr = cnt_address;
 	int pollLoopCounter = 0;
@@ -79,29 +89,60 @@ int main()
 	unsigned int chainLatencyStartIndicator = 10e6;
 	unsigned int lat1 = 0;
 	int label_to_feed_in = 97;
+	fprintf(stderr,"===========================================================================\n");
+	fprintf(stderr,"tick||THC(row,col)||THC(row,col)||(L,row,col,indx) ||(F,indx) ||(F,indx) ||\n");
+	//fprintf(stderr,"tick||THC(row,col)||THC(row,col)||(L,row,col,indx) ||(F,indx)  	||(F,indx)   ||\n");
+	fprintf(stderr,"===========================================================================\n");
+	int prev1,prev2,prev3;
 	for (pollLoopCounter=0;pollLoopCounter<=40;pollLoopCounter++){
 		//label_to_feed_in++;
 		//shared_label_to_read[9] = label_to_feed_in;
 		message[3] = 0;
 		//e_write(&emem, 0, 0, (0x0000), (void *) &(shared_label_to_read[0]), sizeof(shared_label_to_read));
 		e_read(&dev,0,0,addr, &message, sizeof(message));
-		e_read(&dev,0,0,dstr_mem_offset, &shared_label_core_00, sizeof(shared_label_core_00));
+		e_read(&dev,0,0,dstr_mem_offset_sec_1, &shared_label_core_00, sizeof(shared_label_core_00));
 		e_read(&dev,1,0,addr, &message2, sizeof(message2));
-		e_read(&dev,1,0,dstr_mem_offset, &shared_label_core_10, sizeof(shared_label_core_10));
+		e_read(&dev,1,0,dstr_mem_offset_sec_1, &shared_label_core_10, sizeof(shared_label_core_10));
 		e_read(&emem,0,0,0x00, &shared_label_to_read, sizeof(shared_label_to_read));
 		if (message[8]!= message2[8] ){
 			//fprintf(stderr,"NIS->");
 		}
+		//||(L,1,0,0)-> %3d  ||(F,0)-> %3d||(F,0)-> %3d||\n
+		//fprintf(stderr,"tick||THC(row,col)||THC(row,col)||(L,row,col,indx) ||(F,indx)  	||(F,indx)   ||\n");
+/*
+		fprintf(stderr,"%3d ||(0,0) %2d   ||(0,1) %2d   ",
+				message[8]+1,message[6],message2[6]);
+*/
 		taskMessage = message[6];
-		fprintf(stderr, "tick %3d||",message[8]+1);
-		fprintf(stderr,"THC(0,0) %2u||", message[6]);
-		fprintf(stderr, "tick2 %3d||",message2[8]+1);
-		fprintf(stderr,"THC(1,0) %2u||", message2[6]);
-		fprintf(stderr,"L_5ms0->10ms1 %2c||", shared_label_to_read[0]);
-		fprintf(stderr,"L_10ms1->Out %2c||"	, shared_label_to_read[1]);
-		fprintf(stderr,"C_5ms0->10ms1 %2c||", shared_label_core_00[0]);
-		fprintf(stderr,"C_10ms1->Out %2c||"	, shared_label_core_10[0]);
-		if ((message[8]+1)%5 == 0){
+		fprintf(stderr, "T%3d||",message[8]+1);
+		fprintf(stderr,"\t (0,0) %3u||", message[6]);
+		//fprintf(stderr, "tick2 %3d||",message2[8]+1);
+		fprintf(stderr,"   (1,0) %3u||", message2[6]);
+		//fprintf(stderr,"(1,0) %2u||", message2[6]);
+		//fprintf(stderr,"(L,0,0,0)->%2c||", shared_label_core_00[0]);
+		if (shared_label_core_10[0] != prev1){
+			fprintf(stderr,"(L,1,0,0)-> %3d  ||", shared_label_core_10[0]);
+			prev1 = shared_label_core_10[0];
+
+		}else {
+			fprintf(stderr,"(L,1,0,0)-> ---  ||");
+		}
+
+		if (shared_label_to_read[0]!=prev2){
+			fprintf(stderr,"(F,0) %3d||", shared_label_to_read[0]);
+			prev2 = shared_label_to_read[0];
+		}else {
+			fprintf(stderr,"(F,0) ---||");
+		}
+
+		if (shared_label_to_read[1] != prev3){
+			fprintf(stderr,"(F,1) %3d||", shared_label_to_read[1]);
+			prev3 = shared_label_to_read[1];
+		}else {
+			fprintf(stderr,"(F,1) ---||");
+		}
+
+		/*if ((message[8]+1)%5 == 0){
 			//fprintf(stderr,"<== chainIn");
 			lat1 = message[8];
 		}
@@ -112,7 +153,7 @@ int main()
 		if (shared_label_to_read[1] != chainLatencyEndIndicator && shared_label_to_read[1]>1){
 			chainLatencyEndIndicator = shared_label_to_read[1];
 			//fprintf(stderr,"<== T_10ms1_cOut %d", message[8]-lat1);
-		}
+		}*/
 		fprintf(stderr,"\n");
 		//usleep(READ_PRECISION_US);
 		nsleep(1);
