@@ -17,6 +17,8 @@
 
 #define shared_mem_section_2	0x01001000
 
+#define shared_mem_section1_label_count 10
+
 
 
 

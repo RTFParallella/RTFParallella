@@ -26,11 +26,9 @@ run: armcode main.elf main_2.elf
 %.elf: $(ELDF) tasks.o queue.o list.o port.o portasm.o heap_1.o c2c.o debugFlags.o AmaltheaConverter.o taskCode.o ParallellaUtils.o shared_comms.o %.o
 	$(CC) -g -T$< -Wl,--gc-sections -o $@ $(filter-out $<,$^) -le-lib
 
-
-
 #host target
-armcode: armcode.c $(DEPS)
-	$(LCC) $< -o $@  -I ${EINCS} -L ${ELIBS} -lpal -le-hal -le-loader -lpthread
+armcode: armcode.c $(DEPS) 
+	$(LCC) $< -o $@  -I ${EINCS} -L ${ELIBS} -lpal -le-hal -le-loader -lpthread 
 #clean target
 clean:
 	rm -f *.o *.srec *.elf armcode

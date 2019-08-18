@@ -7,7 +7,7 @@
 
 #include "shared_comms.h"
 
-unsigned int *outbuf_shared[10];
+unsigned int *outbuf_shared[shared_mem_section1_label_count];
 
 void shared_labels_init(){
 	outbuf_shared[0] = (unsigned int *) shared_mem_section;
@@ -22,7 +22,7 @@ void shared_labels_init(){
 	//initialize buffer
 	int i;
 	//timer1init();
-	for (i=0;i<9;i++){
+	for (i=0;i<shared_mem_section1_label_count;i++){
 		*outbuf_shared[i] =0;
 	}
 }
