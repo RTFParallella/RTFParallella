@@ -1,5 +1,18 @@
+/*******************************************************************************
+ *  * Copyright (c) 2019 Dortmund University of Applied Sciences and Arts and others.
+ *  * 
+ *  * This program and the accompanying materials are made
+ *  * available under the terms of the Eclipse Public License 2.0
+ *  * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *  * 
+ *  * SPDX-License-Identifier: EPL-2.0
+ *  * 
+ *  * Contributors:
+ *  *     Dortmund University of Applied Sciences and Arts - initial API and implementation
+ *******************************************************************************/
 
-#include  "c2c.h"
+#include "c2c.h"
+
 #include "e-lib.h"
 
 dstr_mem_sec_1_label_type *outbuf_dstr_shared[10];
@@ -28,11 +41,6 @@ void shared_labels_init_core(){
 	/*int emem;
 	//define distributed memory section in Epi range
 	e_alloc(&emem[1], dstr_mem_offset_sec_1 , sizeof(outbuf_dstr_shared));*/
-
-}
-
-void core_shared_space_inti(){
-
 
 }
 

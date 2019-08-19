@@ -1,12 +1,18 @@
-/*
- * debugFlags.h
- *
- *  Created on: Jun 21, 2019
- *      Author: bigm
- */
+/*******************************************************************************
+ *  * Copyright (c) 2019 Dortmund University of Applied Sciences and Arts and others.
+ *  * 
+ *  * This program and the accompanying materials are made
+ *  * available under the terms of the Eclipse Public License 2.0
+ *  * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *  * 
+ *  * SPDX-License-Identifier: EPL-2.0
+ *  * 
+ *  * Contributors:
+ *  *     Dortmund University of Applied Sciences and Arts - initial API and implementation
+ *******************************************************************************/
 
-#ifndef DEMO_PARALLELLA_DEBUGFLAGS_H_
-#define DEMO_PARALLELLA_DEBUGFLAGS_H_
+#ifndef SRC_PARALLELLA_DEBUGFLAGS_H_
+#define SRC_PARALLELLA_DEBUGFLAGS_H_
 
 #define cnt_address 	0x3000
 
@@ -30,4 +36,4 @@ void updateTick(void);
 void updateDebugFlag(int debugMessage);
 
 
-#endif /* DEMO_PARALLELLA_DEBUGFLAGS_H_ */
+#endif /* SRC_PARALLELLA_DEBUGFLAGS_H_ */

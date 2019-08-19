@@ -1,28 +1,19 @@
+/*******************************************************************************
+ *  * Copyright (c) 2019 Dortmund University of Applied Sciences and Arts and others.
+ *  * 
+ *  * This program and the accompanying materials are made
+ *  * available under the terms of the Eclipse Public License 2.0
+ *  * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *  * 
+ *  * SPDX-License-Identifier: EPL-2.0
+ *  * 
+ *  * Contributors:
+ *  *     Dortmund University of Applied Sciences and Arts - initial API and implementation
+ *******************************************************************************/
 #ifndef C2C_H
 #define C2C_H
 
-#ifndef C2C_MSG_TYPE
-  typedef int c2c_msg_t;
-#else
-  typedef C2C_MSG_TYPE c2c_msg_t;
-#endif
 
-
-//#include "c2c.h"
-
-
-/*
-
-typedef struct{
-  c2c_msg_t msg;
-  int src;
-} c2c_payload;
-
-void sendMsgTo(c2c_msg_t msg, unsigned row, unsigned col, unsigned slot);
-void registerForSlot(unsigned slot, QueueHandle_t handler);
-void createReceiver();
-
-*/
 #include <stdint.h>
 #define dstr_mem_offset_sec_1 			0x4000
 #define dstr_mem_sec_1_label_count		10

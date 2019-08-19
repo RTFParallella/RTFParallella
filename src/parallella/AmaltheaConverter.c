@@ -1,17 +1,23 @@
-/*
- * AmaltheaConverter.c
- *
- *  Created on: Jun 23, 2019
- *      Author: bigm
- */
+/*******************************************************************************
+ *  * Copyright (c) 2019 Dortmund University of Applied Sciences and Arts and others.
+ *  * 
+ *  * This program and the accompanying materials are made
+ *  * available under the terms of the Eclipse Public License 2.0
+ *  * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *  * 
+ *  * SPDX-License-Identifier: EPL-2.0
+ *  * 
+ *  * Contributors:
+ *  *     Dortmund University of Applied Sciences and Arts - initial API and implementation
+ *******************************************************************************/
 
 
 #include "AmaltheaConverter.h"
 
-#include "debugFlags.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include <stdarg.h>
+#include "debugFlags.h"
 
 
 
@@ -39,12 +45,12 @@ void createRTOSTask(AmaltheaTask* task, int priority, int argCount, ...){
 	//make sure the stack size is at least big enough to run the task.
 	stack_size += configMINIMAL_STACK_SIZE;
 	//create the RTOS task with the generalized form
-	xTaskCreate(generalizedRTOSTak	,"Task"	,configMINIMAL_STACK_SIZE/*stack_size*/,	&(*task)	,priority,NULL);
+	xTaskCreate(generalizedRTOSTask	,"Task"	,configMINIMAL_STACK_SIZE/*stack_size*/,	&(*task)	,priority,NULL);
 }
 
 
 #ifdef use_LET_COMM_SEMANTICS
-void generalizedRTOSTak(AmaltheaTask task){
+void generalizedRTOSTask(AmaltheaTask task){
 	TickType_t xLastWakeTime = xTaskGetTickCount();
 	//task.cInHandler();
 	for (;;){
@@ -57,7 +63,7 @@ void generalizedRTOSTak(AmaltheaTask task){
 }
 #else
 
-void generalizedRTOSTak(AmaltheaTask task){
+void generalizedRTOSTask(AmaltheaTask task){
 	TickType_t xLastWakeTime = xTaskGetTickCount();
 	//task.cInHandler();
 	for (;;){

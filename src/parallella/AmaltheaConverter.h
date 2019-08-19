@@ -1,3 +1,15 @@
+/*******************************************************************************
+ *  * Copyright (c) 2019 Dortmund University of Applied Sciences and Arts and others.
+ *  * 
+ *  * This program and the accompanying materials are made
+ *  * available under the terms of the Eclipse Public License 2.0
+ *  * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *  * 
+ *  * SPDX-License-Identifier: EPL-2.0
+ *  * 
+ *  * Contributors:
+ *  *     Dortmund University of Applied Sciences and Arts - initial API and implementation
+ *******************************************************************************/
 /*
  * AmaltheaConverter.h
  *
@@ -5,8 +17,8 @@
  *      Author: bigm
  */
 
-#ifndef DEMO_PARALLELLA_AMALTHEACONVERTER_H_
-#define DEMO_PARALLELLA_AMALTHEACONVERTER_H_
+#ifndef SRC_PARALLELLA_AMALTHEACONVERTER_H_
+#define SRC_PARALLELLA_AMALTHEACONVERTER_H_
 
 #define PLATFORM_WORD_LENGTH 32
 
@@ -29,7 +41,8 @@ typedef struct{
 //#define use_LET_COMM_SEMANTICS
 
 AmaltheaTask createAmaltheaTask(void *taskHandler,void *cInHandler,void *cOutHandler,unsigned int period,unsigned int deadline, unsigned int WCET);
-/*
+
+/**
  *	Create the RTOS task that represents a given Amalthea task.
  *	This function can have multiple arguments for all label types used by the task and the number of labels of each type.
  *
@@ -42,10 +55,9 @@ AmaltheaTask createAmaltheaTask(void *taskHandler,void *cInHandler,void *cOutHan
  *
  *
  */
-
 void createRTOSTask(AmaltheaTask* task, int priority, int argCount, ...);
 
-/*
+/**
  * This function returns the additional stack size (in words) needed for the task to andle its labels
  *
  * Arguments:
@@ -54,7 +66,10 @@ void createRTOSTask(AmaltheaTask* task, int priority, int argCount, ...);
  */
 unsigned int calculateStackSize(int labelBitCount, int labelCount);
 
-void generalizedRTOSTak(AmaltheaTask task);
+/**
+ *
+ */
+void generalizedRTOSTask(AmaltheaTask task);
 
 
-#endif /* DEMO_PARALLELLA_AMALTHEACONVERTER_H_ */
+#endif /* SRC_PARALLELLA_AMALTHEACONVERTER_H_ */

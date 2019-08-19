@@ -1,13 +1,26 @@
+/*******************************************************************************
+ *  * Copyright (c) 2019 Dortmund University of Applied Sciences and Arts and others.
+ *  * 
+ *  * This program and the accompanying materials are made
+ *  * available under the terms of the Eclipse Public License 2.0
+ *  * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *  * 
+ *  * SPDX-License-Identifier: EPL-2.0
+ *  * 
+ *  * Contributors:
+ *  *     Dortmund University of Applied Sciences and Arts - initial API and implementation
+ *******************************************************************************/
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 #include <e-hal.h> //hardware abstraction library
 #include <time.h>   /* Needed for struct timespec */
+
+#include "c2c.h"
 #include "debugFlags.h"
 #include "shared_comms.h"
-#include "c2c.h"
-//#include "host_visual_utils.h"
+
 #define READ_PRECISION_US 1000
 
 typedef struct{
@@ -98,36 +111,6 @@ unsigned get_user_input_DRAM(unsigned indices[]){
 	return label_num;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 int nsleep(long miliseconds){
    struct timespec req, rem;
    if(miliseconds > 999){
@@ -161,7 +144,7 @@ int main()
 	array_init(index_array2,dstr_mem_sec_1_label_count);
 	array_init(index_array2_prv_val,dstr_mem_sec_1_label_count);
 	LabelVisual core2 = get_user_input(index_array2);
-
+	//steup visualization for shared memeory
 	unsigned index_array_DRAM[shared_mem_section1_label_count];
 	unsigned index_array_prv_DRAM[shared_mem_section1_label_count];
 	array_init(index_array_DRAM,shared_mem_section1_label_count);
@@ -240,7 +223,6 @@ int main()
 	int prev1,prev2,prev3;
 	for (pollLoopCounter=0;pollLoopCounter<=40;pollLoopCounter++){
 		message[3] = 0;
-		//e_write(&emem, 0, 0, (0x0000), (void *) &(shared_label_to_read[0]), sizeof(shared_label_to_read));
 		e_read(&dev,0,0,addr, &message, sizeof(message));
 		e_read(&dev,0,0,dstr_mem_offset_sec_1, &shared_label_core_00, sizeof(shared_label_core_00));
 		e_read(&dev,1,0,addr, &message2, sizeof(message2));
@@ -249,13 +231,6 @@ int main()
 		if (message[8]!= message2[8] ){
 			//fprintf(stderr,"NIS->");
 		}
-		//||(L,1,0,0)-> %3d  ||(F,0)-> %3d||(F,0)-> %3d||\n
-		//fprintf(stderr,"tick||THC(row,col)||THC(row,col)||(L,row,col,indx) ||(F,indx)  	||(F,indx)   ||\n");
-/*
-		fprintf(stderr,"%3d ||(0,0) %2d   ||(0,1) %2d   ",
-				message[8]+1,message[6],message2[6]);
-*/
-		taskMessage = message[6];
 		fprintf(stderr, "%4d |",message[8]+1);
 		fprintf(stderr,"   %4u   |", message[6]);
 		fprintf(stderr,"   %4u   |", message2[6]);

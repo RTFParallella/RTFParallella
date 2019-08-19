@@ -1,16 +1,29 @@
+/*******************************************************************************
+ *  * Copyright (c) 2019 Dortmund University of Applied Sciences and Arts and others.
+ *  * 
+ *  * This program and the accompanying materials are made
+ *  * available under the terms of the Eclipse Public License 2.0
+ *  * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *  * 
+ *  * SPDX-License-Identifier: EPL-2.0
+ *  * 
+ *  * Contributors:
+ *  *     Dortmund University of Applied Sciences and Arts - initial API and implementation
+ *******************************************************************************/
 //epiphany imports
 #include <stdlib.h>
+
+#include "AmaltheaConverter.h"
+#include "c2c.h"
+#include "debugFlags.h"
+#include "shared_comms.h"
+#include "taskCode.h"
 #include "e_lib.h"
 //freeRTOS imports
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
 //utility imports
-#include "debugFlags.h"
-#include "AmaltheaConverter.h"
-#include "taskCode.h"
-#include "shared_comms.h"
-#include "c2c.h"
 
 //---------------------------------------------
 int main(void) {
@@ -22,23 +35,11 @@ int main(void) {
 	AmaltheaTask t5ms =  createAmaltheaTask(handler5ms,cIn5ms,cOut5ms,5,5,2);
 	AmaltheaTask t10ms = createAmaltheaTask(handler10ms,cIn10ms,cOut10ms,10,10,3);
 	AmaltheaTask t20ms = createAmaltheaTask(handler20ms,cIn20ms,cOut20ms,20,20,5);
-	AmaltheaTask taskList[] = {t5ms,t10ms,t20ms};
-	/*int priorities[numTasks];
-	int min = 100;
-	int minIndx;
-	for (int i=0;i<numTasks;i++){
-		if (taskList[i].period<min){
-			minIndx = i;
-		}
-	}*/
 	//create RTOS task from templates
 	createRTOSTask(&t5ms,3,0);
 	createRTOSTask(&t10ms,2,0);
 	createRTOSTask(&t20ms,1,0);
-
-	/*xTaskCreate(generalizedRTOSTak	,"t5ms"	,configMINIMAL_STACK_SIZE,	&t5ms	,3,NULL);
-	xTaskCreate(generalizedRTOSTak	,"t10ms",configMINIMAL_STACK_SIZE,	&t10ms	,2,NULL);
-	xTaskCreate(generalizedRTOSTak	,"t20ms",configMINIMAL_STACK_SIZE,	&t20ms	,1,NULL);*/
+	//start RTOS scheduler
 	vTaskStartScheduler();
 	return EXIT_SUCCESS;
 }
