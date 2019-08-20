@@ -11,22 +11,37 @@
  *  *     Dortmund University of Applied Sciences and Arts - initial API and implementation
  *******************************************************************************/
 
-#ifndef SRC_PARALLELLA_PARALLELLAUTILS_H_
-#define SRC_PARALLELLA_PARALLELLAUTILS_H_
-
-#include "e_lib.h"
-//freeRTOS imports
-#include "FreeRTOS.h"
+#ifndef SRC_PARALLELLA_TASKCODE_H_
+#define SRC_PARALLELLA_TASKCODE_H_
+#include "c2c.h"
 #include "debugFlags.h"
+#include "ParallellaUtils.h"
+#include "shared_comms.h"
+#include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
 
-//time units in processor cycles
-#define _1MS 700000
-#define _1US 700
+//declare taskHandler functions
 
+void handler5ms();
+void handler10ms();
+void handler20ms();
+void handler10msCore2();
+void handler20msCore2();
+//-------
+//declare cIn/Out operations
+//to be set up from the amalthea model during
+//code generation
+void cIn5ms();
+void cIn10ms();
+void cIn20ms();
+void cIn10msCore2();
+void cIn20msCore2();
+//-------
+void cOut5ms();
+void cOut10ms();
+void cOut20ms();
+void cOut10msCore2();
+void cOut20msCore2();
 
-void sleepTimerMs(int ticks,int taskNum);
-
-
-#endif /* SRC_PARALLELLA_PARALLELLAUTILS_H_ */
+#endif /* SRC_PARALLELLA_TASKCODE_H_ */

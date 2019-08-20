@@ -6,18 +6,16 @@ CC=e-gcc
 #FreeRTOS dependencies
 CFLAGS=-I.
 FREERTOSSRC=../../Source
-RTFPSRC=../rtfparallella_framework/include
-INCLUDES= -g -I$(FREERTOSSRC)/include -I$(FREERTOSSRC)/portable/GCC/Epiphany -I${RTFPSRC} -I.
-DEPS = $(FREERTOSSRC)/portable/GCC/Epiphany/portmacro.h Makefile FreeRTOSConfig.h ${RTFPSRC}/c2c.h ${RTFPSRC}/debugFlags.h ${RTFPSRC}/AmaltheaConverter.h taskCode.h ${RTFPSRC}/ParallellaUtils.h
+INCLUDES= -g -I$(FREERTOSSRC)/include -I$(FREERTOSSRC)/portable/GCC/Epiphany -I.
+DEPS = $(FREERTOSSRC)/portable/GCC/Epiphany/portmacro.h Makefile FreeRTOSConfig.h c2c.h debugFlags.h AmaltheaConverter.h taskCode.h ParallellaUtils.h
 #Epiphany SDK dependencies
 ESDK=${EPIPHANY_HOME}
 ELIBS=${ESDK}/tools/host.armv7l/lib
 EINCS=${ESDK}/tools/host.armv7l/include
-ELDF=${ESDK}/bsps/current/internal.ldf
+ELDF=${ESDK}/bsps/current/fast.ldf
 EHDF=${EPIPHANY_HDF}
-
 #search paths for C source code files
-vpath %.c .:$(FREERTOSSRC)/:$(FREERTOSSRC)/portable/MemMang:$(FREERTOSSRC)/portable/GCC/Epiphany:../rtfparallella_framework:/
+vpath %.c .:$(FREERTOSSRC)/:$(FREERTOSSRC)/portable/MemMang:$(FREERTOSSRC)/portable/GCC/Epiphany:/
 #search path for assembly listings
 vpath %.s $(FREERTOSSRC)/portable/GCC/Epiphany
 #main target 
