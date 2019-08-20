@@ -17,9 +17,9 @@
 #include <e-hal.h> //hardware abstraction library
 #include <time.h>   /* Needed for struct timespec */
 
-#include "c2c.h"
-#include "debugFlags.h"
-#include "shared_comms.h"
+#include "../rtfparallella_framework/include/c2c.h"
+#include "../rtfparallella_framework/include/debugFlags.h"
+#include "../rtfparallella_framework/include/shared_comms.h"
 
 #define READ_PRECISION_US 1000
 

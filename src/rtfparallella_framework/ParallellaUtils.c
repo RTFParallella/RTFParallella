@@ -11,22 +11,16 @@
  *  *     Dortmund University of Applied Sciences and Arts - initial API and implementation
  *******************************************************************************/
 
-#ifndef SRC_PARALLELLA_PARALLELLAUTILS_H_
-#define SRC_PARALLELLA_PARALLELLAUTILS_H_
+#include "include/ParallellaUtils.h"
 
-#include "debugFlags.h"
-#include "e_lib.h"
-//freeRTOS imports
-#include "FreeRTOS.h"
-#include "task.h"
-#include "queue.h"
+void sleepTimerMs(int ticks, int taskNum){
+	updateDebugFlag(ticks*10);
+	int i;
+	for (i=0;i<ticks;i++){
+		taskENTER_CRITICAL();
+		traceRunningTask(taskNum);
+		e_wait(E_CTIMER_0,_1MS);
+		taskEXIT_CRITICAL();
+	}
+}
 
-//time units in processor cycles
-#define _1MS 700000
-#define _1US 700
-
-
-void sleepTimerMs(int ticks,int taskNum);
-
-
-#endif /* SRC_PARALLELLA_PARALLELLAUTILS_H_ */

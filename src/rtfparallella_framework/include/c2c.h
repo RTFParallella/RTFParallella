@@ -13,6 +13,9 @@
 #ifndef C2C_H
 #define C2C_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <stdint.h>
 #define dstr_mem_offset_sec_1 			0x4000

@@ -11,7 +11,7 @@
  *  *     Dortmund University of Applied Sciences and Arts - initial API and implementation
  *******************************************************************************/
 
-#include "c2c.h"
+#include "include/c2c.h"
 
 #include "e-lib.h"
 
@@ -22,26 +22,14 @@ int core_write_mutex=0;
 void shared_labels_init_core(){
 	//shared buffer in core memory
 	outbuf_dstr_shared[0] = (dstr_mem_sec_1_label_type *) dstr_mem_offset_sec_1;
-	/*for (int i=1;i<dstr_mem_sec_1_label_count;i++){
+	for (int i=1;i<dstr_mem_sec_1_label_count;i++){
 		outbuf_dstr_shared[i] = outbuf_dstr_shared[i-1] + 1;
 	}
-	outbuf_dstr_shared[1] = outbuf_dstr_shared[0] + 1;
-	outbuf_dstr_shared[2] = outbuf_dstr_shared[1] + 1;
-	outbuf_dstr_shared[3] = outbuf_dstr_shared[2] + 1;
-	outbuf_dstr_shared[4] = outbuf_dstr_shared[3] + 1;
-	outbuf_dstr_shared[5] = outbuf_dstr_shared[4] + 1;
-	outbuf_dstr_shared[6] = outbuf_dstr_shared[5] + 1;
-	outbuf_dstr_shared[7] = outbuf_dstr_shared[6] + 1;
-	outbuf_dstr_shared[8] = outbuf_dstr_shared[7] + 1;*/
 	//initialize buffer
 	int i;
 	for (i=0;i<9;i++){
 		*outbuf_dstr_shared[i] =0;
 	}
-	/*int emem;
-	//define distributed memory section in Epi range
-	e_alloc(&emem[1], dstr_mem_offset_sec_1 , sizeof(outbuf_dstr_shared));*/
-
 }
 
 uint8_t shared_label_write_core	(unsigned row,unsigned col,int label_indx,int payload){
