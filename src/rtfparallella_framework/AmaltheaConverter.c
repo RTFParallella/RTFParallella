@@ -12,13 +12,13 @@
  *******************************************************************************/
 
 
-#include "AmaltheaConverter.h"
+#include "include/AmaltheaConverter.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
 #include <stdarg.h>
 
-#include "debugFlags.h"
+#include "include/debugFlags.h"
 
 
 

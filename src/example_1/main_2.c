@@ -13,16 +13,16 @@
 //epiphany imports
 #include <stdlib.h>
 
-#include "../rtfparallella_framework/shared_comms.h"
 #include "e_lib.h"
 #include "taskCode.h"
 //freeRTOS imports
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
-#include "AmaltheaConverter.h"
-#include "c2c.h"
-#include "debugFlags.h"
+#include "../rtfparallella_framework/include/AmaltheaConverter.h"
+#include "../rtfparallella_framework/include/c2c.h"
+#include "../rtfparallella_framework/include/debugFlags.h"
+#include "../rtfparallella_framework/include/shared_comms.h"
 //utility imports
 //---------------------------------------------
 int main(void) {

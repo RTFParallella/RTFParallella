@@ -17,7 +17,7 @@
  *      Author: bigm
  */
 
-#include "debugFlags.h"
+#include "include/debugFlags.h"
 
 #include "FreeRTOS.h"
 #include "task.h"

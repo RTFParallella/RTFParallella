@@ -14,10 +14,10 @@
 #ifndef SRC_PARALLELLA_PARALLELLAUTILS_H_
 #define SRC_PARALLELLA_PARALLELLAUTILS_H_
 
-#include "debugFlags.h"
 #include "e_lib.h"
 //freeRTOS imports
 #include "FreeRTOS.h"
+#include "debugFlags.h"
 #include "task.h"
 #include "queue.h"
 

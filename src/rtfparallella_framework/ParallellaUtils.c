@@ -11,7 +11,7 @@
  *  *     Dortmund University of Applied Sciences and Arts - initial API and implementation
  *******************************************************************************/
 
-#include "ParallellaUtils.h"
+#include "include/ParallellaUtils.h"
 
 void sleepTimerMs(int ticks, int taskNum){
 	updateDebugFlag(ticks*10);
