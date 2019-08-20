@@ -11,7 +11,7 @@
  *  *     Dortmund University of Applied Sciences and Arts - initial API and implementation
  *******************************************************************************/
 
-#include "include/shared_comms.h"
+#include "shared_comms.h"
 
 unsigned int *outbuf_shared[shared_mem_section1_label_count];
 

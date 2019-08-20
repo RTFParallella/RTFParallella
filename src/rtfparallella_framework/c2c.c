@@ -11,7 +11,7 @@
  *  *     Dortmund University of Applied Sciences and Arts - initial API and implementation
  *******************************************************************************/
 
-#include "include/c2c.h"
+#include "c2c.h"
 
 #include "e-lib.h"
 

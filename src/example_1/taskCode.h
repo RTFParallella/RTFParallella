@@ -13,13 +13,13 @@
 
 #ifndef SRC_PARALLELLA_TASKCODE_H_
 #define SRC_PARALLELLA_TASKCODE_H_
+#include "../rtfparallella_framework/shared_comms.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
-#include "../rtfparallella_framework/include/c2c.h"
-#include "../rtfparallella_framework/include/debugFlags.h"
-#include "../rtfparallella_framework/include/ParallellaUtils.h"
-#include "../rtfparallella_framework/include/shared_comms.h"
+#include "c2c.h"
+#include "debugFlags.h"
+#include "ParallellaUtils.h"
 
 //declare taskHandler functions
 
