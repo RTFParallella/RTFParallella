@@ -21,8 +21,12 @@
 #include "c2c.h"
 #include "debugFlags.h"
 #include "shared_comms.h"
+#include "model_enumerations.h"
 
 #define READ_PRECISION_US 1000
+
+#define MEM_TYPE_SHM 	0
+#define MEM_TYPE_DSHM 	1
 
 typedef struct{
 	unsigned row;
@@ -38,11 +42,13 @@ void user_config_print_values(LabelVisual core_config,unsigned array[],unsigned 
 
 LabelVisual get_user_input(unsigned indices[]);
 
-void user_config_print_legend_DRAM(unsigned array_length,unsigned array[]);
+void user_config_print_legend_auto(unsigned array_length,unsigned array[]);
 
-void user_config_print_values_DRAM(unsigned visible_label_count,unsigned array[],unsigned int values_array[],unsigned int prv_val_array[]);
+void user_config_print_values_auto(unsigned visible_label_count,unsigned array[],unsigned int values_array[],unsigned int prv_val_array[]);
 
 unsigned get_user_input_DRAM(unsigned indices[]);
+
+void print_legend_enum (unsigned label_count,unsigned label_positions[], unsigned memory_type);
 
 int nsleep(long miliseconds);
 

@@ -8,7 +8,7 @@ CFLAGS=-I.
 FREERTOSSRC=../../RTFP_RTOS_KERNEL_PATCHED/FreeRTOS/Source
 INCLUDES= -g -I$(FREERTOSSRC)/include -I$(FREERTOSSRC)/portable/GCC/Epiphany -I.
 DEPS = $(FREERTOSSRC)/portable/GCC/Epiphany/portmacro.h Makefile FreeRTOSConfig.h c2c.h debugFlags.h AmaltheaConverter.h taskCode.h ParallellaUtils.h
-DEPSHOST = c2c.h debugFlags.h AmaltheaConverter.h shared_comms.h 
+DEPSHOST = c2c.h debugFlags.h AmaltheaConverter.h shared_comms.h model_enumerations.h
 #Epiphany SDK dependencies
 ESDK=${EPIPHANY_HOME}
 ELIBS=${ESDK}/tools/host.armv7l/lib
@@ -23,16 +23,22 @@ vpath %.s $(FREERTOSSRC)/portable/GCC/Epiphany
 run: armcode core0_main.elf core1_main.elf
 	@echo build status : successful
 
+example1: host_main_example1 core0_main.elf core1_main.elf
+	@echo build status : successful
+
 #rule for every device target
 %.elf: $(ELDF) tasks.o queue.o list.o portasm.o port.o heap_1.o c2c.o debugFlags.o AmaltheaConverter.o taskCode.o ParallellaUtils.o shared_comms.o %.o
 	$(CC) -g -T$< -Wl,--gc-sections -o $@ $(filter-out $<,$^) -le-lib
 
 #host target
 armcode: armcode.c $(DEPSHOST) 
-	$(LCC) $< -o $@  host_utils.c -I ${EINCS} -L ${ELIBS} -lpal -le-hal -le-loader -lpthread 
+	$(LCC) $< -o $@  host_utils.c model_enumerations.c -I ${EINCS} -L ${ELIBS} -lpal -le-hal -le-loader -lpthread 
+host_main_example1: host_main_example1.c $(DEPSHOST) 
+	$(LCC) $< -o $@  host_utils.c model_enumerations.c -I ${EINCS} -L ${ELIBS} -lpal -le-hal -le-loader -lpthread 
+
 #clean target
 clean:
-	rm -f *.o *.srec *.elf armcode
+	rm -f *.o *.srec *.elf armcode host_main_example1
 
 .SECONDARY:
 %.o: %.c $(DEPS)

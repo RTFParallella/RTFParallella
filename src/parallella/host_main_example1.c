@@ -31,7 +31,31 @@ unsigned int shared_label_core_10[dstr_mem_sec_1_label_count];
 int main()
 {
 	int label_enable_count_core0 = 0;
-	printf("RTFP demo host code\n");
+	unsigned labelVisual_perCore[core_count][DSHM_visible_label_count];
+	for (int i=0;i<core_count;i++){
+		get_visible_label_index(labelVisual_perCore[i]);
+	}
+
+	for (int i=0;i<core_count;i++){
+		printf ("@%d : ",i);
+		for (int j=0;j<DSHM_visible_label_count;j++){
+			printf("L%d ",labelVisual_perCore[i][j]);
+		}
+		printf("\n");
+	}
+	fprintf(stderr,"===========================================================================\n");
+		fprintf(stderr,"      |   Tasks being executed  | observed labels values |\n");
+		fprintf(stderr,"%6s|%12s|%12s|"," tick ","   Core 1   ","   Core 2   ");
+		//char str[10] = "deadbeef";
+		//get_DSHM_label_name(0,str);
+		//fprintf(stderr,"%s\n",str);
+		for (int i=0;i<core_count;i++){
+			print_legend_enum(DSHM_visible_label_count,labelVisual_perCore[i],MEM_TYPE_DSHM);
+		}
+
+
+/*
+
 	//setup visualization config for the first core
 	unsigned index_array1[dstr_mem_sec_1_label_count];
 	unsigned index_array1_prv_val[dstr_mem_sec_1_label_count];
@@ -50,6 +74,7 @@ int main()
 	array_init(index_array_DRAM,shared_mem_section1_label_count);
 	array_init(index_array_prv_DRAM,shared_mem_section1_label_count);
 	unsigned dram_indices = get_user_input_DRAM(index_array_DRAM);
+*/
 
 	//counters for row and column, cored id and loop counter
 	unsigned   row_loop,col_loop;
@@ -62,8 +87,7 @@ int main()
 	int loop;
 	int addr;
 	e_mem_t emem;
-	e_init(NULL); // initialise the system establish connection to the Device
-	//initial ecore is set to 0,0
+	e_init(NULL);
 	/*
 	 * reserve shared mem sections
 	 * one section for each shared label in the model
@@ -89,36 +113,30 @@ int main()
 		fprintf(stderr,"Error Loading the Epiphany Application 1 %i\n", result);
 	}
 	e_start_group(&dev);
-	fprintf(stderr,"Legend: \n");
-	fprintf(stderr,"--------\n");
-	fprintf(stderr," Tick				 -> RTOS tick \n");
-	fprintf(stderr," Core 1 -> (0,0) \n");
-	fprintf(stderr," Core 2 -> (1,0) \n");
-	fprintf(stderr," THC 				 -> Task Holding Core(row, column) \n");
-	fprintf(stderr," L 					 -> Local core memory \n");
-	fprintf(stderr," F 					 -> Foreign memory (DRAM) \n");
-	fprintf(stderr,"(L,row,column,indx)  -> Label of index _indx_ on Local core memory(row, column) \n");
-	fprintf(stderr,"----------------------------------------------\n");
 
-	fprintf(stderr,"RFTP demo started \n");
+	//fprintf(stderr,"RFTP demo started \n");
 	addr = cnt_address;
 	int pollLoopCounter = 0;
-	int taskMessage;
-	int prevtaskMessage;
-	int prevpollLoopCounter = 0;
 	unsigned int chainLatencyEndIndicator = 0;
 	unsigned int chainLatencyStartIndicator = 10e6;
 	unsigned int lat1 = 0;
 	int label_to_feed_in = 97;
-	fprintf(stderr,"===========================================================================\n");
-	fprintf(stderr,"     | Tasks being executed| Shared labels' values |\n");
-	fprintf(stderr,"tick | Core 1   | Core 2   |");
+	/*for (int i=0;i<core_count;i++){
+
+	}*/
+/*
 	user_config_print_legend(core1,index_array1);
 	user_config_print_legend(core2,index_array2);
-	user_config_print_legend_auto(dram_indices,index_array_DRAM);
+	user_config_print_legend_DRAM(dram_indices,index_array_DRAM);
+*/
 
 	fprintf(stderr,"\n");
 	fprintf(stderr,"===========================================================================\n");
+	char buffer1[label_str_len];
+	array_init(buffer1,label_str_len);
+	char buffer2[label_str_len];
+	array_init(buffer2,label_str_len);
+
 
 	int prev1,prev2,prev3;
 	for (pollLoopCounter=0;pollLoopCounter<=40;pollLoopCounter++){
@@ -131,12 +149,13 @@ int main()
 		if (message[8]!= message2[8] ){
 			//fprintf(stderr,"NIS->");
 		}
-		fprintf(stderr, "%4d |",message[8]+1);
-		fprintf(stderr,"   %4u   |", message[6]);
-		fprintf(stderr,"   %4u   |", message2[6]);
-		user_config_print_values(core1,index_array1,shared_label_core_00,index_array1_prv_val);
+		get_task_name(message[6],buffer1);
+		get_task_name(message2[6],buffer2);
+		fprintf(stderr," %4d | %10s | %10s |",message[8]+1,buffer1,buffer2);
+		/*user_config_print_values(core1,index_array1,shared_label_core_00,index_array1_prv_val);
 		user_config_print_values(core2,index_array2,shared_label_core_10,index_array2_prv_val);
-		user_config_print_values_auto(dram_indices,index_array_DRAM,shared_label_to_read,index_array_prv_DRAM);
+		user_config_print_values_DRAM(dram_indices,index_array_DRAM,shared_label_to_read,index_array_prv_DRAM);
+		*/
 		fprintf(stderr,"\n");
 		nsleep(1);
 	}
