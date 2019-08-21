@@ -39,6 +39,5 @@ echo "port patched with RTFP fix"
 echo "*****************************************************"
 echo "cleaning kernel and port"
 pwd
-sudo rm -r Epiphay_port/
 echo "***************************************"
 echo "done"
