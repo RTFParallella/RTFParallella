@@ -183,8 +183,8 @@ int main()
 	e_return_stat_t result1;
 	e_return_stat_t result2;
 	//load the group
-	result1 =  e_load("main.elf",&dev,0,0,E_FALSE);
-	result2 =  e_load("main_2.elf",&dev,1,0,E_FALSE);
+	result1 =  e_load("core0_main.elf",&dev,0,0,E_FALSE);
+	result2 =  e_load("core1_main.elf",&dev,1,0,E_FALSE);
 	if (result1 != E_OK || result2 != E_OK){
 		fprintf(stderr,"Error Loading the Epiphany Application 1 %i\n", result);
 	}

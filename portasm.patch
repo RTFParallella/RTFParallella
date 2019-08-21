@@ -1,0 +1,45 @@
+7,8c7,8
+<   mov  r0,%low(_interrupt_mode)
+<   movt r0,%high(_interrupt_mode)
+---
+>   mov  r0,%low(interrupt_mode)
+>   movt r0,%high(interrupt_mode)
+13c13
+<   b _common_interrupt_handler
+---
+>   b common_interrupt_handler
+26,27c26,27
+< _handlers:
+<   .global _handlers
+---
+> .global handlers
+>   handlers:
+30,31c30,31
+< _common_interrupt_handler:
+<   .global _common_interrupt_handler
+---
+> .global common_interrupt_handler
+>   common_interrupt_handler:
+111,112c111,112
+<   mov  fp,%low(_pxCurrentTCB)
+<   movt fp,%high(_pxCurrentTCB)
+---
+>   mov  fp,%low(pxCurrentTCB)
+>   movt fp,%high(pxCurrentTCB)
+121,122c121,122
+<   mov  r0,%low(_vInterruptCentral)
+<   movt r0,%high(_vInterruptCentral)
+---
+>   mov  r0,%low(vInterruptCentral)
+>   movt r0,%high(vInterruptCentral)
+128,132c128,131
+< 
+< _portRESTORE_CONTEXT:
+<   .global _portRESTORE_CONTEXT
+<   mov  fp,%low(_pxCurrentTCB)
+<   movt fp,%high(_pxCurrentTCB)
+---
+> .global portRESTORE_CONTEXT
+>   portRESTORE_CONTEXT:
+>   mov  fp,%low(pxCurrentTCB)
+>   movt fp,%high(pxCurrentTCB)

@@ -5,7 +5,7 @@ LCC=/opt/gcc-linaro-7.2.1-2017.11-x86_64_arm-linux-gnueabihf/bin/arm-linux-gnuea
 CC=e-gcc
 #FreeRTOS dependencies
 CFLAGS=-I.
-FREERTOSSRC=../../Source
+FREERTOSSRC=../../RTFP_RTOS_KERNEL_PATCHED/FreeRTOS/Source
 INCLUDES= -g -I$(FREERTOSSRC)/include -I$(FREERTOSSRC)/portable/GCC/Epiphany -I.
 DEPS = $(FREERTOSSRC)/portable/GCC/Epiphany/portmacro.h Makefile FreeRTOSConfig.h c2c.h debugFlags.h AmaltheaConverter.h taskCode.h ParallellaUtils.h
 #Epiphany SDK dependencies
@@ -19,11 +19,11 @@ vpath %.c .:$(FREERTOSSRC)/:$(FREERTOSSRC)/portable/MemMang:$(FREERTOSSRC)/porta
 #search path for assembly listings
 vpath %.s $(FREERTOSSRC)/portable/GCC/Epiphany
 #main target 
-run: armcode main.elf main_2.elf
+run: portasm.o armcode core0_main.elf core1_main.elf
 	@echo build status : successful
 
 #rule for every device target
-%.elf: $(ELDF) tasks.o queue.o list.o port.o portasm.o heap_1.o c2c.o debugFlags.o AmaltheaConverter.o taskCode.o ParallellaUtils.o shared_comms.o %.o
+%.elf: $(ELDF) tasks.o queue.o list.o portasm.o port.o heap_1.o c2c.o debugFlags.o AmaltheaConverter.o taskCode.o ParallellaUtils.o shared_comms.o %.o
 	$(CC) -g -T$< -Wl,--gc-sections -o $@ $(filter-out $<,$^) -le-lib
 
 #host target
