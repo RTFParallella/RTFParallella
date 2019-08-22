@@ -5,7 +5,7 @@ RTFParallella uses FreeRTOS to implement amalthea models for verification.
 ## Installation
 
 ```sh
-sh patch_inti.sh
+sh patch_init.sh
 ```
 
 ## Usage example
