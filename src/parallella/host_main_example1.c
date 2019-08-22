@@ -27,15 +27,18 @@
 unsigned int shared_label_to_read[10];
 unsigned int shared_label_core_00[dstr_mem_sec_1_label_count];
 unsigned int shared_label_core_10[dstr_mem_sec_1_label_count];
-
+unsigned int shared_label_core[core_count][dstr_mem_sec_1_label_count];
 int main()
 {
 	int label_enable_count_core0 = 0;
 	unsigned labelVisual_perCore[core_count][DSHM_visible_label_count];
+	unsigned int prv_val_preCore[core_count][DSHM_visible_label_count];
 	for (int i=0;i<core_count;i++){
-		get_visible_label_index(labelVisual_perCore[i]);
+		get_visible_label_index(labelVisual_perCore[i],MEM_TYPE_DSHM);
 	}
-
+	unsigned labelVisual_SHM[SHM_visible_label_count];
+	unsigned int prv_val_SHM[SHM_visible_label_count];
+	get_visible_label_index(labelVisual_SHM,MEM_TYPE_SHM);
 	for (int i=0;i<core_count;i++){
 		printf ("@%d : ",i);
 		for (int j=0;j<DSHM_visible_label_count;j++){
@@ -44,38 +47,14 @@ int main()
 		printf("\n");
 	}
 	fprintf(stderr,"===========================================================================\n");
-		fprintf(stderr,"      |   Tasks being executed  | observed labels values |\n");
-		fprintf(stderr,"%6s|%12s|%12s|"," tick ","   Core 1   ","   Core 2   ");
-		//char str[10] = "deadbeef";
-		//get_DSHM_label_name(0,str);
-		//fprintf(stderr,"%s\n",str);
-		for (int i=0;i<core_count;i++){
-			print_legend_enum(DSHM_visible_label_count,labelVisual_perCore[i],MEM_TYPE_DSHM);
-		}
-
-
-/*
-
-	//setup visualization config for the first core
-	unsigned index_array1[dstr_mem_sec_1_label_count];
-	unsigned index_array1_prv_val[dstr_mem_sec_1_label_count];
-	array_init(index_array1,dstr_mem_sec_1_label_count);
-	array_init(index_array1_prv_val,dstr_mem_sec_1_label_count);
-	LabelVisual core1 = get_user_input(index_array1);
-	//setup visualization config for the first core
-	unsigned index_array2[dstr_mem_sec_1_label_count];
-	unsigned index_array2_prv_val[dstr_mem_sec_1_label_count];
-	array_init(index_array2,dstr_mem_sec_1_label_count);
-	array_init(index_array2_prv_val,dstr_mem_sec_1_label_count);
-	LabelVisual core2 = get_user_input(index_array2);
-	//steup visualization for shared memeory
-	unsigned index_array_DRAM[shared_mem_section1_label_count];
-	unsigned index_array_prv_DRAM[shared_mem_section1_label_count];
-	array_init(index_array_DRAM,shared_mem_section1_label_count);
-	array_init(index_array_prv_DRAM,shared_mem_section1_label_count);
-	unsigned dram_indices = get_user_input_DRAM(index_array_DRAM);
-*/
-
+	fprintf(stderr,"      |   Tasks being executed  | observed labels values |\n");
+	fprintf(stderr,"%6s|%12s|%12s|"," tick ","   Core 1   ","   Core 2   ");
+	for (int i=0;i<core_count;i++){
+		print_legend_enum(DSHM_visible_label_count,labelVisual_perCore[i],MEM_TYPE_DSHM);
+	}
+	print_legend_enum(SHM_visible_label_count,labelVisual_SHM,MEM_TYPE_SHM);
+	fprintf(stderr,"\n");
+	fprintf(stderr,"===========================================================================\n");
 	//counters for row and column, cored id and loop counter
 	unsigned   row_loop,col_loop;
 	// this will contain the epiphany platform configuration
@@ -113,25 +92,11 @@ int main()
 		fprintf(stderr,"Error Loading the Epiphany Application 1 %i\n", result);
 	}
 	e_start_group(&dev);
-
-	//fprintf(stderr,"RFTP demo started \n");
 	addr = cnt_address;
 	int pollLoopCounter = 0;
 	unsigned int chainLatencyEndIndicator = 0;
 	unsigned int chainLatencyStartIndicator = 10e6;
 	unsigned int lat1 = 0;
-	int label_to_feed_in = 97;
-	/*for (int i=0;i<core_count;i++){
-
-	}*/
-/*
-	user_config_print_legend(core1,index_array1);
-	user_config_print_legend(core2,index_array2);
-	user_config_print_legend_DRAM(dram_indices,index_array_DRAM);
-*/
-
-	fprintf(stderr,"\n");
-	fprintf(stderr,"===========================================================================\n");
 	char buffer1[label_str_len];
 	array_init(buffer1,label_str_len);
 	char buffer2[label_str_len];
@@ -142,20 +107,20 @@ int main()
 	for (pollLoopCounter=0;pollLoopCounter<=40;pollLoopCounter++){
 		message[3] = 0;
 		e_read(&dev,0,0,addr, &message, sizeof(message));
-		e_read(&dev,0,0,dstr_mem_offset_sec_1, &shared_label_core_00, sizeof(shared_label_core_00));
+		e_read(&dev,0,0,dstr_mem_offset_sec_1, &shared_label_core[0], sizeof(shared_label_core_00));
 		e_read(&dev,1,0,addr, &message2, sizeof(message2));
-		e_read(&dev,1,0,dstr_mem_offset_sec_1, &shared_label_core_10, sizeof(shared_label_core_10));
-		e_read(&emem,0,0,0x00, &shared_label_to_read, sizeof(shared_label_to_read));
+		e_read(&dev,1,0,dstr_mem_offset_sec_1, &shared_label_core[1], sizeof(shared_label_core_10));
+		e_read(&emem,0,0,0x00, &shared_label_to_read, sizeof(shared_label_core_10));
 		if (message[8]!= message2[8] ){
 			//fprintf(stderr,"NIS->");
 		}
 		get_task_name(message[6],buffer1);
 		get_task_name(message2[6],buffer2);
-		fprintf(stderr," %4d | %10s | %10s |",message[8]+1,buffer1,buffer2);
-		/*user_config_print_values(core1,index_array1,shared_label_core_00,index_array1_prv_val);
-		user_config_print_values(core2,index_array2,shared_label_core_10,index_array2_prv_val);
-		user_config_print_values_DRAM(dram_indices,index_array_DRAM,shared_label_to_read,index_array_prv_DRAM);
-		*/
+		fprintf(stderr," %4d | %10s | %10s | ",message[8]+1,buffer1,buffer2);
+		for (int i=0;i<core_count;i++){
+			user_config_print_values_auto(DSHM_visible_label_count,labelVisual_perCore[i],shared_label_core[i],prv_val_preCore[i]);
+		}
+		user_config_print_values_auto(SHM_visible_label_count,labelVisual_SHM,shared_label_to_read,prv_val_SHM);
 		fprintf(stderr,"\n");
 		nsleep(1);
 	}

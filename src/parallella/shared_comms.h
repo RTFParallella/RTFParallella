@@ -25,16 +25,33 @@
 #define shared_mem_section1_label_count 10
 
 
-
-
-
+/**
+ * Initiate the shared label section, this funcion will assign addresses to labels in a section,
+ * and initialize those labels to 0
+ *
+ * Arguments:
+ *
+ */
 void shared_labels_init();
 
+/**
+ * write a value to a label in a shared memory(DRAM) section
+ *
+ * Arguments:
+ * label_indx	:	index of the target shared label
+ * payload		:	value to write
+ *
+ */
 uint8_t shared_label_write	(int label_indx,int payload);
 
+/**
+ * read a value of a label in a shared memory(DRAM) section
+ *
+ * Arguments:
+ * label_indx	:	index of the target shared label
+ *
+ */
 unsigned int shared_label_read(int label_indx);
-
-
 
 
 #endif /* SRC_PARALLELLA_SHARED_COMMS_H_ */

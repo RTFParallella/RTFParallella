@@ -31,6 +31,8 @@ example1: host_main_example1 core0_main.elf core1_main.elf
 	$(CC) -g -T$< -Wl,--gc-sections -o $@ $(filter-out $<,$^) -le-lib
 
 #host target
+all:
+
 armcode: armcode.c $(DEPSHOST) 
 	$(LCC) $< -o $@  host_utils.c model_enumerations.c -I ${EINCS} -L ${ELIBS} -lpal -le-hal -le-loader -lpthread 
 host_main_example1: host_main_example1.c $(DEPSHOST) 

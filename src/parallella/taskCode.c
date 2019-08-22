@@ -107,7 +107,7 @@ void cOut5ms(){
 	shared_label_write_core(1,0,0,shared_label_2);
 }
 void cOut10ms(){
-	//shared_label_write(0,2);
+	shared_label_write(0,2);
 }
 void cOut20ms(){
 

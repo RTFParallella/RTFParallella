@@ -47,8 +47,8 @@ char task_enum [task_count +1][label_str_len] =
   "Task20ms1"
 };
 
-unsigned DSHM_visible_labels [DSHM_visible_label_count] = {0,1,2,3};
-
+unsigned DSHM_visible_labels [DSHM_visible_label_count] = {0,1};
+unsigned SHM_visible_labels [SHM_visible_label_count] = {0,1};
 
 
 
@@ -70,7 +70,12 @@ void get_task_name(int index,char *str){
 	}
 }
 
-void get_visible_label_index(unsigned array[]){
+void get_visible_label_index(unsigned array[],unsigned mem_type){
+	if (mem_type==0){
+		for (int i=0; i<SHM_visible_label_count;i++){
+			array[i] = SHM_visible_labels[i];
+		}
+	}
 	for (int i=0; i<DSHM_visible_label_count;i++){
 		array[i] = DSHM_visible_labels[i];
 	}

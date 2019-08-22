@@ -18,7 +18,9 @@
 
 #define numTasks 3
 
-//task typedef
+/**
+ * Structure to hold tasks according to amalthea model
+ */
 typedef struct{
 	unsigned isDone;
 	unsigned isReady;
@@ -31,7 +33,10 @@ typedef struct{
 }AmaltheaTask;
 
 
-//choose communication semantics
+/**
+ * communication semantics of tasks
+ * if use_LET_COMM_SEMANTICS is defined, the tasks will behave in LET semantics else it will use implicit by default
+ */
 //#define use_LET_COMM_SEMANTICS
 
 AmaltheaTask createAmaltheaTask(void *taskHandler,void *cInHandler,void *cOutHandler,unsigned int period,unsigned int deadline, unsigned int WCET);
@@ -57,10 +62,17 @@ void createRTOSTask(AmaltheaTask* task, int priority, int argCount, ...);
  * Arguments:
  * labelBitCount	:	label size in bits
  * labelCount		:	number of labels
+ *
  */
 unsigned int calculateStackSize(int labelBitCount, int labelCount);
 
 /**
+ *
+ *This RTOS task invokes the task handlers and realizes periodic task execution according to
+ * Amalthea model
+ *
+ * Arguments:
+ * task		:	instance of AmaltheaTask structure to be invoked
  *
  */
 void generalizedRTOSTask(AmaltheaTask task);

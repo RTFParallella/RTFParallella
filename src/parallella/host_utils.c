@@ -70,9 +70,9 @@ void user_config_print_values_auto(unsigned visible_label_count,unsigned array[]
 		int val_ind = array[i];
 		unsigned int val_to_print = values_array[val_ind];
 		if (val_to_print == prv_val_array[val_ind]){
-			fprintf(stderr," ----|");
+			fprintf(stderr,"            |");
 		}else {
-			fprintf(stderr,"%4d |",val_to_print);
+			fprintf(stderr," %10d |",val_to_print);
 			prv_val_array[val_ind] = val_to_print;
 		}
 	}
@@ -100,7 +100,7 @@ void print_legend_enum (unsigned label_count,unsigned label_positions[], unsigne
 	if (memory_type==MEM_TYPE_SHM){
 		for (int i=0;i<label_count;i++){
 			get_SHM_label_name(i,small_buf);
-			fprintf(stderr,"| %10s |",small_buf);
+			fprintf(stderr,"| %s ",small_buf);
 			//fflush(stderr);
 		}
 	} else {

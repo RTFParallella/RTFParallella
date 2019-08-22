@@ -25,7 +25,14 @@
 #define _1MS 700000
 #define _1US 700
 
-
+/**
+ * sleep for a multiple of milliseconds
+ *
+ * Arguments:
+ * ticks		:	number of milliseconds to sleep
+ * taskNum		:	index of task invoking this function (used for tracing during sleep)
+ *
+ */
 void sleepTimerMs(int ticks,int taskNum);
 
 

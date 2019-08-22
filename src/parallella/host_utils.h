@@ -34,6 +34,15 @@ typedef struct{
 	unsigned num_visible_labels;
 }LabelVisual;
 
+/**
+ * read a value of a label in a distributed shared memory section
+ *
+ * Arguments:
+ * row			:	absolute row number of the core
+ * col			:	absolute column number of the core
+ * label_indx	:	index of the target shared label
+ *
+ */
 void array_init(unsigned array[],unsigned array_size);
 
 void user_config_print_legend(LabelVisual core_config,unsigned array[]);

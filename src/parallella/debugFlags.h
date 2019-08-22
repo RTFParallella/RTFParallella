@@ -25,15 +25,48 @@
 #define DEBUG_FLAG 			7
 #define TICK_FLAG			8
 
+/**
+ * initialize output buffer in core memory
+ *
+ * Arguments:
+ *
+ */
 void outbuf_init(void );
 
+/**
+ * write the index of the running task to output buffer
+ *
+ * Arguments:
+ * taskNum			:	index of the task
+ *
+ */
 void traceRunningTask(unsigned taskNum);
 
+/**
+ * write the task instance (job) to output buffer
+ *
+ * Arguments:
+ * taskNum			:	index of the task
+ * currentPasses	:	instance of task (job number)
+ *
+ */
 void traceTaskPasses(unsigned taskNum, int currentPasses);
 
+/**
+ * update RTOS tick value in output buffer
+ *
+ * Arguments:
+ *
+ */
 void updateTick(void);
 
+/**
+ * Write a custom value to the output buffer for code coverage debugging
+ *
+ * Arguments:
+ * debugMessage			:	message to be written
+ *
+ */
 void updateDebugFlag(int debugMessage);
-
 
 #endif /* SRC_PARALLELLA_DEBUGFLAGS_H_ */
