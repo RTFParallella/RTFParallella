@@ -19,7 +19,9 @@ EHDF=${EPIPHANY_HDF}
 vpath %.c .:$(FREERTOSSRC)/:$(FREERTOSSRC)/portable/MemMang:$(FREERTOSSRC)/portable/GCC/Epiphany:/
 #search path for assembly listings
 vpath %.s $(FREERTOSSRC)/portable/GCC/Epiphany
-#main target 
+#main target
+all: host_main_example1 armcode core0_main.elf core1_main.elf
+	@echo build status : successful
 run: armcode core0_main.elf core1_main.elf
 	@echo build status : successful
 
@@ -31,8 +33,6 @@ example1: host_main_example1 core0_main.elf core1_main.elf
 	$(CC) -g -T$< -Wl,--gc-sections -o $@ $(filter-out $<,$^) -le-lib
 
 #host target
-all:
-
 armcode: armcode.c $(DEPSHOST) 
 	$(LCC) $< -o $@  host_utils.c model_enumerations.c -I ${EINCS} -L ${ELIBS} -lpal -le-hal -le-loader -lpthread 
 host_main_example1: host_main_example1.c $(DEPSHOST) 
