@@ -23,7 +23,7 @@ _For more examples and usage, please refer to the [documentation][documentation]
 
 ## Contributers
 
-* Your Name – [@mahmood1994has](https://twitter.com/mahmood1994has) – mahmood1994ha@gmail.com
+* Mahmoud Bazzal – [@mahmood1994has](https://twitter.com/mahmood1994has) – mahmood1994ha@gmail.com
 
 Distributed under EPL license.
 
