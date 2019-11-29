@@ -1,14 +1,14 @@
 /*******************************************************************************
  *   Copyright (c) 2019 Dortmund University of Applied Sciences and Arts and others.
- *   
+ *  
  *   This program and the accompanying materials are made
  *   available under the terms of the Eclipse Public License 2.0
  *   which is available at https://www.eclipse.org/legal/epl-2.0/
- *   
+ *  
  *   SPDX-License-Identifier: EPL-2.0
- *   
+ *  
  *   Contributors:
- *       Dortmund University of Applied Sciences and Arts - initial API and implementation
+ *        Dortmund University of Applied Sciences and Arts - initial API and implementation
  *******************************************************************************/
 
 #include <stdlib.h>
@@ -110,7 +110,7 @@ int main()
 		e_read(&dev,0,0,dstr_mem_offset_sec_1, &shared_label_core[0], sizeof(shared_label_core_00));
 		e_read(&dev,1,0,addr, &message2, sizeof(message2));
 		e_read(&dev,1,0,dstr_mem_offset_sec_1, &shared_label_core[1], sizeof(shared_label_core_10));
-		e_read(&emem,0,0,0x00, &shared_label_to_read, sizeof(shared_label_core_10));
+		e_read(&emem,0,0,0x00, &shared_label_to_read, sizeof(unsigned int));
 		if (message[8]!= message2[8] ){
 			//fprintf(stderr,"NIS->");
 		}
@@ -120,7 +120,11 @@ int main()
 		for (int i=0;i<core_count;i++){
 			user_config_print_values_auto(DSHM_visible_label_count,labelVisual_perCore[i],shared_label_core[i],prv_val_preCore[i]);
 		}
-		user_config_print_values_auto(SHM_visible_label_count,labelVisual_SHM,shared_label_to_read,prv_val_SHM);
+		for (int i=0;i<10;i++){
+			fprintf(stderr," %3d |",shared_label_to_read[i]);
+		}
+
+		//user_config_print_values_auto(SHM_visible_label_count,labelVisual_SHM,shared_label_to_read,prv_val_SHM);
 		fprintf(stderr,"\n");
 		nsleep(1);
 	}

@@ -3,3 +3,4 @@
 *.elf
 armcode
 .gdbinit
+/host_main_example1

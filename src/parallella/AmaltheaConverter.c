@@ -1,14 +1,14 @@
 /*******************************************************************************
  *   Copyright (c) 2019 Dortmund University of Applied Sciences and Arts and others.
- *   
+ *  
  *   This program and the accompanying materials are made
  *   available under the terms of the Eclipse Public License 2.0
  *   which is available at https://www.eclipse.org/legal/epl-2.0/
- *   
+ *  
  *   SPDX-License-Identifier: EPL-2.0
- *   
+ *  
  *   Contributors:
- *       Dortmund University of Applied Sciences and Arts - initial API and implementation
+ *        Dortmund University of Applied Sciences and Arts - initial API and implementation
  *******************************************************************************/
 #include "AmaltheaConverter.h"
 
@@ -43,7 +43,7 @@ void createRTOSTask(AmaltheaTask* task, int priority, int argCount, ...){
 	//make sure the stack size is at least big enough to run the task.
 	stack_size += configMINIMAL_STACK_SIZE;
 	//create the RTOS task with the generalized form
-	xTaskCreate(generalizedRTOSTask	,"Task"	,configMINIMAL_STACK_SIZE/*stack_size*/,	&(*task)	,priority,NULL);
+	xTaskCreate(generalizedRTOSTask	,"Task"	,stack_size,	&(*task)	,priority,NULL);
 }
 
 

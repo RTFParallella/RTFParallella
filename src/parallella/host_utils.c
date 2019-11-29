@@ -1,14 +1,14 @@
 /*******************************************************************************
  *   Copyright (c) 2019 Dortmund University of Applied Sciences and Arts and others.
- *   
+ *  
  *   This program and the accompanying materials are made
  *   available under the terms of the Eclipse Public License 2.0
  *   which is available at https://www.eclipse.org/legal/epl-2.0/
- *   
+ *  
  *   SPDX-License-Identifier: EPL-2.0
- *   
+ *  
  *   Contributors:
- *       Dortmund University of Applied Sciences and Arts - initial API and implementation
+ *        Dortmund University of Applied Sciences and Arts - initial API and implementation
  *******************************************************************************/
 
 #include "host_utils.h"
@@ -93,7 +93,7 @@ unsigned get_user_input_DRAM(unsigned indices[]){
 void print_legend_enum (unsigned label_count,unsigned label_positions[], unsigned memory_type){
 	char buf[label_count*label_str_len];
 	for (int i=0;i<label_str_len;i++){
-		buf[i] = "";
+		buf[i] = " ";
 	}
 	char small_buf[label_str_len];
 	//array_init(buf,label_str_len);

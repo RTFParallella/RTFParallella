@@ -29,7 +29,7 @@ example1: host_main_example1 core0_main.elf core1_main.elf
 	@echo build status : successful
 
 #rule for every device target
-%.elf: $(ELDF) tasks.o queue.o list.o portasm.o port.o heap_1.o c2c.o debugFlags.o AmaltheaConverter.o taskCode.o ParallellaUtils.o shared_comms.o %.o
+%.elf: $(ELDF) tasks.o queue.o list.o portasm.o port.o heap_1.o c2c.o debugFlags.o AmaltheaConverter.o taskCode.o ParallellaUtils.o shared_comms.o label_man_core0.o %.o
 	$(CC) -g -T$< -Wl,--gc-sections -o $@ $(filter-out $<,$^) -le-lib
 
 #host target

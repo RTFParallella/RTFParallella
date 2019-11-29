@@ -1,14 +1,14 @@
 /*******************************************************************************
  *   Copyright (c) 2019 Dortmund University of Applied Sciences and Arts and others.
- *   
+ *  
  *   This program and the accompanying materials are made
  *   available under the terms of the Eclipse Public License 2.0
  *   which is available at https://www.eclipse.org/legal/epl-2.0/
- *   
+ *  
  *   SPDX-License-Identifier: EPL-2.0
- *   
+ *  
  *   Contributors:
- *       Dortmund University of Applied Sciences and Arts - initial API and implementation
+ *        Dortmund University of Applied Sciences and Arts - initial API and implementation
  *******************************************************************************/
 
 #include <stdlib.h>
@@ -127,7 +127,7 @@ int main()
 		e_read(&dev,0,0,dstr_mem_offset_sec_1, &shared_label_core_00, sizeof(shared_label_core_00));
 		e_read(&dev,1,0,addr, &message2, sizeof(message2));
 		e_read(&dev,1,0,dstr_mem_offset_sec_1, &shared_label_core_10, sizeof(shared_label_core_10));
-		e_read(&emem,0,0,0x00, &shared_label_to_read, sizeof(shared_label_to_read));
+		e_read(&emem,0,0,0x00, &shared_label_to_read, 10*sizeof(unsigned int));
 		if (message[8]!= message2[8] ){
 			//fprintf(stderr,"NIS->");
 		}

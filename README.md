@@ -1,11 +1,6 @@
-# [RTFParallella][documentation]
+# RTFParallella
 > RTFP is a framework to implement multi core real time embedded applications on the Adapteva Parallella platform.
 RTFParallella uses FreeRTOS to implement amalthea models for verification.
-
-This project is done in the context of Google Summer of Code 2019 
-
-## History
-*  merged with eclipse APP4MC examples [repositiory][eclipseGit].
 
 ## Installation
 
@@ -42,4 +37,3 @@ Distributed under EPL license.
 
 <!-- Markdown link & img dfn's -->
 [documentation]: https://rtfparallella.readthedocs.io/en/latest/
-[eclipseGit]:https://git.eclipse.org/c/app4mc/org.eclipse.app4mc.examples.git/commit/?id=69a0a24f120bb0d79cbd688081ca697368e252f7

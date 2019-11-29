@@ -1,14 +1,14 @@
 /*******************************************************************************
  *   Copyright (c) 2019 Dortmund University of Applied Sciences and Arts and others.
- *   
+ *  
  *   This program and the accompanying materials are made
  *   available under the terms of the Eclipse Public License 2.0
  *   which is available at https://www.eclipse.org/legal/epl-2.0/
- *   
+ *  
  *   SPDX-License-Identifier: EPL-2.0
- *   
+ *  
  *   Contributors:
- *       Dortmund University of Applied Sciences and Arts - initial API and implementation
+ *        Dortmund University of Applied Sciences and Arts - initial API and implementation
  *******************************************************************************/
 
 #include "c2c.h"
@@ -52,12 +52,44 @@ uint8_t shared_label_write_core	(unsigned row,unsigned col,int label_indx,int pa
 	*addr = payload;
 }
 
+
+void DSHM_section_init(DSHM_section sec){
+	unsigned int *addr;
+	unsigned int* addr_base;
+	addr_base = get_base_address_core(sec.row,sec.col);
+	addr = (unsigned int*) ((unsigned ) addr_base | (unsigned)sec.base_addr);
+	for (int i = 0;i<sec.label_count;i++){
+		addr[i] = 256;
+	}
+}
+
+
+uint8_t write_DSHM_section	(DSHM_section sec,int label_indx,int payload){
+	unsigned int *addr;
+	unsigned int* addr_base;
+	addr_base = get_base_address_core(sec.row,sec.col);
+	addr = (unsigned int*) ((unsigned ) addr_base | (unsigned)sec.base_addr);
+	addr[label_indx] = payload;
+}
+
+unsigned int read_DSHM_section (DSHM_section sec, int label_indx){
+	unsigned int *addr;
+	unsigned int* addr_base;
+	addr_base = get_base_address_core(sec.row,sec.col);
+	addr = (unsigned int*) ((unsigned ) addr_base | (unsigned)sec.base_addr);
+	return addr[label_indx];
+}
+
+
+
+
+
 unsigned int shared_label_read_core (unsigned row, unsigned col, int label_indx){
 	unsigned int *addr;
 	unsigned int* addr_base;
 	addr_base = get_base_address_core(row,col);
 	addr = (unsigned int*) ((unsigned ) addr_base | (unsigned)outbuf_dstr_shared[label_indx]);
-	return *addr;
+	return addr;
 }
 
 
