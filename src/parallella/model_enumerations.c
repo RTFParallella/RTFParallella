@@ -42,7 +42,7 @@ char DSHM_sec1_enum [DSHM_section1_label_count][label_str_len] =
   "DSH_labelJ"
 };
 
-char task_enum [task_count +1][label_str_len] =
+char task_enum [task_count + 1][label_str_len] =
 {
   "[idle]",
   "Task5ms0",

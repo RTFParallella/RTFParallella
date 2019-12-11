@@ -15,6 +15,7 @@
 #define SRC_PARALLELLA_DEBUGFLAGS_H_
 
 #define cnt_address 	0x3000
+#define btf_trace_address    0x2000
 
 #define TASK1_FLAG			2
 #define TASK2_FLAG 			0
@@ -24,6 +25,7 @@
 #define RUNNINGTASK_FLAG 	6
 #define DEBUG_FLAG 			7
 #define TICK_FLAG			8
+
 
 /**
  * initialize output buffer in core memory
