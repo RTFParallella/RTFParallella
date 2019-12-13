@@ -93,7 +93,7 @@ unsigned get_user_input_DRAM(unsigned indices[]){
 void print_legend_enum (unsigned label_count,unsigned label_positions[], unsigned memory_type){
 	char buf[label_count*label_str_len];
 	for (int i=0;i<label_str_len;i++){
-		buf[i] = " ";
+		buf[i] = 0;
 	}
 	char small_buf[label_str_len];
 	//array_init(buf,label_str_len);

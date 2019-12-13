@@ -15,13 +15,15 @@
 
 #include "FreeRTOS.h"
 #include "task.h"
-#include "trace_utils_BTF.h"
 
 
 unsigned int *outbuf[10];
 
+#define BTF_TRACE_BUFFER_SIZE      8
 unsigned int *btf_trace_buf[BTF_TRACE_BUFFER_SIZE];
 
+
+static void btf_trace_buf_init(void);
 /*
  * initialize output buffer with the addresses to array elements
  */
@@ -44,11 +46,34 @@ void outbuf_init(void ){
     for (i=0;i<9;i++){
         *outbuf[i] = 0;
     }
-#ifdef RFTP_GENERATE_BTF_TRACE
-    btf_trace_buf_init(btf_trace_buf, btf_trace_address);
-#endif /* End of RFTP_GENERATE_BTF_TRACE */
+    btf_trace_buf_init();
 }
 
+/**
+ * Function to initialize the BTF trace buffer.
+ *
+ * Arguments:
+ * @in_param btf_trace_buf  : Pointer to the BTF trace buffer.
+ * @in_param address        : Starting offset of the BTF trace buffer.
+ *
+ * Return: void
+ */
+static void btf_trace_buf_init(void)
+{
+    int index;
+    btf_trace_buf[0] = (unsigned int *) btf_trace_address;
+    btf_trace_buf[1] = btf_trace_buf[0] + 1;
+    btf_trace_buf[2] = btf_trace_buf[1] + 1;
+    btf_trace_buf[3] = btf_trace_buf[2] + 1;
+    btf_trace_buf[4] = btf_trace_buf[3] + 1;
+    btf_trace_buf[5] = btf_trace_buf[4] + 1;
+    btf_trace_buf[6] = btf_trace_buf[5] + 1;
+    btf_trace_buf[7] = btf_trace_buf[6] + 1;
+    //initialize buffer
+    for (index = 0;index < BTF_TRACE_BUFFER_SIZE; index++){
+        *btf_trace_buf[index] = 0x00;
+    }
+}
 
 
 

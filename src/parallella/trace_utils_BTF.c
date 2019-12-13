@@ -15,12 +15,20 @@
 #include "trace_utils_BTF.h"
 
 
+/*------------------------------DEFINES-------------------------*/
+#define BTF_TRACE_ENTITY_TABLE_SIZE                 64
+
 /*-------------------------GOLBAL VARIABLES--------------------*/
-const char btf_trace_version = "#version 1.0";
+const char *btf_trace_version = "#version 1.0";
 
 /*-------------------------STATIC GOLBAL VARIABLES--------------------*/
 static btf_trace_header_config_t btf_header;
 static uint8_t output_trace_path[512];
+static btf_trace_entity_table entity_table[BTF_TRACE_ENTITY_TABLE_SIZE];
+static uint8_t isEntityTypeHeaderWritten = BTF_TRACE_FALSE;
+static uint8_t isEntityTableHeaderWritten = BTF_TRACE_FALSE;
+static uint8_t isEntityTypTableHeaderWritten = BTF_TRACE_FALSE;
+
 
 /*-------------------------CONST VARIABLES---------------------------*/
 const uint8_t event_type[][8] = {
@@ -49,13 +57,31 @@ const uint8_t event_name[][16] = {
 /*-------------------------STATIC FUNCTIONS----------------------------*/
 static void print_usage(void);
 static void get_trace_timestamp(uint8_t *buffer);
+static int validate_timescale(char *scale);
+static int16_t find_first_free_index(void);
+static void get_trace_timestamp(uint8_t *buffer);
 
 
 
 static int validate_timescale(char *scale)
 {
-	return BTF_TRACE_TRUE;
+    return BTF_TRACE_TRUE;
 }
+
+/* Function to get the first free available index */
+static int16_t find_first_free_index(void)
+{
+    int index = 0;
+    for(index = 0; index < BTF_TRACE_ENTITY_TABLE_SIZE; index++)
+    {
+        if (entity_table[index].is_occupied == 0x00)
+        {
+            return index;
+        }
+    }
+    return -1;
+}
+
 
 /* Function to get the current time of creation of btf trace file */
 static void get_trace_timestamp(uint8_t *buffer)
@@ -80,6 +106,11 @@ static void print_usage(void)
     fflush(stdout);
 }
 
+
+void get_btf_trace_file_path(uint8_t *trace_file_path)
+{
+	//TODO: Get the file path from the current working directory
+}
 
 /**
  * Parse the command line arguments for generating the BTF trace file
@@ -139,6 +170,33 @@ void  parse_btf_trace_arguments(int argc, char **argv)
     }
 }
 
+
+
+/**
+ * Store the entity metadata which can be used to generate the entity
+ * type and entity type table.
+ *
+ * Arguments:
+ * @in_param typeId  : Unique entity type ID
+ * @in_param type    : Entity type..e.g TASK, RUNNABLE etc..
+ * @in_param name    : Entity name
+ *
+ * Return: void
+ */
+void store_entity_entry(uint16_t typeId, btf_trace_event_type type, uint8_t *name)
+{
+    int16_t index = 0;
+    index = find_first_free_index();
+    if (index >= 0)
+    {
+        entity_table[index].entity_data.entity_id = typeId;
+        entity_table[index].entity_data.entity_type = type;
+        strcpy((char *)entity_table[index].entity_data.entity_name, (const char *)name);
+        entity_table[index].is_occupied = 0x01;
+    }
+}
+
+
 /**
  * Function to write BTF header data to the trace file.
  * It writes the version, creator, input model file,
@@ -167,30 +225,96 @@ void write_btf_trace_header_config(FILE *stream)
     fflush(stream);
 }
 
-
-
 /**
- * Function to initialize the BTF trace buffer.
+ * Function to write entity type in BTF header data
  *
  * Arguments:
- * @in_param btf_trace_buf  : Pointer to the BTF trace buffer.
- * @in_param address        : Starting offset of the BTF trace buffer.
+ * @in_param stream  : File pointer to the stream where the data has to be
+ *                     written.
+ * @in_param type    : Type of the entity i.e. TASK, RUNNABLE, STIMULUS etc..
  *
  * Return: void
  */
-void btf_trace_buf_init(int **btf_trace_buf, int address)
+void write_btf_trace_header_entity_type(FILE *stream, btf_trace_event_type type)
 {
-    int index;
-    btf_trace_buf[0] = (unsigned int *) address;
-    btf_trace_buf[1] = btf_trace_buf[0] + 1;
-    btf_trace_buf[2] = btf_trace_buf[1] + 1;
-    btf_trace_buf[3] = btf_trace_buf[2] + 1;
-    btf_trace_buf[4] = btf_trace_buf[3] + 1;
-    btf_trace_buf[5] = btf_trace_buf[4] + 1;
-    btf_trace_buf[6] = btf_trace_buf[5] + 1;
-    btf_trace_buf[7] = btf_trace_buf[6] + 1;
-    //initialize buffer
-    for (index = 0;index < BTF_TRACE_BUFFER_SIZE; index++){
-        *btf_trace_buf[index] = 0x00;
+    if (stream == NULL)
+    {
+        return;
+    }
+    if (isEntityTypeHeaderWritten == BTF_TRACE_FALSE)
+    {
+        fprintf(stream, "#entityType\n");
+        isEntityTypeHeaderWritten = BTF_TRACE_TRUE;
+    }
+    fprintf(stream, "#-%d %s\n", type, event_type[type]);
+    fflush(stream);
+}
+
+
+/**
+ * Function to write entity type in BTF header data
+ *
+ * Arguments:
+ * @in_param stream  : File pointer to the stream where the data has to be
+ *                     written.
+ * @in_param type    : Type of the entity i.e. TASK, RUNNABLE, STIMULUS etc..
+ *
+ * Return: void
+ */
+void write_btf_trace_header_entity_type_table(FILE *stream)
+{
+    if (stream == NULL)
+    {
+        return;
+    }
+    if (isEntityTypTableHeaderWritten == BTF_TRACE_FALSE)
+    {
+        fprintf(stream, "#entityTypeTable\n");
+        isEntityTypTableHeaderWritten = BTF_TRACE_TRUE;
+    }
+    int index = 0;
+    for(index = 0; index < BTF_TRACE_ENTITY_TABLE_SIZE; index++)
+    {
+        if (entity_table[index].is_occupied == 0x01)
+        {
+            int type_index = entity_table[index].entity_data.entity_type;
+            fprintf(stream, "#-%s %s\n", event_type[type_index],
+                            entity_table[index].entity_data.entity_name);
+            fflush(stream);
+        }
+    }
+}
+
+
+/**
+ * Function to write entity type in BTF header data
+ *
+ * Arguments:
+ * @in_param stream  : File pointer to the stream where the data has to be
+ *                     written.
+ * @in_param type    : Type of the entity i.e. TASK, RUNNABLE, STIMULUS etc..
+ *
+ * Return: void
+ */
+void write_btf_trace_header_entity_table(FILE *stream)
+{
+    if (stream == NULL)
+    {
+        return;
+    }
+    if (isEntityTableHeaderWritten == BTF_TRACE_FALSE)
+    {
+        fprintf(stream, "#entityTable\n");
+        isEntityTableHeaderWritten = BTF_TRACE_TRUE;
+    }
+    int index = 0;
+    for(index = 0; index < BTF_TRACE_ENTITY_TABLE_SIZE; index++)
+    {
+        if (entity_table[index].is_occupied == 0x01)
+        {
+            fprintf(stream, "#-%d %s\n", entity_table[index].entity_data.entity_id,
+                    entity_table[index].entity_data.entity_name);
+            fflush(stream);
+        }
     }
 }

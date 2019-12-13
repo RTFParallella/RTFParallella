@@ -12,6 +12,7 @@
  *******************************************************************************/
 
 #include "shared_comms.h"
+#include "debugFlags.h"
 #include "e-lib.h"
 
 typedef unsigned int e_label_size; // one word = 4 bytes = unsigned int
@@ -97,7 +98,7 @@ void shared_labels_init(){
 }
 
 uint8_t shared_label_write(int label_indx,int payload){
-	uint8_t retval=NULL;
+	uint8_t retval= 0;
 	*outbuf_shared[label_indx] = payload;
 	/*if (payload == *outbuf_shared[label_indx]){
 		retval = 1;

@@ -1,13 +1,13 @@
 EPIPHANY_HOME=/opt/adapteva/esdk
 #host compiler path
-LCC=/opt/gcc-linaro-7.2.1-2017.11-x86_64_arm-linux-gnueabihf/bin/arm-linux-gnueabihf-gcc
+LCC=/opt/linaro/bin/arm-linux-gnueabihf-gcc
 #device compiler path
 CC=e-gcc
 #FreeRTOS dependencies
 CFLAGS=-I.
 FREERTOSSRC=../../RTFP_RTOS_KERNEL_PATCHED/FreeRTOS/Source
 INCLUDES= -g -I$(FREERTOSSRC)/include -I$(FREERTOSSRC)/portable/GCC/Epiphany -I.
-DEPS = $(FREERTOSSRC)/portable/GCC/Epiphany/portmacro.h Makefile FreeRTOSConfig.h c2c.h debugFlags.h AmaltheaConverter.h taskCode.h ParallellaUtils.h
+DEPS = $(FREERTOSSRC)/portable/GCC/Epiphany/portmacro.h Makefile FreeRTOSConfig.h c2c.h debugFlags.h AmaltheaConverter.h taskCode.h ParallellaUtils.h trace_utils_BTF.h
 DEPSHOST = c2c.h debugFlags.h AmaltheaConverter.h shared_comms.h model_enumerations.h
 #Epiphany SDK dependencies
 ESDK=${EPIPHANY_HOME}
@@ -34,9 +34,9 @@ example1: host_main_example1 core0_main.elf core1_main.elf
 
 #host target
 armcode: armcode.c $(DEPSHOST) 
-	$(LCC) $< -o $@  host_utils.c model_enumerations.c -I ${EINCS} -L ${ELIBS} -lpal -le-hal -le-loader -lpthread 
+	$(LCC) $< -o $@  host_utils.c model_enumerations.c trace_utils_BTF.c -I ${EINCS} -L ${ELIBS} -lpal -le-hal -le-loader -lpthread 
 host_main_example1: host_main_example1.c $(DEPSHOST) 
-	$(LCC) $< -o $@  host_utils.c model_enumerations.c -I ${EINCS} -L ${ELIBS} -lpal -le-hal -le-loader -lpthread 
+	$(LCC) $< -o $@ host_utils.c model_enumerations.c trace_utils_BTF.c -I ${EINCS} -L ${ELIBS} -lpal -le-hal -le-loader -lpthread 
 
 #clean target
 clean:

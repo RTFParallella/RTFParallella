@@ -23,7 +23,6 @@
 #include "shared_comms.h"
 #include "host_utils.h"
 #include "model_enumerations.h"
-#include "trace_utils_BTF.h"
 
 unsigned int shared_label_to_read[10];
 unsigned int shared_label_core_00[dstr_mem_sec_1_label_count];
@@ -35,14 +34,15 @@ unsigned int shared_label_core[core_count][dstr_mem_sec_1_label_count];
 static void construct_btf_trace_header(FILE *stream)
 {
     write_btf_trace_header_config(stream);
-    write_task_events(stream);
-    write_stimulus_events(stream);
-    write_signal_events(stream);
-    write_runnable_events(stream);
-    write_shared_labels(stream);
-    write_distributed_shared_labels(stream);
-
-    dump_btf_trace_data(stream);
+    write_btf_trace_header_entity_type(stream, TASK_EVENT);
+    write_btf_trace_header_entity_type(stream, RUNNABLE_EVENT);
+    write_btf_trace_header_entity_type(stream, SIGNAL_EVENT);
+    generate_task_entity_table();
+    generate_runnable_entity_table();
+    generate_signal_entity_table();
+    generate_hw_entity_table();
+    write_btf_trace_header_entity_table(stream);
+    write_btf_trace_header_entity_type_table(stream);
 }
 
 #endif
@@ -55,8 +55,9 @@ int main(int argc, char *argv[])
 #ifdef RFTP_GENERATE_BTF_TRACE
     FILE *fp_to_trace = NULL;
     parse_btf_trace_arguments(argc, argv);
-    uint8_t *trace_file_path = get_btf_trace_file_path();
-    if (trace_file_path != NULL)
+    uint8_t trace_file_path[512] = {0};
+    get_btf_trace_file_path(trace_file_path);
+    if (strlen(trace_file_path) == 0)
     {
         //TODO: Add function to create file pointer for given file path.
     }
