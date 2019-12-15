@@ -16,6 +16,7 @@
 
 #include "shared_comms.h"
 #include "c2c.h"
+#include "debugFlags.h"
 
 #define num_unique_sections 1
 
@@ -26,6 +27,19 @@ void init_DSHM_sections(void);
 //declare cIn/Out operations
 //to be set up from the amalthea model during
 //code generation
+#ifdef RFTP_GENERATE_BTF_TRACE
+void cIn5ms(int srcId, int srcInstance);
+void cIn10ms(int srcId, int srcInstance);
+void cIn20ms(int srcId, int srcInstance);
+void cIn10msCore2(int srcId, int srcInstance);
+void cIn20msCore2(int srcId, int srcInstance);
+//-------
+void cOut5ms(int srcId, int srcInstance);
+void cOut10ms(int srcId, int srcInstance);
+void cOut20ms(int srcId, int srcInstance);
+void cOut10msCore2(int srcId, int srcInstance);
+void cOut20msCore2(int srcId, int srcInstance);
+#else
 void cIn5ms();
 void cIn10ms();
 void cIn20ms();
@@ -37,6 +51,7 @@ void cOut10ms();
 void cOut20ms();
 void cOut10msCore2();
 void cOut20msCore2();
+#endif
 
 
 

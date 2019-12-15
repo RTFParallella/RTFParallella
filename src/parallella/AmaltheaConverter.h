@@ -14,6 +14,8 @@
 #ifndef SRC_PARALLELLA_AMALTHEACONVERTER_H_
 #define SRC_PARALLELLA_AMALTHEACONVERTER_H_
 
+#include "debugFlags.h"
+
 #define PLATFORM_WORD_LENGTH 32
 
 #define numTasks 3
@@ -21,6 +23,22 @@
 /**
  * Structure to hold tasks according to amalthea model
  */
+#ifdef RFTP_GENERATE_BTF_TRACE
+typedef struct{
+	unsigned isDone;
+	unsigned isReady;
+	unsigned srcId;
+	unsigned srcInstance;
+	unsigned taskId;
+	unsigned taskInstance;
+	void(* taskHandler)(int srcId, int srcInstance);
+	unsigned executionTime;//in ticks
+	unsigned deadline;		//in ticks
+	unsigned period;		//in ticks
+	void(* cInHandler)(int srcId, int srcInstance);
+	void(* cOutHandler)(int srcId, int srcInstance);
+}AmaltheaTask;
+#else
 typedef struct{
 	unsigned isDone;
 	unsigned isReady;
@@ -32,14 +50,20 @@ typedef struct{
 	void(* cOutHandler)();
 }AmaltheaTask;
 
+#endif
+
 
 /**
  * communication semantics of tasks
  * if use_LET_COMM_SEMANTICS is defined, the tasks will behave in LET semantics else it will use implicit by default
  */
 //#define use_LET_COMM_SEMANTICS
-
-AmaltheaTask createAmaltheaTask(void *taskHandler,void *cInHandler,void *cOutHandler,unsigned int period,unsigned int deadline, unsigned int WCET);
+#ifdef RFTP_GENERATE_BTF_TRACE
+AmaltheaTask createAmaltheaTask(void *taskHandler,void *cInHandler,void *cOutHandler,unsigned int period, unsigned int srcId, unsigned int srcInstance,
+		unsigned int taskId, unsigned int taskInstance, unsigned int deadline, unsigned int WCET);
+#else
+AmaltheaTask createAmaltheaTask(void *taskHandler,void *cInHandler,void *cOutHandler,unsigned int period, unsigned int deadline, unsigned int WCET);
+#endif
 
 /**
  *	Create the RTOS task that represents a given Amalthea task.

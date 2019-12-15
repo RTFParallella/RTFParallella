@@ -22,12 +22,19 @@
 #include "queue.h"
 
 //declare taskHandler functions
-
+#ifdef RFTP_GENERATE_BTF_TRACE
+void handler5ms(int srcId, int srcInstance);
+void handler10ms(int srcId, int srcInstance);
+void handler20ms(int srcId, int srcInstance);
+void handler10msCore2(int srcId, int srcInstance);
+void handler20msCore2(int srcId, int srcInstance);
+#else
 void handler5ms();
 void handler10ms();
 void handler20ms();
 void handler10msCore2();
 void handler20msCore2();
+#endif
 //-------
 
 

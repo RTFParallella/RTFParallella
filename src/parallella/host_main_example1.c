@@ -29,7 +29,7 @@ unsigned int shared_label_core_00[dstr_mem_sec_1_label_count];
 unsigned int shared_label_core_10[dstr_mem_sec_1_label_count];
 unsigned int shared_label_core[core_count][dstr_mem_sec_1_label_count];
 
-#ifdef RFTP_GENERATE_BTF_TRACE
+//#ifdef RFTP_GENERATE_BTF_TRACE
 
 static void construct_btf_trace_header(FILE *stream)
 {
@@ -45,28 +45,29 @@ static void construct_btf_trace_header(FILE *stream)
     write_btf_trace_header_entity_type_table(stream);
 }
 
-#endif
+//#endif
 
 int main(int argc, char *argv[])
 {
     int label_enable_count_core0 = 0;
     unsigned labelVisual_perCore[core_count][DSHM_visible_label_count];
     unsigned int prv_val_preCore[core_count][DSHM_visible_label_count];
-#ifdef RFTP_GENERATE_BTF_TRACE
+//#ifdef RFTP_GENERATE_BTF_TRACE
     FILE *fp_to_trace = NULL;
     parse_btf_trace_arguments(argc, argv);
     uint8_t trace_file_path[512] = {0};
     get_btf_trace_file_path(trace_file_path);
-    if (strlen(trace_file_path) == 0)
+    if (strlen(trace_file_path) != 0)
     {
         //TODO: Add function to create file pointer for given file path.
     }
     else
     {
-        fp_to_trace = stdout;
+    	fprintf(stderr,"Output redirected to stderr\n");
+        fp_to_trace = stderr;
     }
     construct_btf_trace_header(fp_to_trace);
-#endif/* End of RFTP_GENERATE_BTF_TRACE*/
+//#endif/* End of RFTP_GENERATE_BTF_TRACE*/
     for (int i=0;i<core_count;i++){
         get_visible_label_index(labelVisual_perCore[i],MEM_TYPE_DSHM);
     }
@@ -97,8 +98,15 @@ int main(int argc, char *argv[])
     e_return_stat_t result;
     unsigned int message[9];
     unsigned int message2[9];
+//#ifdef RFTP_GENERATE_BTF_TRACE
+    unsigned int core0_btf_trace[BTF_TRACE_BUFFER_SIZE];
+    unsigned int core1_btf_trace[BTF_TRACE_BUFFER_SIZE];
+//#endif
     int loop;
     int addr;
+//#ifdef RFTP_GENERATE_BTF_TRACE
+    int btf_trace_addr;
+//#endif
     e_mem_t emem;
     e_init(NULL);
     /*
@@ -127,6 +135,9 @@ int main(int argc, char *argv[])
     }
     e_start_group(&dev);
     addr = cnt_address;
+//#ifdef RFTP_GENERATE_BTF_TRACE
+    btf_trace_addr = btf_trace_address;
+//#endif
     int pollLoopCounter = 0;
     unsigned int chainLatencyEndIndicator = 0;
     unsigned int chainLatencyStartIndicator = 10e6;
@@ -137,14 +148,22 @@ int main(int argc, char *argv[])
     array_init(buffer2,label_str_len);
 
 
-    int prev1,prev2,prev3;
+    //int prev1,prev2,prev3;
     for (pollLoopCounter=0;pollLoopCounter<=40;pollLoopCounter++){
         message[3] = 0;
         e_read(&dev,0,0,addr, &message, sizeof(message));
+//#ifdef RFTP_GENERATE_BTF_TRACE
+        e_read(&dev,0,0,btf_trace_addr, &core0_btf_trace, sizeof(core0_btf_trace));
+//#endif
         e_read(&dev,0,0,dstr_mem_offset_sec_1, &shared_label_core[0], sizeof(shared_label_core_00));
         e_read(&dev,1,0,addr, &message2, sizeof(message2));
+//#ifdef RFTP_GENERATE_BTF_TRACE
+        e_read(&dev,1,0,btf_trace_addr, &core1_btf_trace, sizeof(core1_btf_trace));
+//#endif
         e_read(&dev,1,0,dstr_mem_offset_sec_1, &shared_label_core[1], sizeof(shared_label_core_10));
         e_read(&emem,0,0,0x00, &shared_label_to_read, sizeof(unsigned int));
+//#ifdef RFTP_GENERATE_BTF_TRACE
+//#endif /* End of RFTP_GENERATE_BTF_TRACE */
         if (message[8]!= message2[8] ){
             //fprintf(stderr,"NIS->");
         }
@@ -160,6 +179,14 @@ int main(int argc, char *argv[])
 
         //user_config_print_values_auto(SHM_visible_label_count,labelVisual_SHM,shared_label_to_read,prv_val_SHM);
         fprintf(stderr,"\n");
+        fprintf(stderr, "BTF trace Core 0---[Ticks=%d][SourceId=%d][SourceIns=%d][Type=%d] \
+        		[Target=%d][TargetIns=%d][Event=%d][Data=%d]\n", core0_btf_trace[0],
+        		core0_btf_trace[1], core0_btf_trace[2], core0_btf_trace[3], core0_btf_trace[4],
+				core0_btf_trace[5], core0_btf_trace[6], core0_btf_trace[7]);
+        fprintf(stderr, "BTF trace Core 1---[Ticks=%d][SourceId=%d][SourceIns=%d][Type=%d] \
+        		[Target=%d][TargetIns=%d][Event=%d][Data=%d]\n", core1_btf_trace[0],
+        		core1_btf_trace[1], core1_btf_trace[2], core1_btf_trace[3], core1_btf_trace[4],
+				core1_btf_trace[5], core1_btf_trace[6], core1_btf_trace[7]);
         nsleep(1);
     }
     fprintf(stderr,"----------------------------------------------\n");

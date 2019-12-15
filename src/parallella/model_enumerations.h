@@ -22,12 +22,12 @@
 
 #define label_str_len                16
 
-#ifdef RFTP_GENERATE_BTF_TRACE
+//#ifdef RFTP_GENERATE_BTF_TRACE
 
 #define runnable_str_len            32
 #define hw_str_len                  16
 
-#endif
+//#endif
 
 #define task_count                    5
 

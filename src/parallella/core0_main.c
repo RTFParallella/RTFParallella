@@ -43,9 +43,15 @@ int main(void) {
 	y = read_shm_section(global_shm_sec_ptr,0);
 	write_shm_section(global_shm_sec_ptr,5,y + 10);*/
 	//create Amalthea task objects
-	AmaltheaTask t5ms =  createAmaltheaTask(handler5ms,cIn5ms,cOut5ms,5,5,2);
-	AmaltheaTask t10ms = createAmaltheaTask(handler10ms,cIn10ms,cOut10ms,10,10,3);
+#ifdef RFTP_GENERATE_BTF_TRACE
+	AmaltheaTask t5ms =  createAmaltheaTask(handler5ms,cIn5ms,cOut5ms,5,25, 0, 1, 0, 5,2);
+	AmaltheaTask t10ms = createAmaltheaTask(handler10ms,cIn10ms,cOut10ms,10,25, 0, 2, 0, 10,3);
+	AmaltheaTask t20ms = createAmaltheaTask(handler20ms,cIn20ms,cOut20ms,20,25, 0, 3, 0,20,5);
+#else
+	AmaltheaTask t5ms =  createAmaltheaTask(handler5ms,cIn5ms,cOut5ms,5, 5,2);
+	AmaltheaTask t10ms = createAmaltheaTask(handler10ms,cIn10ms,cOut10ms,10, 10,3);
 	AmaltheaTask t20ms = createAmaltheaTask(handler20ms,cIn20ms,cOut20ms,20,20,5);
+#endif
 	//create RTOS task from templates
 	createRTOSTask(&t5ms,3,0);
 	createRTOSTask(&t10ms,2,0);

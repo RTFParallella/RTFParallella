@@ -19,7 +19,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#define RFTP_GENERATE_BTF_TRACE   0x01
+//#define RFTP_GENERATE_BTF_TRACE 0x01
 
 #define BTF_TRACE_TRUE     0x01
 #define BTF_TRACE_FALSE    0x00
@@ -27,13 +27,13 @@
 
 /* BTF trace flags */
 #define BTF_TRACE_BUFFER_SIZE           8
-#define SOURCE_FLAG                     0
-#define SOURCE_INSTANCE_FLAG            1
-#define EVENT_TYPE_FLAG                 2
-#define TARGET_FLAG                     3
-#define TARGET_INSTANCE_FLAG            4
-#define EVENT_FLAG                      5
-#define TIME_FLAG                       6
+#define TIME_FLAG                       0
+#define SOURCE_FLAG                     1
+#define SOURCE_INSTANCE_FLAG            2
+#define EVENT_TYPE_FLAG                 3
+#define TARGET_FLAG                     4
+#define TARGET_INSTANCE_FLAG            5
+#define EVENT_FLAG                      6
 #define DATA_FLAG                       7
 
 
@@ -55,10 +55,10 @@ typedef enum btf_trace_event_type_t
 
 typedef enum btf_trace_event_name_t
 {
-    START,
-    TERMINATE,
-    READ,
-    WRITE
+    PROCESS_START,
+    PROCESS_TERMINATE,
+    SIGNAL_READ,
+    SIGNAL_WRITE
 } btf_trace_event_name;
 
 
@@ -103,9 +103,6 @@ void write_btf_trace_header_entity_table(FILE *stream);
 
 /* Function to write the entity type table in the BTF header section */
 void write_btf_trace_header_entity_type_table(FILE *stream);
-
-/* Function to initialize the BTF trace buffer */
-void btf_trace_buf_init(int **btf_trace_buf, int address);
 
 /* Function to store the entry for all the entities */
 void store_entity_entry(uint16_t typeId, btf_trace_event_type type, uint8_t *name);

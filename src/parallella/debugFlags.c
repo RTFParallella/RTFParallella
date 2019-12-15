@@ -16,14 +16,15 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
-
 unsigned int *outbuf[10];
 
-#define BTF_TRACE_BUFFER_SIZE      8
+//#ifdef RFTP_GENERATE_BTF_TRACE
 unsigned int *btf_trace_buf[BTF_TRACE_BUFFER_SIZE];
+static unsigned int counter;
 
 
 static void btf_trace_buf_init(void);
+//#endif
 /*
  * initialize output buffer with the addresses to array elements
  */
@@ -46,15 +47,18 @@ void outbuf_init(void ){
     for (i=0;i<9;i++){
         *outbuf[i] = 0;
     }
+//#ifdef RFTP_GENERATE_BTF_TRACE
     btf_trace_buf_init();
+//#endif
 }
 
+
+//#ifdef RFTP_GENERATE_BTF_TRACE
 /**
  * Function to initialize the BTF trace buffer.
  *
  * Arguments:
- * @in_param btf_trace_buf  : Pointer to the BTF trace buffer.
- * @in_param address        : Starting offset of the BTF trace buffer.
+ * void
  *
  * Return: void
  */
@@ -75,7 +79,7 @@ static void btf_trace_buf_init(void)
     }
 }
 
-
+//#endif
 
 void traceRunningTask(unsigned taskNum){
     *outbuf[RUNNINGTASK_FLAG] = taskNum;
@@ -93,15 +97,34 @@ void traceTaskPasses(unsigned taskNum, int currentPasses){
 
 void updateTick(void){
     *outbuf[TICK_FLAG] = xTaskGetTickCount();
+    *btf_trace_buf[TIME_FLAG] = xTaskGetTickCount();
 }
 
 void updateDebugFlag(int debugMessage){
     *outbuf[DEBUG_FLAG] = debugMessage;
+    //*btf_trace_buf[SOURCE_FLAG] = counter++;
+    //*btf_trace_buf[SOURCE_INSTANCE_FLAG] = counter++;
+    //*btf_trace_buf[EVENT_TYPE_FLAG] = counter++;
+    //*btf_trace_buf[TARGET_FLAG] = counter++;
+    //*btf_trace_buf[TARGET_INSTANCE_FLAG] = counter++;
+    //*btf_trace_buf[EVENT_FLAG] = counter++;
+    //*btf_trace_buf[DATA_FLAG] = counter++;
 }
 
-
-
-
+//#ifdef RFTP_GENERATE_BTF_TRACE
+void updateBTFTraceBuffer(int srcID, int srcInstance, btf_trace_event_type type,
+        int targetId, int targetInstance, btf_trace_event_name event_name, int data)
+{
+    //*btf_trace_buf[TIME_FLAG] = xTaskGetTickCount();
+    *btf_trace_buf[SOURCE_FLAG] = srcID;
+    *btf_trace_buf[SOURCE_INSTANCE_FLAG] = srcInstance;
+    *btf_trace_buf[EVENT_TYPE_FLAG] = type;
+    *btf_trace_buf[TARGET_FLAG] = targetId;
+    *btf_trace_buf[TARGET_INSTANCE_FLAG] = targetInstance;
+    *btf_trace_buf[EVENT_FLAG] = event_name;
+    *btf_trace_buf[DATA_FLAG] = data;
+}
+//#endif
 
 
 

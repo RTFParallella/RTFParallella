@@ -23,6 +23,8 @@
 
 //time units in processor cycles
 #define _1MS 700000
+#define _HALFMS  350000
+#define _10US 7000
 #define _1US 700
 
 /**
