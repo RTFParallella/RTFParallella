@@ -19,7 +19,7 @@
 #include <string.h>
 #include <stdint.h>
 
-//#define RFTP_GENERATE_BTF_TRACE 0x01
+#define RFTP_GENERATE_BTF_TRACE 0x01
 
 #define BTF_TRACE_TRUE     0x01
 #define BTF_TRACE_FALSE    0x00
