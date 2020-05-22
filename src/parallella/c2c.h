@@ -18,7 +18,7 @@
 #include <stdint.h>
 #include "shared_comms.h"
 #define dstr_mem_offset_sec_1 			0x4000
-#define dstr_mem_sec_1_label_count		10
+#define DSHM_SEC_LABEL_COUNT		    10
 #define dstr_mem_sec_1_label_type		unsigned int
 
 

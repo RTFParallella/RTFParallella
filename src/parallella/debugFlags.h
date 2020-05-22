@@ -14,22 +14,16 @@
 #ifndef SRC_PARALLELLA_DEBUGFLAGS_H_
 #define SRC_PARALLELLA_DEBUGFLAGS_H_
 
-#include "trace_utils_BTF.h"
+#define cnt_address 	0x3000
 
-#define cnt_address     0x3000
-//#ifdef RFTP_GENERATE_BTF_TRACE
-    #define btf_trace_address    0x3200
-//#endif
-
-#define TASK1_FLAG             2
-#define TASK2_FLAG             0
-#define TASK3_FLAG             4
-#define TASK4_FLAG             0
-#define TASK5_FLAG             4
-#define RUNNINGTASK_FLAG       6
-#define DEBUG_FLAG             7
-#define TICK_FLAG              8
-
+#define TASK1_FLAG			2
+#define TASK2_FLAG 			0
+#define TASK3_FLAG 			4
+#define TASK4_FLAG			0
+#define TASK5_FLAG			4
+#define RUNNINGTASK_FLAG 	6
+#define DEBUG_FLAG 			7
+#define TICK_FLAG			8
 
 /**
  * initialize output buffer in core memory
@@ -43,7 +37,7 @@ void outbuf_init(void );
  * write the index of the running task to output buffer
  *
  * Arguments:
- * taskNum            :    index of the task
+ * taskNum			:	index of the task
  *
  */
 void traceRunningTask(unsigned taskNum);
@@ -52,8 +46,8 @@ void traceRunningTask(unsigned taskNum);
  * write the task instance (job) to output buffer
  *
  * Arguments:
- * taskNum            :    index of the task
- * currentPasses    :    instance of task (job number)
+ * taskNum			:	index of the task
+ * currentPasses	:	instance of task (job number)
  *
  */
 void traceTaskPasses(unsigned taskNum, int currentPasses);
@@ -70,15 +64,9 @@ void updateTick(void);
  * Write a custom value to the output buffer for code coverage debugging
  *
  * Arguments:
- * debugMessage            :    message to be written
+ * debugMessage			:	message to be written
  *
  */
 void updateDebugFlag(int debugMessage);
-
-//#ifdef RFTP_GENERATE_BTF_TRACE
-void updateBTFTraceBuffer(int srcID, int srcInstance, btf_trace_event_type type,
-        int targetId, int targetInstance, btf_trace_event_name event_name, int data);
-//#endif
-
 
 #endif /* SRC_PARALLELLA_DEBUGFLAGS_H_ */

@@ -91,11 +91,11 @@ unsigned get_user_input_DRAM(unsigned indices[]){
 }
 
 void print_legend_enum (unsigned label_count,unsigned label_positions[], unsigned memory_type){
-	char buf[label_count*label_str_len];
-	for (int i=0;i<label_str_len;i++){
+	char buf[label_count*LABEL_STRLEN];
+	for (int i=0;i<LABEL_STRLEN;i++){
 		buf[i] = " ";
 	}
-	char small_buf[label_str_len];
+	char small_buf[LABEL_STRLEN];
 	//array_init(buf,label_str_len);
 	if (memory_type==MEM_TYPE_SHM){
 		for (int i=0;i<label_count;i++){
@@ -110,7 +110,7 @@ void print_legend_enum (unsigned label_count,unsigned label_positions[], unsigne
 		}
 	}
 	//fprintf(stderr,"%s",buf);
-	//fflush(stderr);
+	fflush(stderr);
 }
 
 

@@ -13,6 +13,8 @@
 #ifndef FREERTOS_CONFIG_H
 #define FREERTOS_CONFIG_H
 
+#include "RTFParallellaConfig.h"
+
 
 #define configCALL_STACK_SIZE	0x50
 
@@ -22,7 +24,7 @@
 #define configUSE_IDLE_HOOK			0
 #define configUSE_TICK_HOOK			0
 #define configCPU_CLOCK_HZ			( ( unsigned long ) 700000000 )
-#define configTICK_RATE_HZ			( ( TickType_t ) 1000 )
+#define configTICK_RATE_HZ			( ( TickType_t ) execution_time_scale )
 #define configMAX_PRIORITIES		( 5 )
 #define configMINIMAL_STACK_SIZE	( ( unsigned short ) 0x200) //512 words
 #define configTOTAL_HEAP_SIZE		( (size_t ) ( 10450 ) )

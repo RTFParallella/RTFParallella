@@ -15,186 +15,151 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-#include <e-hal.h> //hardware abstraction library
 #include <time.h>   /* Needed for struct timespec */
+#include <e-hal.h>  /* hardware abstraction library */
 
+#include "RTFParallellaConfig.h"
 #include "c2c.h"
 #include "debugFlags.h"
 #include "shared_comms.h"
 #include "host_utils.h"
 #include "model_enumerations.h"
+#include "trace_utils_BTF.h"
 
-unsigned int shared_label_to_read[10];
-unsigned int shared_label_core_00[dstr_mem_sec_1_label_count];
-unsigned int shared_label_core_10[dstr_mem_sec_1_label_count];
-unsigned int shared_label_core[core_count][dstr_mem_sec_1_label_count];
+unsigned int shared_label_to_read[SHM_LABEL_COUNT];
+unsigned int shared_label_core_00[DSHM_SEC_LABEL_COUNT];
+unsigned int shared_label_core_10[DSHM_SEC_LABEL_COUNT];
+unsigned int shared_label_core[EXEC_CORE_COUNT][DSHM_SEC_LABEL_COUNT];
+unsigned int shared_dram_start_address = SHARED_DRAM_START_ADDRESS;
 
-//#ifdef RFTP_GENERATE_BTF_TRACE
 
-static void construct_btf_trace_header(FILE *stream)
-{
-    write_btf_trace_header_config(stream);
-    write_btf_trace_header_entity_type(stream, TASK_EVENT);
-    write_btf_trace_header_entity_type(stream, RUNNABLE_EVENT);
-    write_btf_trace_header_entity_type(stream, SIGNAL_EVENT);
-    generate_task_entity_table();
-    generate_runnable_entity_table();
-    generate_signal_entity_table();
-    generate_hw_entity_table();
-    write_btf_trace_header_entity_table(stream);
-    write_btf_trace_header_entity_type_table(stream);
-}
-
-//#endif
-
+/* Entry point of the application running on the HOST Core. */
 int main(int argc, char *argv[])
 {
-    int label_enable_count_core0 = 0;
-    unsigned labelVisual_perCore[core_count][DSHM_visible_label_count];
-    unsigned int prv_val_preCore[core_count][DSHM_visible_label_count];
-//#ifdef RFTP_GENERATE_BTF_TRACE
-    FILE *fp_to_trace = NULL;
-    parse_btf_trace_arguments(argc, argv);
-    uint8_t trace_file_path[512] = {0};
-    get_btf_trace_file_path(trace_file_path);
-    if (strlen(trace_file_path) != 0)
+    /* This will contain the epiphany platform configuration */
+    e_platform_t epiphany;
+    e_epiphany_t dev;
+    e_mem_t emem;
+    unsigned int message[9];
+    unsigned int message2[9];
+    int addr;
+    int index = 0;
+
+    unsigned int labelVisual_perCore[EXEC_CORE_COUNT][DSHM_VISIBLE_LABEL_COUNT];
+    unsigned int prv_val_preCore[EXEC_CORE_COUNT][DSHM_VISIBLE_LABEL_COUNT];
+    unsigned int labelVisual_SHM[SHM_VISIBLE_LABEL_COUNT];
+    unsigned int prv_val_SHM[SHM_VISIBLE_LABEL_COUNT];
+
+    for (index = 0;index < EXEC_CORE_COUNT; index++)
     {
-        //TODO: Add function to create file pointer for given file path.
+        /* Get the visible label index per core for epiphany device */
+        get_visible_label_index(labelVisual_perCore[index],MEM_TYPE_DSHM);
     }
-    else
-    {
-    	fprintf(stderr,"Output redirected to stderr\n");
-        fp_to_trace = stderr;
-    }
-    construct_btf_trace_header(fp_to_trace);
-//#endif/* End of RFTP_GENERATE_BTF_TRACE*/
-    for (int i=0;i<core_count;i++){
-        get_visible_label_index(labelVisual_perCore[i],MEM_TYPE_DSHM);
-    }
-    unsigned labelVisual_SHM[SHM_visible_label_count];
-    unsigned int prv_val_SHM[SHM_visible_label_count];
+
+    /* Get the visible label index for the variables stored in shared memory */
     get_visible_label_index(labelVisual_SHM,MEM_TYPE_SHM);
-    for (int i=0;i<core_count;i++){
-        printf ("@%d : ",i);
-        for (int j=0;j<DSHM_visible_label_count;j++){
-            printf("L%d ",labelVisual_perCore[i][j]);
+
+    for (index = 0;index < EXEC_CORE_COUNT; index++)
+    {
+        printf ("@%d : ",index);
+        for (int count = 0; count < DSHM_VISIBLE_LABEL_COUNT; count++)
+        {
+            printf("L%d ",labelVisual_perCore[index][count]);
         }
         printf("\n");
     }
+
     fprintf(stderr,"===========================================================================\n");
     fprintf(stderr,"      |   Tasks being executed  | observed labels values |\n");
     fprintf(stderr,"%6s|%12s|%12s|"," tick ","   Core 1   ","   Core 2   ");
-    for (int i=0;i<core_count;i++){
-        print_legend_enum(DSHM_visible_label_count,labelVisual_perCore[i],MEM_TYPE_DSHM);
+    for (index = 0;index < EXEC_CORE_COUNT;index++)
+    {
+        /* Get the device shared Label name*/
+        print_legend_enum(DSHM_VISIBLE_LABEL_COUNT, labelVisual_perCore[index], MEM_TYPE_DSHM);
     }
-    print_legend_enum(SHM_visible_label_count,labelVisual_SHM,MEM_TYPE_SHM);
+
+    /* Get the shared label name */
+    print_legend_enum(SHM_VISIBLE_LABEL_COUNT, labelVisual_SHM, MEM_TYPE_SHM);
     fprintf(stderr,"\n");
     fprintf(stderr,"===========================================================================\n");
-    //counters for row and column, cored id and loop counter
-    unsigned   row_loop,col_loop;
-    // this will contain the epiphany platform configuration
-    e_platform_t epiphany;
-    e_epiphany_t dev;
-    e_return_stat_t result;
-    unsigned int message[9];
-    unsigned int message2[9];
-//#ifdef RFTP_GENERATE_BTF_TRACE
-    unsigned int core0_btf_trace[BTF_TRACE_BUFFER_SIZE];
-    unsigned int core1_btf_trace[BTF_TRACE_BUFFER_SIZE];
-//#endif
-    int loop;
-    int addr;
-//#ifdef RFTP_GENERATE_BTF_TRACE
-    int btf_trace_addr;
-//#endif
-    e_mem_t emem;
+
     e_init(NULL);
-    /*
-     * reserve shared mem sections
-     * one section for each shared label in the model
-     * shared mem address space starts at 0x0100_0000
-     * and ends at 0x3FFF_FFFF
-     *
-     */
-    e_alloc(&emem, shared_mem_section , sizeof(shared_label_to_read));
-    e_reset_system(); // reset the epiphnay chip
-    e_get_platform_info(&epiphany);//gets the configuration info for the parallella platofrm
-    //debug flag
-    //------------------------------------------------
-    //one core within the parallella work group is 1 x 1 i.e single core
-    e_open(&dev,0,0,2,1); //2 rows one column rectangle size 2*1
-    //reset the group
-    e_reset_group(&dev);
-    e_return_stat_t result1;
-    e_return_stat_t result2;
-    //load the group
-    result1 =  e_load("core0_main.elf",&dev,0,0,E_FALSE);
-    result2 =  e_load("core1_main.elf",&dev,1,0,E_FALSE);
-    if (result1 != E_OK || result2 != E_OK){
-        fprintf(stderr,"Error Loading the Epiphany Application 1 %i\n", result);
+    int time_unit = parse_btf_trace_arguments(argc, argv);
+    /* Reserve the memory for the data in the shared dram region to be shared between
+     * host and epiphany core. The dram offset starts at 0x01000000 which corresponds
+     * to the global address as 0x8F000000. */
+    if (E_OK != e_alloc(&emem, (unsigned int)shared_dram_start_address , 0x00010000))
+    {
+        fprintf(stderr, "Error in reserving the shared dram buffer\n");
     }
+
+
+    /* Reset the system and get the platform information. */
+    e_reset_system();
+    e_get_platform_info(&epiphany);
+
+    /* one core within the parallella work group is 1 x 1 i.e single core
+     * 2 rows one column rectangle size 2*1.
+     */
+    e_open(&dev,0,0,2,1);
+    /* reset the group */
+    e_reset_group(&dev);
+    /* load the group */
+    if (E_OK != e_load("core0_main.elf", &dev, 0, 0, E_FALSE))
+    {
+        fprintf(stderr,"Error Loading the Epiphany Application on core with row=0 and col=0\n");
+    }
+    if (E_OK != e_load("core1_main.elf", &dev, 1, 0, E_FALSE))
+    {
+        fprintf(stderr,"Error Loading the Epiphany Application on core with row=1 and col=0\n");
+    }
+    /* Write the time unit used for the configuration of the clock cycle per tick */
+    if (sizeof(int) != e_write(&emem, 0, 0, INPUT_TIMESCALE_OFFSET, &time_unit, sizeof(int)))
+    {
+        fprintf(stderr, "Error in writing to the shared dram buffer\n");
+    }
+
     e_start_group(&dev);
     addr = cnt_address;
-//#ifdef RFTP_GENERATE_BTF_TRACE
-    btf_trace_addr = btf_trace_address;
-//#endif
     int pollLoopCounter = 0;
-    unsigned int chainLatencyEndIndicator = 0;
-    unsigned int chainLatencyStartIndicator = 10e6;
-    unsigned int lat1 = 0;
-    char buffer1[label_str_len];
-    array_init(buffer1,label_str_len);
-    char buffer2[label_str_len];
-    array_init(buffer2,label_str_len);
+    char buffer1[LABEL_STRLEN] = {0};
+    char buffer2[LABEL_STRLEN] = {0};
 
-
-    //int prev1,prev2,prev3;
-    for (pollLoopCounter=0;pollLoopCounter<=40;pollLoopCounter++){
-        message[3] = 0;
-        e_read(&dev,0,0,addr, &message, sizeof(message));
-//#ifdef RFTP_GENERATE_BTF_TRACE
-        e_read(&dev,0,0,btf_trace_addr, &core0_btf_trace, sizeof(core0_btf_trace));
-//#endif
-        e_read(&dev,0,0,dstr_mem_offset_sec_1, &shared_label_core[0], sizeof(shared_label_core_00));
-        e_read(&dev,1,0,addr, &message2, sizeof(message2));
-//#ifdef RFTP_GENERATE_BTF_TRACE
-        e_read(&dev,1,0,btf_trace_addr, &core1_btf_trace, sizeof(core1_btf_trace));
-//#endif
-        e_read(&dev,1,0,dstr_mem_offset_sec_1, &shared_label_core[1], sizeof(shared_label_core_10));
-        e_read(&emem,0,0,0x00, &shared_label_to_read, sizeof(unsigned int));
-//#ifdef RFTP_GENERATE_BTF_TRACE
-//#endif /* End of RFTP_GENERATE_BTF_TRACE */
+    for (pollLoopCounter = 0; pollLoopCounter <= 40; pollLoopCounter++)
+    {
+        e_read(&dev, 0, 0, addr, message, sizeof(message));
+        e_read(&dev, 0, 0, dstr_mem_offset_sec_1, &shared_label_core[0], sizeof(shared_label_core_00));
+        e_read(&dev, 1, 0, addr, message2, sizeof(message2));
+        e_read(&dev, 1, 0, dstr_mem_offset_sec_1, &shared_label_core[1], sizeof(shared_label_core_10));
+        e_read(&emem, 0, 0, SHARED_LABEL_OFFSET, shared_label_to_read, sizeof(shared_label_to_read));
+        /* Check the tick count of both the messages */
         if (message[8]!= message2[8] ){
             //fprintf(stderr,"NIS->");
         }
         get_task_name(message[6],buffer1);
         get_task_name(message2[6],buffer2);
-        fprintf(stderr," %4d | %10s | %10s | ",message[8]+1,buffer1,buffer2);
-        for (int i=0;i<core_count;i++){
-            user_config_print_values_auto(DSHM_visible_label_count,labelVisual_perCore[i],shared_label_core[i],prv_val_preCore[i]);
-        }
-        for (int i=0;i<10;i++){
-            fprintf(stderr," %3d |",shared_label_to_read[i]);
+        fprintf(stderr," %4d | %10s | %10s | ",message[8],buffer1,buffer2);
+
+        for (index = 0;index < EXEC_CORE_COUNT; index++)
+        {
+            user_config_print_values_auto(DSHM_VISIBLE_LABEL_COUNT,
+                    labelVisual_perCore[index],shared_label_core[index],prv_val_preCore[index]);
         }
 
-        //user_config_print_values_auto(SHM_visible_label_count,labelVisual_SHM,shared_label_to_read,prv_val_SHM);
+        for (index = 0; index < 4; index++)
+        {
+            fprintf(stderr," %2d |",shared_label_to_read[index]);
+        }
+
         fprintf(stderr,"\n");
-        fprintf(stderr, "BTF trace Core 0---[Ticks=%d][SourceId=%d][SourceIns=%d][Type=%d] \
-        		[Target=%d][TargetIns=%d][Event=%d][Data=%d]\n", core0_btf_trace[0],
-        		core0_btf_trace[1], core0_btf_trace[2], core0_btf_trace[3], core0_btf_trace[4],
-				core0_btf_trace[5], core0_btf_trace[6], core0_btf_trace[7]);
-        fprintf(stderr, "BTF trace Core 1---[Ticks=%d][SourceId=%d][SourceIns=%d][Type=%d] \
-        		[Target=%d][TargetIns=%d][Event=%d][Data=%d]\n", core1_btf_trace[0],
-        		core1_btf_trace[1], core1_btf_trace[2], core1_btf_trace[3], core1_btf_trace[4],
-				core1_btf_trace[5], core1_btf_trace[6], core1_btf_trace[7]);
         nsleep(1);
     }
     fprintf(stderr,"----------------------------------------------\n");
     e_close(&dev);
     e_finalize();
-    //----------------------------------------------------------------------------
-    //----------------------------------------------------------------------------
     fprintf(stderr,"RFTP demo complete \n ");
     return 0;
 }
+
+
 

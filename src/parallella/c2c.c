@@ -22,21 +22,10 @@ int core_write_mutex=0;
 void shared_labels_init_core(){
 	//shared buffer in core memory
 	outbuf_dstr_shared[0] = (dstr_mem_sec_1_label_type *) dstr_mem_offset_sec_1;
-	/*for (int i=1;i<dstr_mem_sec_1_label_count;i++){
-		outbuf_dstr_shared[i] = outbuf_dstr_shared[i-1] + 1;
-	}
-	outbuf_dstr_shared[1] = outbuf_dstr_shared[0] + 1;
-	outbuf_dstr_shared[2] = outbuf_dstr_shared[1] + 1;
-	outbuf_dstr_shared[3] = outbuf_dstr_shared[2] + 1;
-	outbuf_dstr_shared[4] = outbuf_dstr_shared[3] + 1;
-	outbuf_dstr_shared[5] = outbuf_dstr_shared[4] + 1;
-	outbuf_dstr_shared[6] = outbuf_dstr_shared[5] + 1;
-	outbuf_dstr_shared[7] = outbuf_dstr_shared[6] + 1;
-	outbuf_dstr_shared[8] = outbuf_dstr_shared[7] + 1;*/
 	//initialize buffer
 	int i;
-	for (i=0;i<9;i++){
-		*outbuf_dstr_shared[i] =0;
+	for (i = 0;i < 10; i++){
+		*outbuf_dstr_shared[i] = 0;
 	}
 	/*int emem;
 	//define distributed memory section in Epi range
@@ -47,7 +36,7 @@ void shared_labels_init_core(){
 uint8_t shared_label_write_core	(unsigned row,unsigned col,int label_indx,int payload){
 	unsigned int *addr;
 	unsigned int* addr_base;
-	addr_base = (unsigned int *)get_base_address_core(row,col);
+	addr_base = get_base_address_core(row,col);
 	addr = (unsigned int*) ((unsigned ) addr_base | (unsigned)outbuf_dstr_shared[label_indx]);
 	*addr = payload;
 }
@@ -56,10 +45,10 @@ uint8_t shared_label_write_core	(unsigned row,unsigned col,int label_indx,int pa
 void DSHM_section_init(DSHM_section sec){
 	unsigned int *addr;
 	unsigned int* addr_base;
-	addr_base = (unsigned int *)get_base_address_core(sec.row,sec.col);
+	addr_base = get_base_address_core(sec.row,sec.col);
 	addr = (unsigned int*) ((unsigned ) addr_base | (unsigned)sec.base_addr);
 	for (int i = 0;i<sec.label_count;i++){
-		addr[i] = 256;
+		addr[i] = 0;
 	}
 }
 
@@ -67,7 +56,7 @@ void DSHM_section_init(DSHM_section sec){
 uint8_t write_DSHM_section	(DSHM_section sec,int label_indx,int payload){
 	unsigned int *addr;
 	unsigned int* addr_base;
-	addr_base = (unsigned int *)get_base_address_core(sec.row,sec.col);
+	addr_base = get_base_address_core(sec.row,sec.col);
 	addr = (unsigned int*) ((unsigned ) addr_base | (unsigned)sec.base_addr);
 	addr[label_indx] = payload;
 }
@@ -75,19 +64,16 @@ uint8_t write_DSHM_section	(DSHM_section sec,int label_indx,int payload){
 unsigned int read_DSHM_section (DSHM_section sec, int label_indx){
 	unsigned int *addr;
 	unsigned int* addr_base;
-	addr_base = (unsigned int *)get_base_address_core(sec.row,sec.col);
+	addr_base = get_base_address_core(sec.row,sec.col);
 	addr = (unsigned int*) ((unsigned ) addr_base | (unsigned)sec.base_addr);
 	return addr[label_indx];
 }
 
 
-
-
-
 unsigned int shared_label_read_core (unsigned row, unsigned col, int label_indx){
 	unsigned int *addr;
 	unsigned int* addr_base;
-	addr_base = (unsigned int *)get_base_address_core(row,col);
+	addr_base = get_base_address_core(row,col);
 	addr = (unsigned int*) ((unsigned ) addr_base | (unsigned)outbuf_dstr_shared[label_indx]);
 	return addr;
 }

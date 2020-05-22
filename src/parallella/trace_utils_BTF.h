@@ -1,5 +1,5 @@
 /*******************************************************************************
- *   Copyright (c) 2019 Dortmund University of Applied Sciences and Arts and others.
+ *   Copyright (c) 2020 Dortmund University of Applied Sciences and Arts and others.
  *
  *   This program and the accompanying materials are made
  *   available under the terms of the Eclipse Public License 2.0
@@ -36,7 +36,7 @@
 #define EVENT_FLAG                      6
 #define DATA_FLAG                       7
 
-
+/* Enum for event type ID */
 typedef enum btf_trace_event_type_t
 {
     TASK_EVENT,
@@ -53,10 +53,15 @@ typedef enum btf_trace_event_type_t
     SIMULATION_EVENT
 } btf_trace_event_type;
 
+/* Enum for event name */
 typedef enum btf_trace_event_name_t
 {
+    INIT = -1,
     PROCESS_START,
     PROCESS_TERMINATE,
+    PROCESS_PREEMPT,
+    PROCESS_SUSPEND,
+    PROCESS_RESUME,
     SIGNAL_READ,
     SIGNAL_WRITE
 } btf_trace_event_name;
@@ -67,19 +72,37 @@ typedef enum btf_trace_event_name_t
  */
 typedef struct btf_trace_header_config_t
 {
-    uint8_t creator[64];          /* Target device on which the trace is generated */
-    uint8_t modelfile[512];       /* Model file used to generate the trace */
-    uint8_t timescale[4];         /* Time scale e.g ns, ms, us, s..*/
+    uint32_t timescale;           /**< This sets the scale of the time e.g 10, 100 etc.. */
+    uint8_t creator[64];          /**< Target device on which the trace is generated */
+    uint8_t modelfile[512];       /**< Model file used to generate the trace */
+    uint8_t timeunit[4];          /**< Time unit e.g ns, ms, us, s..*/
 } btf_trace_header_config_t;
 
 /* BTF structure for storing the entity configuration */
 typedef struct btf_trace_entity_entry_t
 {
     uint16_t entity_id;                 /* Entity ID to get the entity name */
+    int16_t instance;                   /* Current instance of the entity */
+    btf_trace_event_name state;         /* Current state of the entity */
     btf_trace_event_type entity_type;   /* Entity type to get the source*/
     uint8_t entity_name[64];            /* Entity name */
+
 } btf_trace_entity_entry;
 
+/* Structure to hold BTF trace data in task stack for processing */
+typedef struct btf_trace_data_t
+{
+    int32_t ticks;                     /* Not used currently */
+    int32_t srcId;                     /* Source Id */
+    int32_t srcInstance;               /* Instance of the source */
+    int32_t eventTypeId;               /* Type of event Runnable , Task etc.. */
+    int32_t taskId;                    /* Task Id */
+    int32_t taskInstance;              /* Instance of the task */
+    int32_t eventState;                /* State of the event */
+    int32_t data;                      /* Notes */
+} btf_trace_data;
+
+/* Entity table structure */
 typedef struct btf_trace_entity_table_t
 {
     uint16_t is_occupied;                 /* If 0, entry is available else not available */
@@ -87,10 +110,10 @@ typedef struct btf_trace_entity_table_t
 } btf_trace_entity_table;
 
 /* Function to get the trace file path from current working directory */
-void get_btf_trace_file_path(uint8_t *trace_file_path);
+void get_btf_trace_file_path(char *trace_file_path);
 
 /* Function to parse the command line arguments for generating the BTF trace file. */
-void parse_btf_trace_arguments(int argc, char **argv);
+int parse_btf_trace_arguments(int argc, char **argv);
 
 /* Function to write the trace header config */
 void write_btf_trace_header_config(FILE *stream);
@@ -106,5 +129,8 @@ void write_btf_trace_header_entity_type_table(FILE *stream);
 
 /* Function to store the entry for all the entities */
 void store_entity_entry(uint16_t typeId, btf_trace_event_type type, uint8_t *name);
+
+/* Function to write the data section of the BTF */
+void write_btf_trace_data(FILE *stream, uint8_t core_id, unsigned int * data_buffer);
 
 #endif /* SRC_PARALLELLA_TRACE_UTILS_BTF_H_ */

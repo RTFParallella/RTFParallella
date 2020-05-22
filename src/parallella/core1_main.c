@@ -33,13 +33,8 @@ int main(void) {
 	init_mem_sections();
 	shared_labels_init_core();
 	//create Amalthea task objects
-#ifdef RFTP_GENERATE_BTF_TRACE
-	AmaltheaTask t20ms = createAmaltheaTask(handler10msCore2,cIn10msCore2,cOut10msCore2,10,26, 0, 4, 0,10,7);
-	AmaltheaTask t40ms = createAmaltheaTask(handler20msCore2,cIn20msCore2,cOut20msCore2,20,26, 0, 5, 0,20,10);
-#else
 	AmaltheaTask t20ms = createAmaltheaTask(handler10msCore2,cIn10msCore2,cOut10msCore2,10,10,7);
 	AmaltheaTask t40ms = createAmaltheaTask(handler20msCore2,cIn20msCore2,cOut20msCore2,20,20,10);
-#endif
 	//create RTOS task from templates
 	createRTOSTask(&t20ms,2,0);
 	createRTOSTask(&t40ms,1,0);

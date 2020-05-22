@@ -14,8 +14,6 @@
 #ifndef SRC_PARALLELLA_AMALTHEACONVERTER_H_
 #define SRC_PARALLELLA_AMALTHEACONVERTER_H_
 
-#include "debugFlags.h"
-
 #define PLATFORM_WORD_LENGTH 32
 
 #define numTasks 3
@@ -23,34 +21,16 @@
 /**
  * Structure to hold tasks according to amalthea model
  */
-#ifdef RFTP_GENERATE_BTF_TRACE
 typedef struct{
-	unsigned isDone;
-	unsigned isReady;
-	unsigned srcId;
-	unsigned srcInstance;
-	unsigned taskId;
-	unsigned taskInstance;
-	void(* taskHandler)(int srcId, int srcInstance);
-	unsigned executionTime;//in ticks
-	unsigned deadline;		//in ticks
-	unsigned period;		//in ticks
-	void(* cInHandler)(int srcId, int srcInstance);
-	void(* cOutHandler)(int srcId, int srcInstance);
+    unsigned isDone;
+    unsigned isReady;
+    void(* taskHandler)();
+    unsigned executionTime;//in ticks
+    unsigned deadline;        //in ticks
+    unsigned period;        //in ticks
+    void(* cInHandler)();
+    void(* cOutHandler)();
 }AmaltheaTask;
-#else
-typedef struct{
-	unsigned isDone;
-	unsigned isReady;
-	void(* taskHandler)();
-	unsigned executionTime;//in ticks
-	unsigned deadline;		//in ticks
-	unsigned period;		//in ticks
-	void(* cInHandler)();
-	void(* cOutHandler)();
-}AmaltheaTask;
-
-#endif
 
 
 /**
@@ -58,23 +38,19 @@ typedef struct{
  * if use_LET_COMM_SEMANTICS is defined, the tasks will behave in LET semantics else it will use implicit by default
  */
 //#define use_LET_COMM_SEMANTICS
-#ifdef RFTP_GENERATE_BTF_TRACE
-AmaltheaTask createAmaltheaTask(void *taskHandler,void *cInHandler,void *cOutHandler,unsigned int period, unsigned int srcId, unsigned int srcInstance,
-		unsigned int taskId, unsigned int taskInstance, unsigned int deadline, unsigned int WCET);
-#else
-AmaltheaTask createAmaltheaTask(void *taskHandler,void *cInHandler,void *cOutHandler,unsigned int period, unsigned int deadline, unsigned int WCET);
-#endif
+
+AmaltheaTask createAmaltheaTask(void *taskHandler,void *cInHandler,void *cOutHandler,unsigned int period,unsigned int deadline, unsigned int WCET);
 
 /**
- *	Create the RTOS task that represents a given Amalthea task.
- *	This function can have multiple arguments for all label types used by the task and the number of labels of each type.
+ *    Create the RTOS task that represents a given Amalthea task.
+ *    This function can have multiple arguments for all label types used by the task and the number of labels of each type.
  *
- *	Arguments:
- *	task			:	pointer to the AmaltheaTask struct
- *	priority		:	priority of the task (according to RMS, lowesrt perio has highest priority)
- *	argCount		:	number of different types of labels used by this task
- *	label_type_size :	size (in bits) of label type.
- *	label_type_count:	number of labels associated with that type.
+ *    Arguments:
+ *    task            :    pointer to the AmaltheaTask struct
+ *    priority        :    priority of the task (according to RMS, lowesrt perio has highest priority)
+ *    argCount        :    number of different types of labels used by this task
+ *    label_type_size :    size (in bits) of label type.
+ *    label_type_count:    number of labels associated with that type.
  *
  *
  */
@@ -84,8 +60,8 @@ void createRTOSTask(AmaltheaTask* task, int priority, int argCount, ...);
  * This function returns the additional stack size (in words) needed for the task to andle its labels
  *
  * Arguments:
- * labelBitCount	:	label size in bits
- * labelCount		:	number of labels
+ * labelBitCount    :    label size in bits
+ * labelCount        :    number of labels
  *
  */
 unsigned int calculateStackSize(int labelBitCount, int labelCount);
@@ -96,7 +72,7 @@ unsigned int calculateStackSize(int labelBitCount, int labelCount);
  * Amalthea model
  *
  * Arguments:
- * task		:	instance of AmaltheaTask structure to be invoked
+ * task        :    instance of AmaltheaTask structure to be invoked
  *
  */
 void generalizedRTOSTask(AmaltheaTask task);

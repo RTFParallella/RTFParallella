@@ -14,28 +14,20 @@
 #ifndef SRC_PARALLELLA_MODEL_ENUMERATIONS_H_
 #define SRC_PARALLELLA_MODEL_ENUMERATIONS_H_
 
-#include "trace_utils_BTF.h"
 
-#define    SHM_section1_label_count     10
+#define SHM_LABEL_COUNT                   10
 
-#define    DSHM_section1_label_count    10
+#define DSHM_LABEL_COUNT                  10
 
-#define label_str_len                16
+#define LABEL_STRLEN                      16
 
-//#ifdef RFTP_GENERATE_BTF_TRACE
+#define EXEC_TASK_COUNT                    5
 
-#define runnable_str_len            32
-#define hw_str_len                  16
+#define EXEC_CORE_COUNT                    2
 
-//#endif
+#define SHM_VISIBLE_LABEL_COUNT            2
 
-#define task_count                    5
-
-#define core_count                    2
-
-#define SHM_visible_label_count        2
-
-#define DSHM_visible_label_count    2
+#define DSHM_VISIBLE_LABEL_COUNT           2
 
 /**
  * Get the string name of DRAM shared label
@@ -72,50 +64,6 @@ void get_task_name(int index,char *str);
  * mem_type            :    the memory type of indices requested (MEM_TYPE_SHM or MEM_TYPE_DSHM)
  */
 void get_visible_label_index(unsigned array[],unsigned mem_type);
-
-
-#ifdef RFTP_GENERATE_BTF_TRACE
-/**
- * Generate the BTF trace entity entry for all the tasks
- *
- * Arguments:
- * void            :
- *
- * Return: void
- */
-void generate_task_entity_table(void);
-
-/**
- * Generate the BTF trace entity entry for all the runnables
- *
- * Arguments:
- * void            :
- *
- * Return: void
- */
-void generate_runnable_entity_table(void);
-
-/**
- * Generate the BTF trace entity entry for all the signals/labels
- *
- * Arguments:
- * void            :
- *
- * Return: void
- */
-void generate_signal_entity_table(void);
-
-/**
- * Generate the BTF trace entity entry for all the hardware entities
- *
- * Arguments:
- * void            :
- *
- * Return: void
- */
-void generate_hw_entity_table(void);
-
-#endif /* End of RFTP_GENERATE_BTF_TRACE */
 
 
 #endif /* SRC_PARALLELLA_MODEL_ENUMERATIONS_H_ */

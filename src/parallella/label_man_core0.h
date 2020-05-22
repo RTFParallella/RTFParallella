@@ -16,7 +16,24 @@
 
 #include "shared_comms.h"
 #include "c2c.h"
-#include "debugFlags.h"
+
+/**
+ *  Structure to ensure proper synchronization between host and epiphany cores
+ * and also within epiphany cores.
+ */
+typedef struct software_interrupt
+{
+    int is_init_done;                 /**< To ensure that the mutex is initialized */
+    int done;                         /**< To ensure that the mutex is initialized */
+#ifdef __EPIPHANY_DEVICE__
+    e_mutex_t* mutex;                 /**< Mutex declaration on Epiphany core for synchronization */
+#else
+    void* mutex;                      /**< Mutex declaration. Unused on host  */
+#endif
+    int offset;                       /**< Offset of the local memory in epiphany core */
+    int row_id;                       /**< Row ID of the Epiphany core */
+    int col_id;                       /**< Row ID of the Epiphany core */
+} software_interrupt_t;
 
 #define num_unique_sections 1
 
@@ -27,19 +44,6 @@ void init_DSHM_sections(void);
 //declare cIn/Out operations
 //to be set up from the amalthea model during
 //code generation
-#ifdef RFTP_GENERATE_BTF_TRACE
-void cIn5ms(int srcId, int srcInstance);
-void cIn10ms(int srcId, int srcInstance);
-void cIn20ms(int srcId, int srcInstance);
-void cIn10msCore2(int srcId, int srcInstance);
-void cIn20msCore2(int srcId, int srcInstance);
-//-------
-void cOut5ms(int srcId, int srcInstance);
-void cOut10ms(int srcId, int srcInstance);
-void cOut20ms(int srcId, int srcInstance);
-void cOut10msCore2(int srcId, int srcInstance);
-void cOut20msCore2(int srcId, int srcInstance);
-#else
 void cIn5ms();
 void cIn10ms();
 void cIn20ms();
@@ -51,7 +55,6 @@ void cOut10ms();
 void cOut20ms();
 void cOut10msCore2();
 void cOut20msCore2();
-#endif
 
 
 

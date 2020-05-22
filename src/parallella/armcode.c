@@ -25,24 +25,24 @@
 #include "model_enumerations.h"
 
 unsigned int shared_label_to_read[10];
-unsigned int shared_label_core_00[dstr_mem_sec_1_label_count];
-unsigned int shared_label_core_10[dstr_mem_sec_1_label_count];
+unsigned int shared_label_core_00[DSHM_SEC_LABEL_COUNT];
+unsigned int shared_label_core_10[DSHM_SEC_LABEL_COUNT];
 
 int main()
 {
 	int label_enable_count_core0 = 0;
 	printf("RTFP demo host code\n");
 	//setup visualization config for the first core
-	unsigned index_array1[dstr_mem_sec_1_label_count];
-	unsigned index_array1_prv_val[dstr_mem_sec_1_label_count];
-	array_init(index_array1,dstr_mem_sec_1_label_count);
-	array_init(index_array1_prv_val,dstr_mem_sec_1_label_count);
+	unsigned index_array1[DSHM_SEC_LABEL_COUNT];
+	unsigned index_array1_prv_val[DSHM_SEC_LABEL_COUNT];
+	array_init(index_array1,DSHM_SEC_LABEL_COUNT);
+	array_init(index_array1_prv_val,DSHM_SEC_LABEL_COUNT);
 	LabelVisual core1 = get_user_input(index_array1);
 	//setup visualization config for the first core
-	unsigned index_array2[dstr_mem_sec_1_label_count];
-	unsigned index_array2_prv_val[dstr_mem_sec_1_label_count];
-	array_init(index_array2,dstr_mem_sec_1_label_count);
-	array_init(index_array2_prv_val,dstr_mem_sec_1_label_count);
+	unsigned index_array2[DSHM_SEC_LABEL_COUNT];
+	unsigned index_array2_prv_val[DSHM_SEC_LABEL_COUNT];
+	array_init(index_array2,DSHM_SEC_LABEL_COUNT);
+	array_init(index_array2_prv_val,DSHM_SEC_LABEL_COUNT);
 	LabelVisual core2 = get_user_input(index_array2);
 	//steup visualization for shared memeory
 	unsigned index_array_DRAM[shared_mem_section1_label_count];

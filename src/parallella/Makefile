@@ -7,8 +7,8 @@ CC=e-gcc
 CFLAGS=-I.
 FREERTOSSRC=../../RTFP_RTOS_KERNEL_PATCHED/FreeRTOS/Source
 INCLUDES= -g -I$(FREERTOSSRC)/include -I$(FREERTOSSRC)/portable/GCC/Epiphany -I.
-DEPS = $(FREERTOSSRC)/portable/GCC/Epiphany/portmacro.h Makefile FreeRTOSConfig.h c2c.h debugFlags.h AmaltheaConverter.h taskCode.h ParallellaUtils.h trace_utils_BTF.h
-DEPSHOST = c2c.h debugFlags.h AmaltheaConverter.h shared_comms.h model_enumerations.h
+DEPS = $(FREERTOSSRC)/portable/GCC/Epiphany/portmacro.h Makefile RTFParallellaConfig.h FreeRTOSConfig.h c2c.h debugFlags.h AmaltheaConverter.h taskCode.h ParallellaUtils.h trace_utils_BTF.h
+DEPSHOST = RTFParallellaConfig.h c2c.h debugFlags.h AmaltheaConverter.h shared_comms.h model_enumerations.h
 #Epiphany SDK dependencies
 ESDK=${EPIPHANY_HOME}
 ELIBS=${ESDK}/tools/host.armv7l/lib
@@ -44,7 +44,7 @@ clean:
 
 .SECONDARY:
 %.o: %.c $(DEPS)
-	$(CC) -fdata-sections -ffunction-sections  -c -o $@ $< $(INCLUDES)
+	$(CC) -fdata-sections -ffunction-sections  -c -D__EPIPHANY_DEVICE__ -o $@ $< $(INCLUDES)
 
 %.o: %.s $(DEPS)
 	$(CC) -c -o $@ $< $(INCLUDES)

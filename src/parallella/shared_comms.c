@@ -11,11 +11,12 @@
  *        Dortmund University of Applied Sciences and Arts - initial API and implementation
  *******************************************************************************/
 
+#include "RTFParallellaConfig.h"
 #include "shared_comms.h"
-#include "debugFlags.h"
 #include "e-lib.h"
 
 typedef unsigned int e_label_size; // one word = 4 bytes = unsigned int
+
 
 unsigned int *outbuf_shared[SHM_DEFINED_SPACE]; //array for global section access API
 
@@ -45,7 +46,7 @@ void* shm_section_init (SHM_section sec){
 	retval = (cast_type ) (0x8e000000 | sec.base_addr);// assign to  the ABSOLUTE address of memory section
 	int i = 0;
 	for (i = 0;i<sec.label_count;i++){
-		retval[i] = 256;
+		retval[i] = 0;
 	}
 	return retval;
 }
@@ -75,42 +76,4 @@ unsigned int shm_section_init_read (SHM_section sec,int index){
 	return (unsigned int) retval;
 }
 
-
-
-/**
- * obsolete utility functions
- * specific for global section access.
- *
- */
-
-
-void shared_labels_init(){
-	outbuf_shared[0] = (unsigned int *) (0x8e000000 | shared_mem_section);
-	for (int j = 1;j<SHM_DEFINED_SPACE;j++){
-		outbuf_shared[j] = outbuf_shared[j-1] + 1;
-	}
-	//initialize buffer
-	int i;
-	//timer1init();
-	for (i=0;i<SHM_DEFINED_SPACE;i++){
-		*outbuf_shared[i] =0x10000;
-	}
-}
-
-uint8_t shared_label_write(int label_indx,int payload){
-	uint8_t retval= 0;
-	*outbuf_shared[label_indx] = payload;
-	/*if (payload == *outbuf_shared[label_indx]){
-		retval = 1;
-	}*/
-	return retval;
-}
-
-
-unsigned int shared_label_read(int label_indx){
-	return *outbuf_shared[label_indx];
-}
-
-
-
-//-------------------end of file-------------------------//
+/*------------------------end of file-------------------------*/
