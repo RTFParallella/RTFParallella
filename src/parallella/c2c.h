@@ -19,7 +19,6 @@
 #include "shared_comms.h"
 #define dstr_mem_offset_sec_1 			0x4000
 #define DSHM_SEC_LABEL_COUNT		    10
-#define dstr_mem_sec_1_label_type		unsigned int
 
 
 
@@ -61,7 +60,7 @@ void shared_labels_init_core();
  * payload		:	value to write
  *
  */
-uint8_t shared_label_write_core	(unsigned row,unsigned col,int label_indx,int payload);
+void shared_label_write_core	(unsigned row,unsigned col,int label_indx,int payload);
 
 
 /**
@@ -131,7 +130,7 @@ unsigned int read_DSHM_section (DSHM_section sec, int label_indx);
  * payload		:	value to be written (will be cast into data type of target label)
  *
  */
-uint8_t write_DSHM_section	(DSHM_section sec,int label_indx,int payload);
+void write_DSHM_section	(DSHM_section sec,int label_indx,int payload);
 
 
 #endif

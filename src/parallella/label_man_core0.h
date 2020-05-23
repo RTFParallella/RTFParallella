@@ -17,23 +17,6 @@
 #include "shared_comms.h"
 #include "c2c.h"
 
-/**
- *  Structure to ensure proper synchronization between host and epiphany cores
- * and also within epiphany cores.
- */
-typedef struct software_interrupt
-{
-    int is_init_done;                 /**< To ensure that the mutex is initialized */
-    int done;                         /**< To ensure that the mutex is initialized */
-#ifdef __EPIPHANY_DEVICE__
-    e_mutex_t* mutex;                 /**< Mutex declaration on Epiphany core for synchronization */
-#else
-    void* mutex;                      /**< Mutex declaration. Unused on host  */
-#endif
-    int offset;                       /**< Offset of the local memory in epiphany core */
-    int row_id;                       /**< Row ID of the Epiphany core */
-    int col_id;                       /**< Row ID of the Epiphany core */
-} software_interrupt_t;
 
 #define num_unique_sections 1
 

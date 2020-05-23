@@ -17,6 +17,7 @@
 #include <unistd.h>
 #include <e-hal.h> //hardware abstraction library
 #include <time.h>   /* Needed for struct timespec */
+#include <e-loader.h>
 
 #include "c2c.h"
 #include "debugFlags.h"

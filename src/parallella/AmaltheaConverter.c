@@ -10,12 +10,15 @@
  *   Contributors:
  *        Dortmund University of Applied Sciences and Arts - initial API and implementation
  *******************************************************************************/
+#include <e_lib.h>
+
 #include "AmaltheaConverter.h"
+#include "debugFlags.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
 #include <stdarg.h>
-#include "debugFlags.h"
+
 
 
 
@@ -50,7 +53,7 @@ void createRTOSTask(AmaltheaTask* task, int priority, int argCount, ...)
     /* make sure the stack size is at least big enough to run the task. */
     stack_size += configMINIMAL_STACK_SIZE;
     /* create the RTOS task with the generalized form */
-    xTaskCreate(generalizedRTOSTask, "Task", stack_size, &(*task), priority, NULL);
+    xTaskCreate((TaskFunction_t)generalizedRTOSTask, "Task", stack_size, &(*task), priority, NULL);
 }
 
 

@@ -13,6 +13,7 @@
 
 //epiphany imports
 #include <stdlib.h>
+#include "e_lib.h"
 
 #include "AmaltheaConverter.h"
 #include "c2c.h"
@@ -20,7 +21,6 @@
 #include "shared_comms.h"
 #include "taskCode.h"
 #include "label_man_core0.h"
-#include "e_lib.h"
 
 /* FreeRTOS imports */
 #include "FreeRTOS.h"
@@ -30,7 +30,10 @@
 //---------------------------------------------
 int main(void) {
     /* initialize output buffer for debug messages */
-    outbuf_init();
+    unsigned int row, col, core_id;
+    e_coords_from_coreid(e_get_coreid(), &row, &col);
+    core_id = ((row * 4) + col);
+    init_task_trace_buffer();
     init_mem_sections();
     shared_labels_init_core();
     AmaltheaTask t5ms =  createAmaltheaTask(handler5ms,cIn5ms,cOut5ms,5,5,2);

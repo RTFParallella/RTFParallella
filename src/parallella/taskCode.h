@@ -14,7 +14,6 @@
 #ifndef SRC_PARALLELLA_TASKCODE_H_
 #define SRC_PARALLELLA_TASKCODE_H_
 #include "c2c.h"
-#include "debugFlags.h"
 #include "ParallellaUtils.h"
 #include "shared_comms.h"
 #include "FreeRTOS.h"

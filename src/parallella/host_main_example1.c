@@ -17,6 +17,7 @@
 #include <unistd.h>
 #include <time.h>   /* Needed for struct timespec */
 #include <e-hal.h>  /* hardware abstraction library */
+#include <e-loader.h>
 
 #include "RTFParallellaConfig.h"
 #include "c2c.h"
@@ -127,9 +128,9 @@ int main(int argc, char *argv[])
 
     for (pollLoopCounter = 0; pollLoopCounter <= 40; pollLoopCounter++)
     {
-        e_read(&dev, 0, 0, addr, message, sizeof(message));
+        e_read(&dev, 0, 0, 0x6000, message, sizeof(message));
         e_read(&dev, 0, 0, dstr_mem_offset_sec_1, &shared_label_core[0], sizeof(shared_label_core_00));
-        e_read(&dev, 1, 0, addr, message2, sizeof(message2));
+        e_read(&dev, 1, 0, 0x6000, message2, sizeof(message2));
         e_read(&dev, 1, 0, dstr_mem_offset_sec_1, &shared_label_core[1], sizeof(shared_label_core_10));
         e_read(&emem, 0, 0, SHARED_LABEL_OFFSET, shared_label_to_read, sizeof(shared_label_to_read));
         /* Check the tick count of both the messages */
@@ -138,7 +139,7 @@ int main(int argc, char *argv[])
         }
         get_task_name(message[6],buffer1);
         get_task_name(message2[6],buffer2);
-        fprintf(stderr," %4d | %10s | %10s | ",message[8],buffer1,buffer2);
+        fprintf(stderr," %4d | %10s | %10s | ",message[8] + 1,buffer1,buffer2);
 
         for (index = 0;index < EXEC_CORE_COUNT; index++)
         {

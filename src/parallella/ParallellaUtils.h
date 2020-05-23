@@ -14,9 +14,8 @@
 #ifndef SRC_PARALLELLA_PARALLELLAUTILS_H_
 #define SRC_PARALLELLA_PARALLELLAUTILS_H_
 
-#include "debugFlags.h"
 #include "e_lib.h"
-//freeRTOS imports
+/* FreeRTOS imports */
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"

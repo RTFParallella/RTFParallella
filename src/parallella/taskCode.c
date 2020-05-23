@@ -12,6 +12,8 @@
  *******************************************************************************/
 
 #include "taskCode.h"
+#include "e_lib.h"
+#include "debugFlags.h"
 
 /* define global variables to be
  * accessed through a specific task (context)
@@ -28,47 +30,46 @@ int passes5 = 0;
 //define tasks and copy operations here
 //-------
 void handler5ms(){
-	int localLabel;
-	updateDebugFlag(700);
-	sleepTimerMs(2,1);
-	passes1++;
-	traceTaskPasses(1,passes1);
-	traceRunningTask(0);
+    int localLabel;
+    updateDebugFlag(700);
+    sleepTimerMs(2,1);
+    passes1++;
+    traceTaskPasses(1,passes1);
+    traceRunningTask(0);
 }
 
 void handler10ms(){
-	updateDebugFlag(800);
-	sleepTimerMs(3,2);
-	passes2++;
-	traceTaskPasses(2,passes2);
-	traceRunningTask(0);
+    updateDebugFlag(800);
+    sleepTimerMs(3,2);
+    passes2++;
+    traceTaskPasses(2,passes2);
+    traceRunningTask(0);
 
 }
 
 void handler20ms(){
-	updateDebugFlag(899);
-	sleepTimerMs(5,3);
-	passes3++;
-	traceRunningTask(0);
-	traceTaskPasses(3,passes3);
+    updateDebugFlag(899);
+    sleepTimerMs(5,3);
+    passes3++;
+    traceRunningTask(0);
+    traceTaskPasses(3,passes3);
 
 }
 
 void handler10msCore2(){
-	updateDebugFlag(899);
-	sleepTimerMs(3,4);
-	passes4++;
-	//shared_label1 = shared_label_to_read;
-	traceRunningTask(0);
-	traceTaskPasses(2,passes4);
+    updateDebugFlag(899);
+    sleepTimerMs(3,4);
+    passes4++;
+    traceRunningTask(0);
+    traceTaskPasses(2,passes4);
 }
 
 void handler20msCore2(){
-	updateDebugFlag(899);
-	sleepTimerMs(7,5);
-	passes5++;
-	traceRunningTask(0);
-	traceTaskPasses(3,passes5);
+    updateDebugFlag(899);
+    sleepTimerMs(7,5);
+    passes5++;
+    traceRunningTask(0);
+    traceTaskPasses(3,passes5);
 }
 
 

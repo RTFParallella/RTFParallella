@@ -109,11 +109,13 @@ int read_shm_section ( unsigned int* x, unsigned indx);
  */
 void write_shm_section (unsigned int* x, unsigned indx, int payload);
 
+#if 0
 /**
  * TODO
  * expand this function to use DMA engine of the Epi chip
  */
 unsigned int shm_section_init_read (SHM_section sec,int index);
 
+#endif
 
 #endif /* SRC_PARALLELLA_SHARED_COMMS_H_ */

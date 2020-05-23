@@ -14,12 +14,14 @@
 //epiphany imports
 #include <stdlib.h>
 
+#include "e_lib.h"
+
 #include "AmaltheaConverter.h"
 #include "c2c.h"
 #include "debugFlags.h"
 #include "shared_comms.h"
 #include "taskCode.h"
-#include "e_lib.h"
+
 #include "label_man_core0.h"
 //freeRTOS imports
 #include "FreeRTOS.h"
@@ -29,7 +31,7 @@
 //---------------------------------------------
 int main(void) {
 	//initialize output buffer for debug messages
-	outbuf_init();
+	init_task_trace_buffer();
 	init_mem_sections();
 	shared_labels_init_core();
 	//create Amalthea task objects
