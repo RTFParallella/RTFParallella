@@ -24,7 +24,7 @@
 /* First five address is used by FreeRTOS porting on Epiphany on shared dram see port.c file. */
 #define INPUT_TIMESCALE_OFFSET                                  20
 
-#define SHARED_LABEL_OFFSET                             (INPUT_TIMESCALE_OFFSET + 4)
+#define SHARED_DATA_OFFSET                             (INPUT_TIMESCALE_OFFSET + 4)
 
 
 extern unsigned int execution_time_scale;

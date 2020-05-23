@@ -19,13 +19,13 @@ DSHM_section sec1_core_10 = {1,0,0x4000,10};
 
 /* Pointer declaration for global shared memory section */
 unsigned int* sec1_global_pointer;
-unsigned int shared_dram_start_address SECTION("shared_dram");
+unsigned int shared_dram_start_address[256] SECTION("shared_dram");
 
 /*initialize shm sections and assign pointers */
 
 void init_mem_sections(void)
 {
-    sec1_global_pointer = &shared_dram_start_address;
+    sec1_global_pointer = shared_dram_start_address + 11;
     for (int index = 0;index < 10; index++){
         sec1_global_pointer[index] = 0;
     }

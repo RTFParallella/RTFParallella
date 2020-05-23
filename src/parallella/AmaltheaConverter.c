@@ -11,7 +11,6 @@
  *        Dortmund University of Applied Sciences and Arts - initial API and implementation
  *******************************************************************************/
 #include <e_lib.h>
-
 #include "AmaltheaConverter.h"
 #include "debugFlags.h"
 

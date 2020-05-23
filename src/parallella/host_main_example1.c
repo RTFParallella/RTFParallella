@@ -45,6 +45,15 @@ int main(int argc, char *argv[])
     unsigned int message2[9];
     int addr;
     int index = 0;
+    btf_trace_info trace_info;
+
+    trace_info.is_init_done = 0;
+    trace_info.rw_operation = -1;
+    for(index = 0; index < 8; index++)
+    {
+        trace_info.data[index] = 0;
+    }
+
 
     unsigned int labelVisual_perCore[EXEC_CORE_COUNT][DSHM_VISIBLE_LABEL_COUNT];
     unsigned int prv_val_preCore[EXEC_CORE_COUNT][DSHM_VISIBLE_LABEL_COUNT];
@@ -120,6 +129,14 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Error in writing to the shared dram buffer\n");
     }
 
+    printf("Size of trace info=%d\n", sizeof(btf_trace_info));
+
+    /* Write the initialized trace buffer values to the shared memory */
+    if (sizeof(btf_trace_info) != e_write(&emem, 0, 0, SHARED_DATA_OFFSET, &trace_info, sizeof(btf_trace_info)))
+    {
+        fprintf(stderr, "Error in writing to the shared dram buffer\n");
+    }
+
     e_start_group(&dev);
     addr = cnt_address;
     int pollLoopCounter = 0;
@@ -132,14 +149,14 @@ int main(int argc, char *argv[])
         e_read(&dev, 0, 0, dstr_mem_offset_sec_1, &shared_label_core[0], sizeof(shared_label_core_00));
         e_read(&dev, 1, 0, 0x6000, message2, sizeof(message2));
         e_read(&dev, 1, 0, dstr_mem_offset_sec_1, &shared_label_core[1], sizeof(shared_label_core_10));
-        e_read(&emem, 0, 0, SHARED_LABEL_OFFSET, shared_label_to_read, sizeof(shared_label_to_read));
+        e_read(&emem, 0, 0, SHARED_DATA_OFFSET + sizeof(btf_trace_info) , shared_label_to_read, sizeof(shared_label_to_read));
         /* Check the tick count of both the messages */
         if (message[8]!= message2[8] ){
             //fprintf(stderr,"NIS->");
         }
         get_task_name(message[6],buffer1);
         get_task_name(message2[6],buffer2);
-        fprintf(stderr," %4d | %10s | %10s | ",message[8] + 1,buffer1,buffer2);
+        fprintf(stderr," %4d | %10s | %10s | ",message[8],buffer1,buffer2);
 
         for (index = 0;index < EXEC_CORE_COUNT; index++)
         {

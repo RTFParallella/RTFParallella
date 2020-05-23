@@ -27,24 +27,23 @@
 #define TICK_FLAG              8
 
 
+#define BTF_TRACE_BUFFER_SIZE  8
+
 /**
  *  Structure to ensure proper synchronization between host and epiphany cores
  * and also within epiphany cores.
  */
-typedef struct software_interrupt
+typedef struct btf_trace_info_t
 {
-    int is_init_done;                 /**< To ensure that the mutex is initialized */
-    int core_write_done;              /**< To ensure that the mutex is initialized */
-    int host_read_done;               /**< To ensure that the mutex is initialized */
+    int is_init_done;                         /**< To ensure that the mutex is initialized */
+    int rw_operation;                         /**< Read write operation between epiphany core and host */
 #ifdef __EPIPHANY_DEVICE__
-    e_mutex_t* mutex;                 /**< Mutex declaration on Epiphany core for synchronization */
+    e_mutex_t* mutex;                         /**< Mutex declaration on Epiphany core for synchronization */
 #else
-    void* mutex;                      /**< Mutex declaration. Unused on host  */
+    void* mutex;                              /**< Mutex declaration. Unused on host  */
 #endif
-    int offset;                       /**< Offset of the local memory in epiphany core */
-    int row_id;                       /**< Row ID of the Epiphany core */
-    int col_id;                       /**< Row ID of the Epiphany core */
-} software_interrupt_t;
+    unsigned int data[BTF_TRACE_BUFFER_SIZE]; /**< BTF trace data buffer */
+} btf_trace_info;
 
 
 /**
