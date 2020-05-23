@@ -14,20 +14,29 @@
 #include "RTFParallellaConfig.h"
 #include "c2c.h"
 
-unsigned int *outbuf_dstr_shared[10];
+unsigned int *outbuf_dstr_shared[SHM_LABEL_COUNT];
+
+
+unsigned int *allocate_epiphany_memory()
+{
+    unsigned int core_address = 0;
+
+    return (unsigned int *)core_address;
+}
 
 void shared_labels_init_core(){
-    //shared buffer in core memory
-    outbuf_dstr_shared[0] = (unsigned int *) dstr_mem_offset_sec_1;
-    //initialize buffer
-    int i;
-    for (i = 0;i < 10; i++){
-        *outbuf_dstr_shared[i] = 0;
+    /* shared buffer in core memory */
+    outbuf_dstr_shared[0] = (unsigned int *) DSHM_LABEL_EPI_CORE_OFFSET;
+    /* initialize buffer */
+    int index;
+    for (index = 0; index < SHM_LABEL_COUNT; index++){
+        *outbuf_dstr_shared[index] = 0;
     }
 
 }
 
-void shared_label_write_core (unsigned row,unsigned col,int label_indx,int payload){
+void shared_label_write_core (unsigned row,unsigned col,int label_indx,int payload)
+{
     unsigned int *addr;
     unsigned int* addr_base;
     addr_base = (unsigned int *)get_base_address_core(row,col);
@@ -36,7 +45,8 @@ void shared_label_write_core (unsigned row,unsigned col,int label_indx,int paylo
 }
 
 
-void DSHM_section_init(DSHM_section sec){
+void DSHM_section_init(DSHM_section sec)
+{
     unsigned int *addr;
     unsigned int* addr_base;
     addr_base = (unsigned int *)get_base_address_core(sec.row,sec.col);
@@ -47,7 +57,8 @@ void DSHM_section_init(DSHM_section sec){
 }
 
 
-void write_DSHM_section (DSHM_section sec,int label_indx,int payload){
+void write_DSHM_section (DSHM_section sec,int label_indx,int payload)
+{
     unsigned int *addr;
     unsigned int* addr_base;
     addr_base = (unsigned int *)get_base_address_core(sec.row,sec.col);
@@ -55,7 +66,8 @@ void write_DSHM_section (DSHM_section sec,int label_indx,int payload){
     addr[label_indx] = payload;
 }
 
-unsigned int read_DSHM_section (DSHM_section sec, int label_indx){
+unsigned int read_DSHM_section (DSHM_section sec, int label_indx)
+{
     unsigned int *addr;
     unsigned int* addr_base;
     addr_base = (unsigned int *)get_base_address_core(sec.row,sec.col);
@@ -64,7 +76,8 @@ unsigned int read_DSHM_section (DSHM_section sec, int label_indx){
 }
 
 
-unsigned int shared_label_read_core (unsigned row, unsigned col, int label_indx){
+unsigned int shared_label_read_core (unsigned row, unsigned col, int label_indx)
+{
     unsigned int *addr;
     unsigned int* addr_base;
     addr_base = (unsigned int *)get_base_address_core(row,col);

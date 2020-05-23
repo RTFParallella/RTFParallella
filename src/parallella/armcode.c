@@ -19,6 +19,7 @@
 #include <time.h>   /* Needed for struct timespec */
 #include <e-loader.h>
 
+#include "RTFParallellaConfig.h"
 #include "c2c.h"
 #include "debugFlags.h"
 #include "shared_comms.h"
@@ -125,9 +126,9 @@ int main()
 	for (pollLoopCounter=0;pollLoopCounter<=40;pollLoopCounter++){
 		message[3] = 0;
 		e_read(&dev,0,0,addr, &message, sizeof(message));
-		e_read(&dev,0,0,dstr_mem_offset_sec_1, &shared_label_core_00, sizeof(shared_label_core_00));
+		e_read(&dev,0,0,DSHM_LABEL_EPI_CORE_OFFSET, &shared_label_core_00, sizeof(shared_label_core_00));
 		e_read(&dev,1,0,addr, &message2, sizeof(message2));
-		e_read(&dev,1,0,dstr_mem_offset_sec_1, &shared_label_core_10, sizeof(shared_label_core_10));
+		e_read(&dev,1,0,DSHM_LABEL_EPI_CORE_OFFSET, &shared_label_core_10, sizeof(shared_label_core_10));
 		e_read(&emem,0,0,0x00, &shared_label_to_read, 10*sizeof(unsigned int));
 		if (message[8]!= message2[8] ){
 			//fprintf(stderr,"NIS->");

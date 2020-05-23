@@ -11,35 +11,13 @@
  *          Dortmund University of Applied Sciences and Arts - initial API and implementation
  *******************************************************************************/
 #include "e-lib.h"
+#include "RTFParallellaConfig.h"
+#include "shared_comms.h"
+#include "c2c.h"
 #include "label_man_core0.h"
 
-DSHM_section sec1_core_00 = {0,0,0x4000,10};
-DSHM_section sec1_core_10 = {1,0,0x4000,10};
-
-
-/* Pointer declaration for global shared memory section */
-unsigned int* sec1_global_pointer;
-unsigned int shared_dram_start_address[256] SECTION("shared_dram");
-
-/*initialize shm sections and assign pointers */
-
-void init_mem_sections(void)
-{
-    sec1_global_pointer = shared_dram_start_address + 11;
-    for (int index = 0;index < 10; index++){
-        sec1_global_pointer[index] = 0;
-    }
-}
-
-
-void init_DSHM_sections(void){
-    DSHM_section_init(sec1_core_00);
-    DSHM_section_init(sec1_core_10);
-}
-
-
-
-//extern unsigned int shared_label1;
+DSHM_section sec1_core_00 = {0,0,DSHM_LABEL_EPI_CORE_OFFSET,10};
+DSHM_section sec1_core_10 = {1,0,DSHM_LABEL_EPI_CORE_OFFSET,10};
 
 int label5_10_00;
 
@@ -50,6 +28,28 @@ int shared_label_2 = 97;
 int shared_label_10 = 0;
 
 extern int passes1;
+
+
+/* Pointer declaration for global shared memory section */
+static unsigned int* sec1_global_pointer;
+
+
+/*initialize shm sections and assign pointers */
+
+void init_mem_sections(void)
+{
+    sec1_global_pointer = allocate_shared_memory(GLOBAL_SHARED_LABEL_OFFSET);
+    for (int index = 0; index < SHM_LABEL_COUNT; index++)
+    {
+        sec1_global_pointer[index] = 0;
+    }
+}
+
+
+void init_DSHM_sections(void){
+    DSHM_section_init(sec1_core_00);
+    DSHM_section_init(sec1_core_10);
+}
 
 //-------
 void cIn5ms(){
@@ -75,7 +75,8 @@ void cOut5ms(){
     label5_10_00 = label5_10_00_copy1;
     write_DSHM_section(sec1_core_10,0,shared_label_2);
 }
-void cOut10ms(){
+void cOut10ms()
+{
     write_shm_section(sec1_global_pointer,0,3);
 }
 void cOut20ms(){

@@ -31,7 +31,7 @@ unsigned int shared_label_to_read[SHM_LABEL_COUNT];
 unsigned int shared_label_core_00[DSHM_SEC_LABEL_COUNT];
 unsigned int shared_label_core_10[DSHM_SEC_LABEL_COUNT];
 unsigned int shared_label_core[EXEC_CORE_COUNT][DSHM_SEC_LABEL_COUNT];
-unsigned int shared_dram_start_address = SHARED_DRAM_START_ADDRESS;
+unsigned int shared_dram_start_address = SHARED_DRAM_START_OFFSET;
 
 
 /* Entry point of the application running on the HOST Core. */
@@ -41,24 +41,21 @@ int main(int argc, char *argv[])
     e_platform_t epiphany;
     e_epiphany_t dev;
     e_mem_t emem;
-    unsigned int message[9];
-    unsigned int message2[9];
-    int addr;
+    unsigned int ecore0[RTF_DEBUG_TRACE_COUNT];
+    unsigned int ecore1[RTF_DEBUG_TRACE_COUNT];
+    unsigned int labelVisual_perCore[EXEC_CORE_COUNT][DSHM_VISIBLE_LABEL_COUNT];
+    unsigned int prv_val_preCore[EXEC_CORE_COUNT][DSHM_VISIBLE_LABEL_COUNT];
+    unsigned int labelVisual_SHM[SHM_VISIBLE_LABEL_COUNT];
+    unsigned int prv_val_SHM[SHM_VISIBLE_LABEL_COUNT];
     int index = 0;
     btf_trace_info trace_info;
 
     trace_info.is_init_done = 0;
     trace_info.rw_operation = -1;
-    for(index = 0; index < 8; index++)
+    for(index = 0; index < BTF_TRACE_BUFFER_SIZE; index++)
     {
         trace_info.data[index] = 0;
     }
-
-
-    unsigned int labelVisual_perCore[EXEC_CORE_COUNT][DSHM_VISIBLE_LABEL_COUNT];
-    unsigned int prv_val_preCore[EXEC_CORE_COUNT][DSHM_VISIBLE_LABEL_COUNT];
-    unsigned int labelVisual_SHM[SHM_VISIBLE_LABEL_COUNT];
-    unsigned int prv_val_SHM[SHM_VISIBLE_LABEL_COUNT];
 
     for (index = 0;index < EXEC_CORE_COUNT; index++)
     {
@@ -95,10 +92,11 @@ int main(int argc, char *argv[])
 
     e_init(NULL);
     int time_unit = parse_btf_trace_arguments(argc, argv);
+
     /* Reserve the memory for the data in the shared dram region to be shared between
      * host and epiphany core. The dram offset starts at 0x01000000 which corresponds
      * to the global address as 0x8F000000. */
-    if (E_OK != e_alloc(&emem, (unsigned int)shared_dram_start_address , 0x00010000))
+    if (E_OK != e_alloc(&emem, (unsigned int)shared_dram_start_address , SHARED_DRAM_SIZE))
     {
         fprintf(stderr, "Error in reserving the shared dram buffer\n");
     }
@@ -129,42 +127,44 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Error in writing to the shared dram buffer\n");
     }
 
-    printf("Size of trace info=%d\n", sizeof(btf_trace_info));
-
     /* Write the initialized trace buffer values to the shared memory */
-    if (sizeof(btf_trace_info) != e_write(&emem, 0, 0, SHARED_DATA_OFFSET, &trace_info, sizeof(btf_trace_info)))
+    if (sizeof(btf_trace_info) != e_write(&emem, 0, 0, SHARED_BTF_DATA_OFFSET, &trace_info, sizeof(btf_trace_info)))
     {
         fprintf(stderr, "Error in writing to the shared dram buffer\n");
     }
 
     e_start_group(&dev);
-    addr = cnt_address;
     int pollLoopCounter = 0;
     char buffer1[LABEL_STRLEN] = {0};
     char buffer2[LABEL_STRLEN] = {0};
 
     for (pollLoopCounter = 0; pollLoopCounter <= 40; pollLoopCounter++)
     {
-        e_read(&dev, 0, 0, 0x6000, message, sizeof(message));
-        e_read(&dev, 0, 0, dstr_mem_offset_sec_1, &shared_label_core[0], sizeof(shared_label_core_00));
-        e_read(&dev, 1, 0, 0x6000, message2, sizeof(message2));
-        e_read(&dev, 1, 0, dstr_mem_offset_sec_1, &shared_label_core[1], sizeof(shared_label_core_10));
-        e_read(&emem, 0, 0, SHARED_DATA_OFFSET + sizeof(btf_trace_info) , shared_label_to_read, sizeof(shared_label_to_read));
+        e_read(&dev, 0, 0, ECORE_RTF_BUFFER_ADDR, ecore0, sizeof(ecore0));
+        e_read(&dev, 0, 0, DSHM_LABEL_EPI_CORE_OFFSET, &shared_label_core[0],
+                            sizeof(shared_label_core_00));
+        e_read(&dev, 1, 0, ECORE_RTF_BUFFER_ADDR, ecore1, sizeof(ecore1));
+        e_read(&dev, 1, 0, DSHM_LABEL_EPI_CORE_OFFSET, &shared_label_core[1],
+                            sizeof(shared_label_core_10));
+        e_read(&emem, 0, 0, SHARED_BTF_DATA_OFFSET + sizeof(btf_trace_info) ,
+                            shared_label_to_read, sizeof(shared_label_to_read));
+
         /* Check the tick count of both the messages */
-        if (message[8]!= message2[8] ){
-            //fprintf(stderr,"NIS->");
+        if (ecore0[8]!= ecore1[8] )
+        {
+            /* Left empty intentionally */
         }
-        get_task_name(message[6],buffer1);
-        get_task_name(message2[6],buffer2);
-        fprintf(stderr," %4d | %10s | %10s | ",message[8],buffer1,buffer2);
+        get_task_name(ecore0[6],buffer1);
+        get_task_name(ecore1[6],buffer2);
+        fprintf(stderr," %4d | %10s | %10s | ", ecore0[8], buffer1, buffer2);
 
         for (index = 0;index < EXEC_CORE_COUNT; index++)
         {
             user_config_print_values_auto(DSHM_VISIBLE_LABEL_COUNT,
-                    labelVisual_perCore[index],shared_label_core[index],prv_val_preCore[index]);
+                    labelVisual_perCore[index], shared_label_core[index], prv_val_preCore[index]);
         }
 
-        for (index = 0; index < 4; index++)
+        for (index = 0; index < (SHM_VISIBLE_LABEL_COUNT + 2); index++)
         {
             fprintf(stderr," %2d |",shared_label_to_read[index]);
         }

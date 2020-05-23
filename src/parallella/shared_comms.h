@@ -58,6 +58,23 @@ struct{
 
 
 /**
+ * @brief The function provides the pointer to the global address to the shared DRAM memory.
+ *
+ * @detail The shared DRAM memory offset starts at 0x8F000018. This address space is accessible
+ * by the Epiphany cores as well as Host. The actual DRAM starts at 0x8F000000. The first
+ * 20 bytes are reserved by the FreeRTOS. The next 4 bytes is used to store the time scale.
+ * The next 44 bytes will be used to store the BTF trace information. The rest of the memory
+ * can be used for storing the shared labels.
+ *
+ * Arguments:
+ * @param[in] offset : The offset from the shared dram start address.
+ *
+ * @return           : Pointer to the shared DRAM memory.
+ *
+ */
+unsigned int *allocate_shared_memory(unsigned int offset);
+
+/**
  * Initiate the shared label section, this function will assign addresses to labels in a section,
  * and initialize those labels to the value of 256
  * If the requested section does not fit in the system's shared_dram, a null
@@ -109,13 +126,11 @@ int read_shm_section ( unsigned int* x, unsigned indx);
  */
 void write_shm_section (unsigned int* x, unsigned indx, int payload);
 
-#if 0
 /**
  * TODO
  * expand this function to use DMA engine of the Epi chip
  */
 unsigned int shm_section_init_read (SHM_section sec,int index);
 
-#endif
 
 #endif /* SRC_PARALLELLA_SHARED_COMMS_H_ */

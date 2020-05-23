@@ -19,9 +19,6 @@
 #include <stdarg.h>
 
 
-
-
-
 AmaltheaTask createAmaltheaTask(void *taskHandler,void *cInHandler,void *cOutHandler,
         unsigned int period,unsigned int deadline, unsigned int WCET)
 {

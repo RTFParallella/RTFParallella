@@ -14,10 +14,6 @@
 #ifndef SRC_PARALLELLA_LABEL_MAN_CORE0_H_
 #define SRC_PARALLELLA_LABEL_MAN_CORE0_H_
 
-#include "shared_comms.h"
-#include "c2c.h"
-
-
 #define num_unique_sections 1
 
 void init_mem_sections(void);

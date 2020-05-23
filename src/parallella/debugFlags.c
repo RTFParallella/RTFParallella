@@ -12,54 +12,80 @@
  *******************************************************************************/
 
 #include <e-lib.h>
+#include "RTFParallellaConfig.h"
 #include "debugFlags.h"
 #include "FreeRTOS.h"
 #include "task.h"
 
-unsigned int trace_buffer[1024] __attribute__((section(".data_bank3")));
+/**
+ * This buffer is assigned to stored the RTF parallella legacy trace info. Data bank
+ * 3 is used to store the information on each epiphany core. It starts at 0x6000 offset
+ * on each epiphany core. Any change in this buffer addressing must be followed with
+ * the correct offset set in host application to get the correct values.
+ */
+static unsigned int trace_buffer[32] __attribute__((section(".data_bank3")));
+
+/* Variable to set the clock cycle per tick. */
 unsigned int execution_time_scale;
-unsigned int* time_scale = (unsigned int *)0x8f000014;
+
+
+/**
+ * Gets the execution time from the global memory. The global assigned address in shared
+ * memory is 0x8F000014. The shared DRAM buffer starts at 0x8F000000. The first 20 bytes
+ * is used by the port.c file in FreeRTOS to store some interrupt information.
+ */
+static void get_execution_time_scale(void)
+{
+    unsigned int* time_scale = (unsigned int *)(SHARED_DRAM_START_ADDRESS |
+                                                SHARED_DRAM_START_OFFSET  |
+                                                INPUT_TIMESCALE_OFFSET);
+    execution_time_scale = time_scale[0];
+}
+
 /*
  * initialize output buffer with the addresses to array elements
  */
 void init_task_trace_buffer(void )
 {
-    execution_time_scale = time_scale[0];
-    /* initialize buffer */
+    get_execution_time_scale();
+    /* Initialize buffer */
     int index;
-    /* The first */
-    for (index = 0;index < 10; index++)
+    /* The first 10 values are used to store the legacy RTF information. */
+    for (index = 0;index < RTF_DEBUG_TRACE_COUNT; index++)
     {
         trace_buffer[index] = 0;
     }
 }
 
-void traceRunningTask(unsigned taskNum){
-
+void traceRunningTask(unsigned taskNum)
+{
     trace_buffer[RUNNINGTASK_FLAG] = taskNum;
 }
 
-void traceTaskPasses(unsigned taskNum, int currentPasses){
-    if (taskNum == 1){
+void traceTaskPasses(unsigned taskNum, int currentPasses)
+{
+    if (taskNum == 1)
+    {
         trace_buffer[TASK1_FLAG] = currentPasses;
-    }else if (taskNum == 2){
+    }
+    else if (taskNum == 2)
+    {
         trace_buffer[TASK2_FLAG] = currentPasses;
-    }else if (taskNum == 3){
+    }
+    else if (taskNum == 3)
+    {
         trace_buffer[TASK3_FLAG] = currentPasses;
     }
 }
 
-void updateTick(void){
+void updateTick(void)
+{
     trace_buffer[TICK_FLAG] = xTaskGetTickCount();
 }
 
-void updateDebugFlag(int debugMessage){
+void updateDebugFlag(int debugMessage)
+{
     trace_buffer[DEBUG_FLAG] = debugMessage;
 }
-
-
-
-
-
 
 
