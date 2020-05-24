@@ -49,4 +49,35 @@
 extern unsigned int execution_time_scale;
 
 
+/* Enum for entity type ID */
+typedef enum entity_id_t
+{
+    /* 0 to 15 entity ID is reserved for TASKS. */
+    IDLE_TASK_ID = 0,
+    TASK5MS0_ID,
+    TASK10MS0_ID,
+    TASK20MS0_ID,
+    TASK10MS1_ID,
+    TASK20MS1_ID,
+
+
+    /* 16 to 64 entity ID reserved for RUNNABLES */
+    RUNNABLE_HANDLER5MS0_ID = 16,
+    RUNNABLE_HANDLER10MS0_ID,
+    RUNNABLE_HANDLER20MS0_ID,
+    RUNNABLE_HANDLER10MS1_ID,
+    RUNNABLE_HANDLER20MS1_ID,
+
+    /* 64 to 256 reserved for LABELS */
+    SH_LABEL_A_ID = 64,
+    SH_LABEL_B_ID,
+    DSH_LABEL_A_ID,
+    DSH_LABEL_B_ID,
+
+    /* 256 to 264 reserved for HARDWARE */
+    HW_CORE0_ID = 256,
+    HW_CORE1_ID
+} entity_id;
+
+
 #endif /* SRC_PARALLELLA_RTFPARALLELLACONFIG_H_ */

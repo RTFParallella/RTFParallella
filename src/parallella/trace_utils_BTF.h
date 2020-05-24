@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#include "RTFParallellaConfig.h"
 
 #define RFTP_GENERATE_BTF_TRACE 0x01
 
@@ -128,7 +129,7 @@ void write_btf_trace_header_entity_table(FILE *stream);
 void write_btf_trace_header_entity_type_table(FILE *stream);
 
 /* Function to store the entry for all the entities */
-void store_entity_entry(uint16_t typeId, btf_trace_event_type type, uint8_t *name);
+void store_entity_entry(entity_id typeId, btf_trace_event_type type, const char *name);
 
 /* Function to write the data section of the BTF */
 void write_btf_trace_data(FILE *stream, uint8_t core_id, unsigned int * data_buffer);

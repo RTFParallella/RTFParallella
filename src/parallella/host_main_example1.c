@@ -34,6 +34,21 @@ unsigned int shared_label_core[EXEC_CORE_COUNT][DSHM_SEC_LABEL_COUNT];
 unsigned int shared_dram_start_address = SHARED_DRAM_START_OFFSET;
 
 
+static void construct_btf_trace_header(FILE *stream)
+{
+    write_btf_trace_header_config(stream);
+    write_btf_trace_header_entity_type(stream, TASK_EVENT);
+    write_btf_trace_header_entity_type(stream, RUNNABLE_EVENT);
+    write_btf_trace_header_entity_type(stream, SIGNAL_EVENT);
+    generate_task_entity_table();
+    generate_runnable_entity_table();
+    generate_signal_entity_table();
+    generate_hw_entity_table();
+    write_btf_trace_header_entity_table(stream);
+    write_btf_trace_header_entity_type_table(stream);
+}
+
+
 /* Entry point of the application running on the HOST Core. */
 int main(int argc, char *argv[])
 {
@@ -56,6 +71,26 @@ int main(int argc, char *argv[])
     {
         trace_info.data[index] = 0;
     }
+
+    FILE *fp_to_trace = NULL;
+    int scale_factor = parse_btf_trace_arguments(argc, argv);
+    char trace_file_path[512] = {0};
+    get_btf_trace_file_path(trace_file_path);
+    if (strlen((const char *)trace_file_path) != 0)
+    {
+        fp_to_trace = fopen((const char *)trace_file_path, "w+");
+        if (fp_to_trace == NULL)
+        {
+            fprintf(stderr,"Output redirected to stderr\n");
+            fp_to_trace = stderr;
+        }
+    }
+    else
+    {
+        fprintf(stderr,"Output redirected to stderr\n");
+        fp_to_trace = stderr;
+    }
+    construct_btf_trace_header(fp_to_trace);
 
     for (index = 0;index < EXEC_CORE_COUNT; index++)
     {
@@ -94,7 +129,6 @@ int main(int argc, char *argv[])
                     "=======================================================================\n");
 
     e_init(NULL);
-    int scale_factor = parse_btf_trace_arguments(argc, argv);
 
     /* Reserve the memory for the data in the shared dram region to be shared between
      * host and epiphany core. The dram offset starts at 0x01000000 which corresponds
@@ -177,6 +211,11 @@ int main(int argc, char *argv[])
         nsleep(1);
     }
     fprintf(stderr,"----------------------------------------------\n");
+    if (fp_to_trace != NULL)
+    {
+        fclose(fp_to_trace);
+        fp_to_trace = NULL;
+    }
     e_close(&dev);
     e_finalize();
     fprintf(stderr,"RFTP demo complete \n ");

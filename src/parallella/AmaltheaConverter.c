@@ -24,11 +24,11 @@ AmaltheaTask createAmaltheaTask(void *taskHandler,void *cInHandler,void *cOutHan
 {
     if (WCET >= period)
     {
-        AmaltheaTask retValNull = {NULL, 0, 0, 0, NULL, NULL};
+        AmaltheaTask retValNull = {0, 0, 0, 0, NULL, 0, 0, 0, NULL, NULL};
         return retValNull;
     }else
     {
-        AmaltheaTask retVal = {taskHandler, WCET, deadline, period, cInHandler, cOutHandler};
+        AmaltheaTask retVal = {0, 0, 0, 0, taskHandler, WCET, deadline, period, cInHandler, cOutHandler};
         return retVal;
     }
 }

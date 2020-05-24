@@ -21,7 +21,12 @@
 /**
  * Structure to hold tasks according to amalthea model
  */
-typedef struct{
+typedef struct AmaltheaTask_t
+{
+    unsigned int src_id;
+    unsigned int src_instance;
+    unsigned int task_id;
+    unsigned int task_instance;
     void(* taskHandler)();
     unsigned int executionTime;//in ticks
     unsigned int deadline;        //in ticks

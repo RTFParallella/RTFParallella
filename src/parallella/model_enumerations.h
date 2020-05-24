@@ -19,7 +19,7 @@
 
 #define DSHM_LABEL_COUNT                  10
 
-#define LABEL_STRLEN                      16
+#define LABEL_STRLEN                      32
 
 #define EXEC_TASK_COUNT                    5
 
@@ -64,6 +64,47 @@ void get_task_name(int index,char *str);
  * mem_type            :    the memory type of indices requested (MEM_TYPE_SHM or MEM_TYPE_DSHM)
  */
 void get_visible_label_index(unsigned array[],unsigned mem_type);
+
+
+/**
+ * Generate the BTF trace entity entry for all the tasks
+ *
+ * Arguments:
+ * void            :
+ *
+ * Return: void
+ */
+void generate_task_entity_table(void);
+
+/**
+ * Generate the BTF trace entity entry for all the runnables
+ *
+ * Arguments:
+ * void            :
+ *
+ * Return: void
+ */
+void generate_runnable_entity_table(void);
+
+/**
+ * Generate the BTF trace entity entry for all the signals/labels
+ *
+ * Arguments:
+ * void            :
+ *
+ * Return: void
+ */
+void generate_signal_entity_table(void);
+
+/**
+ * Generate the BTF trace entity entry for all the hardware entities
+ *
+ * Arguments:
+ * void            :
+ *
+ * Return: void
+ */
+void generate_hw_entity_table(void);
 
 
 #endif /* SRC_PARALLELLA_MODEL_ENUMERATIONS_H_ */

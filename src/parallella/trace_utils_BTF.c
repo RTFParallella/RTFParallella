@@ -15,6 +15,7 @@
 #include "trace_utils_BTF.h"
 #include <limits.h>
 #include <unistd.h>
+
 /*------------------------------DEFINES-------------------------*/
 #define BTF_TRACE_ENTITY_TABLE_SIZE                 64
 #define CORE_STACK_SIZE                             16
@@ -353,7 +354,7 @@ void get_btf_trace_file_path(char *trace_file_path)
     {
         fprintf(stderr,"You don't have write access to the directory in which you are trying to create the btf file\n");
     }
-    sprintf(trace_file_path,"%s" "%c" "%s",lcwd,'/',output_trace_path);
+    sprintf(trace_file_path,"%s" "%c" "%s",lcwd,'/', output_trace_path);
     fprintf(stderr,"trace_file_path = %s\n",trace_file_path);
     fflush(stderr);
 }
@@ -452,7 +453,7 @@ int  parse_btf_trace_arguments(int argc, char **argv)
  *
  * @return: void
  */
-void store_entity_entry(uint16_t typeId, btf_trace_event_type type, uint8_t *name)
+void store_entity_entry(entity_id typeId, btf_trace_event_type type, const char *name)
 {
     int16_t index = 0;
     index = find_first_free_index();
@@ -494,7 +495,7 @@ void write_btf_trace_header_config(FILE *stream)
     get_trace_timestamp(time_string);
     fprintf(stream, "#creationdate %s\n", time_string);
     fprintf(stream, "#inputFile %s\n", btf_header.modelfile);
-    fprintf(stream, "#timescale %s\n", btf_header.timescale);
+    fprintf(stream, "#timescale %s\n", btf_header.timeunit);
     fflush(stream);
 }
 
