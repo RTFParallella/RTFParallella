@@ -29,14 +29,18 @@
 #include "queue.h"
 //utility imports
 //---------------------------------------------
+
 int main(void) {
 	//initialize output buffer for debug messages
 	init_task_trace_buffer();
 	init_mem_sections();
+    int ts = get_time_scale_factor();
 	shared_labels_init_core();
 	//create Amalthea task objects
-	AmaltheaTask t20ms = createAmaltheaTask(handler10msCore2,cIn10msCore2,cOut10msCore2,10,10,7);
-	AmaltheaTask t40ms = createAmaltheaTask(handler20msCore2,cIn20msCore2,cOut20msCore2,20,20,10);
+	AmaltheaTask t20ms = createAmaltheaTask(handler10msCore2, cIn10msCore2, cOut10msCore2,
+	        10 * ts ,10 * ts , 7* ts);
+	AmaltheaTask t40ms = createAmaltheaTask(handler20msCore2, cIn20msCore2, cOut20msCore2,
+	        20 * ts, 20 * ts, 10 * ts);
 	//create RTOS task from templates
 	createRTOSTask(&t20ms,2,0);
 	createRTOSTask(&t40ms,1,0);

@@ -14,11 +14,14 @@
 #include "ParallellaUtils.h"
 #include "debugFlags.h"
 
+
 void sleepTimerMs(int ticks, int taskNum){
     updateDebugFlag(ticks * 10);
     int clock_cycle = (configCPU_CLOCK_HZ / execution_time_scale);
     int tick_count;
-    for (tick_count = 0;tick_count < ticks; tick_count++){
+    int ts = get_time_scale_factor();
+    int no_of_ticks = ts * ticks;
+    for (tick_count = 0;tick_count < no_of_ticks; tick_count++){
         taskENTER_CRITICAL();
         traceRunningTask(taskNum);
         e_wait(E_CTIMER_0,clock_cycle);

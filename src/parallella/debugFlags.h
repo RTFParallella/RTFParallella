@@ -46,6 +46,9 @@ typedef struct btf_trace_info_t
 } btf_trace_info;
 
 
+
+unsigned int get_time_scale_factor(void);
+
 /**
  * initialize output buffer in core memory
  *

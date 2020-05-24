@@ -122,7 +122,7 @@ void print_legend_enum (unsigned label_count,unsigned label_positions[], unsigne
         {
             /* Get the shared label name */
             get_SHM_label_name(index,label_name);
-            fprintf(stderr,"| %s ",label_name);
+            fprintf(stderr," %s |",label_name);
         }
     }
     else
@@ -131,7 +131,7 @@ void print_legend_enum (unsigned label_count,unsigned label_positions[], unsigne
         {
             /* Get the distributed shared label name */
             get_DSHM_label_name(index, label_name);
-            fprintf(stderr,"| %s ", label_name);
+            fprintf(stderr," %s |", label_name);
         }
     }
     fflush(stderr);

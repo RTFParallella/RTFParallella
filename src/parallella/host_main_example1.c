@@ -76,9 +76,11 @@ int main(int argc, char *argv[])
         printf("\n");
     }
 
-    fprintf(stderr,"===========================================================================\n");
-    fprintf(stderr,"      |   Tasks being executed  | observed labels values |\n");
-    fprintf(stderr,"%6s|%12s|%12s|"," tick ","   Core 1   ","   Core 2   ");
+    fprintf(stderr,"======================================================================="
+                    "=======================================================================\n");
+    fprintf(stderr,"        |   Tasks being executed  |                                 "
+            "      observed labels values                                          |\n");
+    fprintf(stderr,"%8s|%12s|%12s|"," tick ","   Core 1   ","   Core 2   ");
     for (index = 0;index < EXEC_CORE_COUNT;index++)
     {
         /* Get the device shared Label name*/
@@ -86,12 +88,13 @@ int main(int argc, char *argv[])
     }
 
     /* Get the shared label name */
-    print_legend_enum(SHM_VISIBLE_LABEL_COUNT, labelVisual_SHM, MEM_TYPE_SHM);
+    print_legend_enum(SHM_VISIBLE_LABEL_COUNT + 2, labelVisual_SHM, MEM_TYPE_SHM);
     fprintf(stderr,"\n");
-    fprintf(stderr,"===========================================================================\n");
+    fprintf(stderr,"======================================================================="
+                    "=======================================================================\n");
 
     e_init(NULL);
-    int time_unit = parse_btf_trace_arguments(argc, argv);
+    int scale_factor = parse_btf_trace_arguments(argc, argv);
 
     /* Reserve the memory for the data in the shared dram region to be shared between
      * host and epiphany core. The dram offset starts at 0x01000000 which corresponds
@@ -122,7 +125,7 @@ int main(int argc, char *argv[])
         fprintf(stderr,"Error Loading the Epiphany Application on core with row=1 and col=0\n");
     }
     /* Write the time unit used for the configuration of the clock cycle per tick */
-    if (sizeof(int) != e_write(&emem, 0, 0, INPUT_TIMESCALE_OFFSET, &time_unit, sizeof(int)))
+    if (sizeof(int) != e_write(&emem, 0, 0, INPUT_TIMESCALE_OFFSET, &scale_factor, sizeof(int)))
     {
         fprintf(stderr, "Error in writing to the shared dram buffer\n");
     }
@@ -138,7 +141,7 @@ int main(int argc, char *argv[])
     char buffer1[LABEL_STRLEN] = {0};
     char buffer2[LABEL_STRLEN] = {0};
 
-    for (pollLoopCounter = 0; pollLoopCounter <= 40; pollLoopCounter++)
+    for (pollLoopCounter = 0; pollLoopCounter <= 50; pollLoopCounter++)
     {
         e_read(&dev, 0, 0, ECORE_RTF_BUFFER_ADDR, ecore0, sizeof(ecore0));
         e_read(&dev, 0, 0, DSHM_LABEL_EPI_CORE_OFFSET, &shared_label_core[0],
@@ -156,7 +159,8 @@ int main(int argc, char *argv[])
         }
         get_task_name(ecore0[6],buffer1);
         get_task_name(ecore1[6],buffer2);
-        fprintf(stderr," %4d | %10s | %10s | ", ecore0[8], buffer1, buffer2);
+
+        fprintf(stderr," %6d | %10s | %10s | ", ((ecore0[8] + 1) * scale_factor), buffer1, buffer2);
 
         for (index = 0;index < EXEC_CORE_COUNT; index++)
         {
@@ -166,7 +170,7 @@ int main(int argc, char *argv[])
 
         for (index = 0; index < (SHM_VISIBLE_LABEL_COUNT + 2); index++)
         {
-            fprintf(stderr," %2d |",shared_label_to_read[index]);
+            fprintf(stderr," %10d |",shared_label_to_read[index]);
         }
 
         fprintf(stderr,"\n");

@@ -34,11 +34,15 @@ int main(void) {
     e_coords_from_coreid(e_get_coreid(), &row, &col);
     core_id = ((row * 4) + col);
     init_task_trace_buffer();
+    int ts = get_time_scale_factor();
     init_mem_sections();
     shared_labels_init_core();
-    AmaltheaTask t5ms =  createAmaltheaTask(handler5ms,cIn5ms,cOut5ms,5,5,2);
-    AmaltheaTask t10ms = createAmaltheaTask(handler10ms,cIn10ms,cOut10ms,10,10,3);
-    AmaltheaTask t20ms = createAmaltheaTask(handler20ms,cIn20ms,cOut20ms,20,20,5);
+    AmaltheaTask t5ms =  createAmaltheaTask(handler5ms ,cIn5ms ,cOut5ms,
+            5 * ts, 5 * ts, 2 * ts);
+    AmaltheaTask t10ms = createAmaltheaTask(handler10ms, cIn10ms, cOut10ms,
+            10 * ts, 10 * ts, 3 * ts);
+    AmaltheaTask t20ms = createAmaltheaTask(handler20ms, cIn20ms, cOut20ms,
+            20 * ts,20 * ts, 5 * ts);
     /* create RTOS task from templates */
     createRTOSTask(&t5ms,3,0);
     createRTOSTask(&t10ms,2,0);

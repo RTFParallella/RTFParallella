@@ -22,12 +22,10 @@
  * Structure to hold tasks according to amalthea model
  */
 typedef struct{
-    unsigned isDone;
-    unsigned isReady;
     void(* taskHandler)();
-    unsigned executionTime;//in ticks
-    unsigned deadline;        //in ticks
-    unsigned period;        //in ticks
+    unsigned int executionTime;//in ticks
+    unsigned int deadline;        //in ticks
+    unsigned int period;        //in ticks
     void(* cInHandler)();
     void(* cOutHandler)();
 }AmaltheaTask;

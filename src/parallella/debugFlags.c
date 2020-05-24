@@ -28,6 +28,12 @@ static unsigned int trace_buffer[32] __attribute__((section(".data_bank3")));
 /* Variable to set the clock cycle per tick. */
 unsigned int execution_time_scale;
 
+static unsigned int scale_factor;
+
+unsigned int get_time_scale_factor(void)
+{
+    return (scale_factor > 0 ) ? scale_factor : 1;
+}
 
 /**
  * Gets the execution time from the global memory. The global assigned address in shared
@@ -36,10 +42,13 @@ unsigned int execution_time_scale;
  */
 static void get_execution_time_scale(void)
 {
+    /* 1000 corresponds to 1 ms which is considered as max resolution */
+    uint32_t max_resolution = 1000;
     unsigned int* time_scale = (unsigned int *)(SHARED_DRAM_START_ADDRESS |
                                                 SHARED_DRAM_START_OFFSET  |
                                                 INPUT_TIMESCALE_OFFSET);
-    execution_time_scale = time_scale[0];
+    scale_factor = ( max_resolution / time_scale[0] );
+    execution_time_scale = ( scale_factor * max_resolution );
 }
 
 /*
