@@ -46,8 +46,9 @@ int main(void) {
     AmaltheaTask t40ms = createAmaltheaTask(handler20msCore2, cIn20msCore2, cOut20msCore2,
             20 * ts, 20 * ts, 10 * ts, HW_CORE1_ID, 0, TASK20MS1_ID, 0);
     /* create RTOS task from templates */
-    createRTOSTask(&t20ms,2,0);
-    createRTOSTask(&t40ms,1,0);
+    createRTOSTask(&t20ms, 2, 0);
+    createRTOSTask(&t40ms, 1, 0);
+    /* start RTOS scheduler */
     vTaskStartScheduler();
     return EXIT_SUCCESS;
 }

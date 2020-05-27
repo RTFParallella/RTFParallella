@@ -11,7 +11,7 @@
  *        Dortmund University of Applied Sciences and Arts - initial API and implementation
  *******************************************************************************/
 
-//epiphany imports
+/* Epiphany imports */
 #include <stdlib.h>
 #include "e_lib.h"
 
@@ -53,5 +53,6 @@ int main(void) {
     vTaskStartScheduler();
     return EXIT_SUCCESS;
 }
-//---------------------------------------------
-//end of file
+
+
+

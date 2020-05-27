@@ -16,15 +16,22 @@
 #include "debugFlags.h"
 #include "c2c.h"
 #include "shared_comms.h"
+#include "trace_utils_BTF.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
 
+/* This buffer is used to store the legacy RTF trace. */
 static unsigned int *core_buffer;
 
+/* Mutex lock for core to core synchronization */
 static e_mutex_t *mutex;
 
+/* btf synchronization structure */
 static btf_trace_info *btf_data;
+
+/* This buffer is used to store the btf data */
+static unsigned int *btf_info;
 
 /* Variable to set the clock cycle per tick. */
 unsigned int execution_time_scale;
@@ -58,6 +65,8 @@ void init_mutex(unsigned int row, unsigned int col, unsigned int core_id)
     /* The BTF trace data starts at 0th offset of the shared memory seen by
      * the Epiphany cores */
     btf_data = (btf_trace_info *)allocate_shared_memory(0);
+    unsigned int offset = (sizeof(btf_trace_info) / sizeof(int)) + SHM_LABEL_COUNT;
+    btf_info = (unsigned int *)allocate_shared_memory(offset);
     /* initialize mutex in core 0 */
     if (core_id == 0)
     {
@@ -118,6 +127,29 @@ void updateTick(void)
 void updateDebugFlag(int debugMessage)
 {
     core_buffer[DEBUG_FLAG] = debugMessage;
+}
+
+void traceTaskEvent(int srcID, int srcInstance, btf_trace_event_type type,
+        int taskId, int taskInstance, btf_trace_event_name event_name, int data)
+{
+    int delay = 0;
+    unsigned int *btf_info;
+    /* Lock the mutex before writing to the shared memory */
+    e_mutex_lock(0, 0, btf_data->mutex);
+    /* Add a delay to stabilize the mutex. Epiphany core does not have
+     * a deterministic behavior if no delay is added */
+    for (delay = 0; delay < 500000; delay++);
+    btf_info[TIME_FLAG] = core_buffer[TICK_FLAG];
+    btf_info[SOURCE_FLAG] = srcID;
+    btf_info[SOURCE_INSTANCE_FLAG] = srcInstance;
+    btf_info[EVENT_TYPE_FLAG] = type;
+    btf_info[EVENT_TYPE_FLAG] = taskId;
+    btf_info[EVENT_TYPE_FLAG] = taskInstance;
+    btf_info[EVENT_TYPE_FLAG] = event_name;
+    btf_info[EVENT_TYPE_FLAG] = data;
+    /* Unlock mutex and wait for the host core to read the data */
+    e_mutex_unlock(0, 0, btf_data->mutex);
+    while(btf_data->rw_operation == 1);
 }
 
 

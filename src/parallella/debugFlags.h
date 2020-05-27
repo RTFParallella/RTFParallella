@@ -42,7 +42,7 @@ typedef struct btf_trace_info_t
 #else
     void* mutex;                              /**< Mutex declaration. Unused on host  */
 #endif
-    unsigned int data[BTF_TRACE_BUFFER_SIZE]; /**< BTF trace data buffer */
+    unsigned int data_size;                   /**< BTF trace data buffer size which is to be read */
 } btf_trace_info;
 
 

@@ -38,7 +38,7 @@
 
 #define BTF_TRACE_BUFFER_SIZE                                    8
 
-#define GLOBAL_SHARED_LABEL_OFFSET                              11
+#define GLOBAL_SHARED_LABEL_OFFSET                               4
 
 #define EPI_CORE_MUTEX_OFFSET                                   16
 

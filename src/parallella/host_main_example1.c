@@ -67,10 +67,7 @@ int main(int argc, char *argv[])
 
     trace_info.is_init_done = 0;
     trace_info.rw_operation = -1;
-    for(index = 0; index < BTF_TRACE_BUFFER_SIZE; index++)
-    {
-        trace_info.data[index] = 0;
-    }
+    trace_info.data_size = BTF_TRACE_BUFFER_SIZE;
 
     FILE *fp_to_trace = NULL;
     int scale_factor = parse_btf_trace_arguments(argc, argv);
