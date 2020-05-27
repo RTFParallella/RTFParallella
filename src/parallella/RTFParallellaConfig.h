@@ -40,6 +40,8 @@
 
 #define GLOBAL_SHARED_LABEL_OFFSET                              11
 
+#define EPI_CORE_MUTEX_OFFSET                                   16
+
 /* Shared label count */
 #define SHM_LABEL_COUNT                                         10
 

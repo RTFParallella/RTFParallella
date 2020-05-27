@@ -40,6 +40,10 @@ struct{
     TYPE            sec_type;
 }typedef DSHM_section;
 
+
+
+unsigned int *allocate_epiphany_memory(unsigned int offset);
+
 /**
  * Initiate the shared label section, this funcion will assign addresses to labels in a section,
  * and initialize those labels to 0

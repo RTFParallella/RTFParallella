@@ -14,16 +14,17 @@
 #include <e-lib.h>
 #include "RTFParallellaConfig.h"
 #include "debugFlags.h"
+#include "c2c.h"
+#include "shared_comms.h"
+
 #include "FreeRTOS.h"
 #include "task.h"
 
-/**
- * This buffer is assigned to stored the RTF parallella legacy trace info. Data bank
- * 3 is used to store the information on each epiphany core. It starts at 0x6000 offset
- * on each epiphany core. Any change in this buffer addressing must be followed with
- * the correct offset set in host application to get the correct values.
- */
-static unsigned int trace_buffer[32] __attribute__((section(".data_bank3")));
+static unsigned int *core_buffer;
+
+static e_mutex_t *mutex;
+
+static btf_trace_info *btf_data;
 
 /* Variable to set the clock cycle per tick. */
 unsigned int execution_time_scale;
@@ -51,6 +52,26 @@ static void get_execution_time_scale(void)
     execution_time_scale = ( scale_factor * max_resolution );
 }
 
+
+void init_mutex(unsigned int row, unsigned int col, unsigned int core_id)
+{
+    /* The BTF trace data starts at 0th offset of the shared memory seen by
+     * the Epiphany cores */
+    btf_data = (btf_trace_info *)allocate_shared_memory(0);
+    /* initialize mutex in core 0 */
+    if (core_id == 0)
+    {
+        mutex = allocate_epiphany_memory(EPI_CORE_MUTEX_OFFSET);
+        btf_data->mutex = e_get_global_address(row, col, mutex);
+        e_mutex_init(row, col, btf_data->mutex, NULL);
+        btf_data->is_init_done = 1;
+    }
+    else
+    {
+        while(btf_data->is_init_done == 0);
+    }
+}
+
 /*
  * initialize output buffer with the addresses to array elements
  */
@@ -59,42 +80,44 @@ void init_task_trace_buffer(void )
     get_execution_time_scale();
     /* Initialize buffer */
     int index;
+    /* The core buffer starts at the 0th offset of memory bank 3 of each core */
+    core_buffer = allocate_epiphany_memory(0);
     /* The first 10 values are used to store the legacy RTF information. */
     for (index = 0;index < RTF_DEBUG_TRACE_COUNT; index++)
     {
-        trace_buffer[index] = 0;
+        core_buffer[index] = 0;
     }
 }
 
 void traceRunningTask(unsigned taskNum)
 {
-    trace_buffer[RUNNINGTASK_FLAG] = taskNum;
+    core_buffer[RUNNINGTASK_FLAG] = taskNum;
 }
 
 void traceTaskPasses(unsigned taskNum, int currentPasses)
 {
     if (taskNum == 1)
     {
-        trace_buffer[TASK1_FLAG] = currentPasses;
+        core_buffer[TASK1_FLAG] = currentPasses;
     }
     else if (taskNum == 2)
     {
-        trace_buffer[TASK2_FLAG] = currentPasses;
+        core_buffer[TASK2_FLAG] = currentPasses;
     }
     else if (taskNum == 3)
     {
-        trace_buffer[TASK3_FLAG] = currentPasses;
+        core_buffer[TASK3_FLAG] = currentPasses;
     }
 }
 
 void updateTick(void)
 {
-    trace_buffer[TICK_FLAG] = xTaskGetTickCount();
+    core_buffer[TICK_FLAG] = xTaskGetTickCount();
 }
 
 void updateDebugFlag(int debugMessage)
 {
-    trace_buffer[DEBUG_FLAG] = debugMessage;
+    core_buffer[DEBUG_FLAG] = debugMessage;
 }
 
 

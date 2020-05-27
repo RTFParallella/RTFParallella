@@ -29,7 +29,7 @@ int passes5 = 0;
 
 //define tasks and copy operations here
 //-------
-void handler5ms(){
+void handler5ms(int src_id, int src_instance){
     int localLabel;
     updateDebugFlag(700);
     sleepTimerMs(2,1);
@@ -38,7 +38,7 @@ void handler5ms(){
     traceRunningTask(0);
 }
 
-void handler10ms(){
+void handler10ms(int src_id, int src_instance){
     updateDebugFlag(800);
     sleepTimerMs(3,2);
     passes2++;
@@ -47,7 +47,7 @@ void handler10ms(){
 
 }
 
-void handler20ms(){
+void handler20ms(int src_id, int src_instance){
     updateDebugFlag(899);
     sleepTimerMs(5,3);
     passes3++;
@@ -56,7 +56,7 @@ void handler20ms(){
 
 }
 
-void handler10msCore2(){
+void handler10msCore2(int src_id, int src_instance){
     updateDebugFlag(899);
     sleepTimerMs(3,4);
     passes4++;
@@ -64,7 +64,7 @@ void handler10msCore2(){
     traceTaskPasses(2,passes4);
 }
 
-void handler20msCore2(){
+void handler20msCore2(int src_id, int src_instance){
     updateDebugFlag(899);
     sleepTimerMs(7,5);
     passes5++;

@@ -20,7 +20,8 @@
 
 
 AmaltheaTask createAmaltheaTask(void *taskHandler,void *cInHandler,void *cOutHandler,
-        unsigned int period,unsigned int deadline, unsigned int WCET)
+        unsigned int period,unsigned int deadline, unsigned int WCET,
+        unsigned int src_id, unsigned int src_instance, unsigned int task_id, unsigned int task_instance)
 {
     if (WCET >= period)
     {
@@ -28,7 +29,8 @@ AmaltheaTask createAmaltheaTask(void *taskHandler,void *cInHandler,void *cOutHan
         return retValNull;
     }else
     {
-        AmaltheaTask retVal = {0, 0, 0, 0, taskHandler, WCET, deadline, period, cInHandler, cOutHandler};
+        AmaltheaTask retVal = {src_id, src_instance, task_id, task_instance,
+                taskHandler, WCET, deadline, period, cInHandler, cOutHandler};
         return retVal;
     }
 }
@@ -68,9 +70,10 @@ void generalizedRTOSTask(AmaltheaTask task){
     for (;;)
     {
         task.cInHandler();
-        task.taskHandler();
+        task.taskHandler(task.task_id, task.task_instance);
         task.cOutHandler();
         vTaskDelayUntil( &xLastWakeTime, task.period);
+        task.task_instance++;
     }
 }
 

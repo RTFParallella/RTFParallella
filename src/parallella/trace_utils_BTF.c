@@ -327,14 +327,15 @@ static void process_btf_trace_data(FILE *stream, btf_trace_data *data, int8_t *t
     }
 }
 
-/* Function to get the file name of the trace file along with the
- * absoulte path.
+/**
+ * @brief Function to get the file name of the trace file along with the
+ * absolute path.
  *
  * Arguments:
- * @out_param trace_file_path  : Pointer to the buffer where the BTF trace file path
+ * @param[inout] trace_file_path  : Pointer to the buffer where the BTF trace file path
  *                                  is stored.
  *
- * Return: void
+ * @return: void
  */
 void get_btf_trace_file_path(char *trace_file_path)
 {
@@ -355,7 +356,6 @@ void get_btf_trace_file_path(char *trace_file_path)
         fprintf(stderr,"You don't have write access to the directory in which you are trying to create the btf file\n");
     }
     sprintf(trace_file_path,"%s" "%c" "%s",lcwd,'/', output_trace_path);
-    fprintf(stderr,"trace_file_path = %s\n",trace_file_path);
     fflush(stderr);
 }
 

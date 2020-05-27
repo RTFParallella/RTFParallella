@@ -27,10 +27,10 @@ typedef struct AmaltheaTask_t
     unsigned int src_instance;
     unsigned int task_id;
     unsigned int task_instance;
-    void(* taskHandler)();
-    unsigned int executionTime;//in ticks
-    unsigned int deadline;        //in ticks
-    unsigned int period;        //in ticks
+    void(* taskHandler)(int  src_id, int src_instance);
+    unsigned int executionTime;
+    unsigned int deadline;
+    unsigned int period;
     void(* cInHandler)();
     void(* cOutHandler)();
 }AmaltheaTask;
@@ -42,7 +42,9 @@ typedef struct AmaltheaTask_t
  */
 //#define use_LET_COMM_SEMANTICS
 
-AmaltheaTask createAmaltheaTask(void *taskHandler,void *cInHandler,void *cOutHandler,unsigned int period,unsigned int deadline, unsigned int WCET);
+AmaltheaTask createAmaltheaTask(void *taskHandler, void *cInHandler, void *cOutHandler,
+        unsigned int period, unsigned int deadline, unsigned int WCET,
+        unsigned int src_id, unsigned int src_instance, unsigned int task_id, unsigned int task_instance);
 
 /**
  *    Create the RTOS task that represents a given Amalthea task.

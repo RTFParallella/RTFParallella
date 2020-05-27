@@ -22,11 +22,11 @@
 
 //declare taskHandler functions
 
-void handler5ms();
-void handler10ms();
-void handler20ms();
-void handler10msCore2();
-void handler20msCore2();
+void handler5ms(int src_id, int src_instance);
+void handler10ms(int src_id, int src_instance);
+void handler20ms(int src_id, int src_instance);
+void handler10msCore2(int src_id, int src_instance);
+void handler20msCore2(int src_id, int src_instance);
 //-------
 
 

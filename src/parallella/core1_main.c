@@ -21,31 +21,34 @@
 #include "debugFlags.h"
 #include "shared_comms.h"
 #include "taskCode.h"
+#include "RTFParallellaConfig.h"
 
 #include "label_man_core0.h"
-//freeRTOS imports
+/* FreeRTOS imports */
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
-//utility imports
-//---------------------------------------------
+
 
 int main(void) {
-	//initialize output buffer for debug messages
-	init_task_trace_buffer();
-	init_mem_sections();
+    /* Initialize output buffer for debug messages */
+    unsigned int row, col, core_id;
+    e_coords_from_coreid(e_get_coreid(), &row, &col);
+    core_id = ((row * 4) + col);
+    init_mutex(row, col, core_id);
+    init_task_trace_buffer();
     int ts = get_time_scale_factor();
-	shared_labels_init_core();
-	//create Amalthea task objects
-	AmaltheaTask t20ms = createAmaltheaTask(handler10msCore2, cIn10msCore2, cOut10msCore2,
-	        10 * ts ,10 * ts , 7* ts);
-	AmaltheaTask t40ms = createAmaltheaTask(handler20msCore2, cIn20msCore2, cOut20msCore2,
-	        20 * ts, 20 * ts, 10 * ts);
-	//create RTOS task from templates
-	createRTOSTask(&t20ms,2,0);
-	createRTOSTask(&t40ms,1,0);
-	vTaskStartScheduler();
-	return EXIT_SUCCESS;
+    init_mem_sections();
+    shared_labels_init_core();
+    /* create Amalthea task objects */
+    AmaltheaTask t20ms = createAmaltheaTask(handler10msCore2, cIn10msCore2, cOut10msCore2,
+            10 * ts ,10 * ts , 7* ts, HW_CORE1_ID, 0, TASK10MS1_ID, 0);
+    AmaltheaTask t40ms = createAmaltheaTask(handler20msCore2, cIn20msCore2, cOut20msCore2,
+            20 * ts, 20 * ts, 10 * ts, HW_CORE1_ID, 0, TASK20MS1_ID, 0);
+    /* create RTOS task from templates */
+    createRTOSTask(&t20ms,2,0);
+    createRTOSTask(&t40ms,1,0);
+    vTaskStartScheduler();
+    return EXIT_SUCCESS;
 }
-//---------------------------------------------
-//end of file
+

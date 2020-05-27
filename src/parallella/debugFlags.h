@@ -30,7 +30,7 @@
 #define BTF_TRACE_BUFFER_SIZE  8
 
 /**
- *  Structure to ensure proper synchronization between host and epiphany cores
+ * Structure to ensure proper synchronization between host and epiphany cores
  * and also within epiphany cores.
  */
 typedef struct btf_trace_info_t
@@ -48,6 +48,8 @@ typedef struct btf_trace_info_t
 
 
 unsigned int get_time_scale_factor(void);
+
+void init_mutex(unsigned int row, unsigned int col, unsigned int core_id);
 
 /**
  * initialize output buffer in core memory
