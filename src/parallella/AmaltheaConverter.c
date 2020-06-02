@@ -13,6 +13,7 @@
 #include <e_lib.h>
 #include "AmaltheaConverter.h"
 #include "debugFlags.h"
+#include "trace_utils_BTF.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -69,9 +70,13 @@ void generalizedRTOSTask(AmaltheaTask task){
     TickType_t xLastWakeTime = xTaskGetTickCount();
     for (;;)
     {
+        traceTaskEvent(task.src_id, task.src_instance, TASK_EVENT, task.task_id,
+                                task.task_instance, PROCESS_START, 0);
         task.cInHandler();
         task.taskHandler(task.task_id, task.task_instance);
         task.cOutHandler();
+        traceTaskEvent(task.src_id, task.src_instance, TASK_EVENT, task.task_id,
+                                task.task_instance, PROCESS_TERMINATE, 0);
         vTaskDelayUntil( &xLastWakeTime, task.period);
         task.task_instance++;
     }

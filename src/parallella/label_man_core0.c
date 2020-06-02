@@ -23,7 +23,7 @@ int label5_10_00;
 
 int label5_10_00_copy1;
 
-int shared_label_1;
+int shared_label_1 = 0;
 int shared_label_2 = 97;
 int shared_label_10 = 0;
 
@@ -38,7 +38,8 @@ static unsigned int* sec1_global_pointer;
 
 void init_mem_sections(void)
 {
-    sec1_global_pointer = allocate_shared_memory(GLOBAL_SHARED_LABEL_OFFSET);
+    int offset = GLOBAL_SHARED_LABEL_OFFSET / sizeof(int);
+    sec1_global_pointer = allocate_shared_memory(offset);
     for (int index = 0; index < SHM_LABEL_COUNT; index++)
     {
         sec1_global_pointer[index] = 0;
@@ -87,5 +88,5 @@ void cOut10msCore2(){
     write_shm_section(sec1_global_pointer,1,shared_label_1);
 }
 void cOut20msCore2(){
-    write_shm_section(sec1_global_pointer,3,shared_label_10 + 1);
+    write_shm_section(sec1_global_pointer,2,shared_label_10 + 1);
 }

@@ -378,8 +378,8 @@ int  parse_btf_trace_arguments(int argc, char **argv)
     int is_time_unit_provided = BTF_TRACE_FALSE;
     int is_time_scale_provided = BTF_TRACE_FALSE;
 
-    //Specifying the expected options
-    //The two options l and b expect numbers as argument
+    /* Reset the posix variable associated to getopt_long */
+    opterr = 0;
     static const struct option long_options[] = {
         {"trace-btf", required_argument, NULL, 't' },
         {"model-file", required_argument, NULL,  'm' },

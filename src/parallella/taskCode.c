@@ -14,16 +14,18 @@
 #include "taskCode.h"
 #include "e_lib.h"
 #include "debugFlags.h"
+#include "RTFParallellaConfig.h"
+#include "trace_utils_BTF.h"
 
 /* define global variables to be
  * accessed through a specific task (context)
  */
 //task recurrence counters
-int passes1 = 0;
-int passes2 = 0;
-int passes3 = 0;
-int passes4 = 0;
-int passes5 = 0;
+int passes1 = 1;
+int passes2 = 1;
+int passes3 = 1;
+int passes4 = 1;
+int passes5 = 1;
 
 
 
@@ -32,7 +34,11 @@ int passes5 = 0;
 void handler5ms(int src_id, int src_instance){
     int localLabel;
     updateDebugFlag(700);
-    sleepTimerMs(2,1);
+    traceTaskEvent(src_id, src_instance, RUNNABLE_EVENT, RUNNABLE_HANDLER5MS0_ID,
+            passes1, PROCESS_START, 0);
+    sleepTimerMs(1,1);
+    traceTaskEvent(src_id, src_instance, RUNNABLE_EVENT, RUNNABLE_HANDLER5MS0_ID,
+            passes1, PROCESS_TERMINATE, 0);
     passes1++;
     traceTaskPasses(1,passes1);
     traceRunningTask(0);
@@ -40,7 +46,11 @@ void handler5ms(int src_id, int src_instance){
 
 void handler10ms(int src_id, int src_instance){
     updateDebugFlag(800);
-    sleepTimerMs(3,2);
+    traceTaskEvent(src_id, src_instance, RUNNABLE_EVENT, RUNNABLE_HANDLER10MS0_ID,
+            passes2, PROCESS_START, 0);
+    sleepTimerMs(2,2);
+    traceTaskEvent(src_id, src_instance, RUNNABLE_EVENT, RUNNABLE_HANDLER10MS0_ID,
+            passes2, PROCESS_TERMINATE, 0);
     passes2++;
     traceTaskPasses(2,passes2);
     traceRunningTask(0);
@@ -49,7 +59,11 @@ void handler10ms(int src_id, int src_instance){
 
 void handler20ms(int src_id, int src_instance){
     updateDebugFlag(899);
-    sleepTimerMs(5,3);
+    traceTaskEvent(src_id, src_instance, RUNNABLE_EVENT, RUNNABLE_HANDLER20MS0_ID,
+            passes3, PROCESS_START, 0);
+    sleepTimerMs(4,3);
+    traceTaskEvent(src_id, src_instance, RUNNABLE_EVENT, RUNNABLE_HANDLER20MS0_ID,
+            passes3, PROCESS_TERMINATE, 0);
     passes3++;
     traceRunningTask(0);
     traceTaskPasses(3,passes3);
@@ -58,7 +72,11 @@ void handler20ms(int src_id, int src_instance){
 
 void handler10msCore2(int src_id, int src_instance){
     updateDebugFlag(899);
-    sleepTimerMs(3,4);
+    traceTaskEvent(src_id, src_instance, RUNNABLE_EVENT, RUNNABLE_HANDLER10MS1_ID,
+            passes4, PROCESS_START, 0);
+    sleepTimerMs(2,4);
+    traceTaskEvent(src_id, src_instance, RUNNABLE_EVENT, RUNNABLE_HANDLER10MS1_ID,
+            passes4, PROCESS_TERMINATE, 0);
     passes4++;
     traceRunningTask(0);
     traceTaskPasses(2,passes4);
@@ -66,7 +84,11 @@ void handler10msCore2(int src_id, int src_instance){
 
 void handler20msCore2(int src_id, int src_instance){
     updateDebugFlag(899);
-    sleepTimerMs(7,5);
+    traceTaskEvent(src_id, src_instance, RUNNABLE_EVENT, RUNNABLE_HANDLER20MS1_ID,
+            passes5, PROCESS_START, 0);
+    sleepTimerMs(5,5);
+    traceTaskEvent(src_id, src_instance, RUNNABLE_EVENT, RUNNABLE_HANDLER20MS1_ID,
+            passes5, PROCESS_TERMINATE, 0);
     passes5++;
     traceRunningTask(0);
     traceTaskPasses(3,passes5);

@@ -14,6 +14,7 @@
 #ifndef SRC_PARALLELLA_DEBUGFLAGS_H_
 #define SRC_PARALLELLA_DEBUGFLAGS_H_
 
+#include "trace_utils_BTF.h"
 
 #define cnt_address     0x3000
 
@@ -29,21 +30,6 @@
 
 #define BTF_TRACE_BUFFER_SIZE  8
 
-/**
- * Structure to ensure proper synchronization between host and epiphany cores
- * and also within epiphany cores.
- */
-typedef struct btf_trace_info_t
-{
-    int is_init_done;                         /**< To ensure that the mutex is initialized */
-    int rw_operation;                         /**< Read write operation between epiphany core and host */
-#ifdef __EPIPHANY_DEVICE__
-    e_mutex_t* mutex;                         /**< Mutex declaration on Epiphany core for synchronization */
-#else
-    void* mutex;                              /**< Mutex declaration. Unused on host  */
-#endif
-    unsigned int data_size;                   /**< BTF trace data buffer size which is to be read */
-} btf_trace_info;
 
 
 
@@ -94,5 +80,8 @@ void updateTick(void);
  *
  */
 void updateDebugFlag(int debugMessage);
+
+void traceTaskEvent(int srcID, int srcInstance, btf_trace_event_type type,
+        int taskId, int taskInstance, btf_trace_event_name event_name, int data);
 
 #endif /* SRC_PARALLELLA_DEBUGFLAGS_H_ */

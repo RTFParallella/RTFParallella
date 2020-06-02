@@ -144,16 +144,16 @@ int nsleep(long miliseconds)
    if(miliseconds > 999)
    {
        /* Must be Non-Negative */
-        req.tv_sec = (int)(miliseconds / 1000);
+        req.tv_sec = (int)(miliseconds / 1000000);
         /* Must be in range of 0 to 999999999 */
-        req.tv_nsec = (miliseconds - ((long)req.tv_sec * 1000)) * 1000000;
+        req.tv_nsec = (miliseconds - ((long)req.tv_sec * 1000000)) * 1000;
    }
    else
    {
        /* Must be Non-Negative */
         req.tv_sec = 0;
         /* Must be in range of 0 to 999999999 */
-        req.tv_nsec = miliseconds * 1000000;
+        req.tv_nsec = miliseconds * 1000;
    }
    return nanosleep(&req , &rem);
 }

@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <stddef.h>
 #include <time.h>   /* Needed for struct timespec */
 #include <e-hal.h>  /* hardware abstraction library */
 #include <e-loader.h>
@@ -65,9 +66,10 @@ int main(int argc, char *argv[])
     int index = 0;
     btf_trace_info trace_info;
 
-    trace_info.is_init_done = 0;
-    trace_info.rw_operation = -1;
-    trace_info.data_size = BTF_TRACE_BUFFER_SIZE;
+    trace_info.host_read = 0;
+    trace_info.core_write = 0;
+    trace_info.addr = 0;
+    trace_info.core_id = 16;
 
     FILE *fp_to_trace = NULL;
     int scale_factor = parse_btf_trace_arguments(argc, argv);
@@ -162,18 +164,38 @@ int main(int argc, char *argv[])
     }
 
     /* Write the initialized trace buffer values to the shared memory */
-    if (sizeof(btf_trace_info) != e_write(&emem, 0, 0, SHARED_BTF_DATA_OFFSET, &trace_info, sizeof(btf_trace_info)))
+    if (sizeof(btf_trace_info) != e_write(&emem, 0, 0, SHARED_BTF_DATA_OFFSET, &trace_info,
+            sizeof(btf_trace_info)))
     {
         fprintf(stderr, "Error in writing to the shared dram buffer\n");
     }
 
+    e_read(&emem, 0, 0, SHARED_BTF_DATA_OFFSET, &trace_info, sizeof(btf_trace_info));
     e_start_group(&dev);
     int pollLoopCounter = 0;
     char buffer1[LABEL_STRLEN] = {0};
     char buffer2[LABEL_STRLEN] = {0};
 
-    for (pollLoopCounter = 0; pollLoopCounter <= 50; pollLoopCounter++)
+    unsigned int btf_trace[BTF_TRACE_BUFFER_SIZE] = {0};
+    for (pollLoopCounter = 0; pollLoopCounter <= 150; pollLoopCounter++)
     {
+        e_read(&emem, 0, 0, SHARED_BTF_DATA_OFFSET + offsetof(btf_trace_info, core_write),
+                &trace_info.core_write, sizeof(int));
+        if (trace_info.core_write == 1)
+        {
+            e_read(&emem, 0, 0, SHARED_BTF_DATA_OFFSET + sizeof(btf_trace_info) + 40,
+                    &btf_trace, sizeof(btf_trace));
+            trace_info.core_write = 0;
+            e_write(&emem, 0, 0, SHARED_BTF_DATA_OFFSET + offsetof(btf_trace_info, core_write),
+                    &trace_info.core_write, sizeof(int));
+
+            for(int i = 0; i < BTF_TRACE_BUFFER_SIZE; i++)
+            {
+                printf("%d ",btf_trace[i]);
+            }
+            printf("\n");
+        }
+
         e_read(&dev, 0, 0, ECORE_RTF_BUFFER_ADDR, ecore0, sizeof(ecore0));
         e_read(&dev, 0, 0, DSHM_LABEL_EPI_CORE_OFFSET, &shared_label_core[0],
                             sizeof(shared_label_core_00));
@@ -183,29 +205,31 @@ int main(int argc, char *argv[])
         e_read(&emem, 0, 0, SHARED_BTF_DATA_OFFSET + sizeof(btf_trace_info) ,
                             shared_label_to_read, sizeof(shared_label_to_read));
 
-        /* Check the tick count of both the messages */
-        if (ecore0[8]!= ecore1[8] )
+         /* Check the tick count of both the messages */
+//        if (ecore0[8]!= ecore1[8] )
+//        {
+//            /* Left empty intentionally */
+//        }
+        if((ecore1[6] != 0) || (ecore0[0] != 0))
         {
-            /* Left empty intentionally */
+            get_task_name(ecore0[6],buffer1);
+            get_task_name(ecore1[6],buffer2);
+
+            fprintf(stderr," %6d | %10s | %10s | ", ecore1[8], buffer1, buffer2);
+
+            for (index = 0; index < EXEC_CORE_COUNT; index++)
+            {
+               user_config_print_values_auto(DSHM_VISIBLE_LABEL_COUNT,
+                        labelVisual_perCore[index], shared_label_core[index], prv_val_preCore[index]);
+            }
+
+            for (index = 0; index < (SHM_VISIBLE_LABEL_COUNT + 2); index++)
+            {
+                fprintf(stderr," %10d |",shared_label_to_read[index]);
+            }
+            fprintf(stderr,"\n");
         }
-        get_task_name(ecore0[6],buffer1);
-        get_task_name(ecore1[6],buffer2);
-
-        fprintf(stderr," %6d | %10s | %10s | ", ((ecore0[8] + 1) * scale_factor), buffer1, buffer2);
-
-        for (index = 0;index < EXEC_CORE_COUNT; index++)
-        {
-            user_config_print_values_auto(DSHM_VISIBLE_LABEL_COUNT,
-                    labelVisual_perCore[index], shared_label_core[index], prv_val_preCore[index]);
-        }
-
-        for (index = 0; index < (SHM_VISIBLE_LABEL_COUNT + 2); index++)
-        {
-            fprintf(stderr," %10d |",shared_label_to_read[index]);
-        }
-
-        fprintf(stderr,"\n");
-        nsleep(1);
+        nsleep(200);
     }
     fprintf(stderr,"----------------------------------------------\n");
     if (fp_to_trace != NULL)

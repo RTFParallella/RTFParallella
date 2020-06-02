@@ -25,7 +25,9 @@
 static unsigned int *core_buffer;
 
 /* Mutex lock for core to core synchronization */
-static e_mutex_t *mutex;
+static unsigned int *mutex;
+
+static unsigned int *task_sync;
 
 /* btf synchronization structure */
 static btf_trace_info *btf_data;
@@ -37,6 +39,8 @@ static unsigned int *btf_info;
 unsigned int execution_time_scale;
 
 static unsigned int scale_factor;
+
+static unsigned int tick_count;
 
 unsigned int get_time_scale_factor(void)
 {
@@ -67,18 +71,20 @@ void init_mutex(unsigned int row, unsigned int col, unsigned int core_id)
     btf_data = (btf_trace_info *)allocate_shared_memory(0);
     unsigned int offset = (sizeof(btf_trace_info) / sizeof(int)) + SHM_LABEL_COUNT;
     btf_info = (unsigned int *)allocate_shared_memory(offset);
-    /* initialize mutex in core 0 */
-    if (core_id == 0)
+    mutex = allocate_shared_memory(offset + BTF_TRACE_BUFFER_SIZE);
+    if ((row == 0) && (col == 0))
     {
-        mutex = allocate_epiphany_memory(EPI_CORE_MUTEX_OFFSET);
-        btf_data->mutex = e_get_global_address(row, col, mutex);
-        e_mutex_init(row, col, btf_data->mutex, NULL);
-        btf_data->is_init_done = 1;
+        mutex[0] = 1;
+        btf_data->host_read = 1;
     }
     else
     {
-        while(btf_data->is_init_done == 0);
+        while(btf_data->host_read == 0)
+        {
+            /* Wait until the mutex has been initialized */
+        }
     }
+
 }
 
 /*
@@ -96,6 +102,8 @@ void init_task_trace_buffer(void )
     {
         core_buffer[index] = 0;
     }
+    task_sync = allocate_epiphany_memory(10);
+    task_sync[0] = 6;
 }
 
 void traceRunningTask(unsigned taskNum)
@@ -121,7 +129,8 @@ void traceTaskPasses(unsigned taskNum, int currentPasses)
 
 void updateTick(void)
 {
-    core_buffer[TICK_FLAG] = xTaskGetTickCount();
+    tick_count = xTaskGetTickCount();
+    core_buffer[TICK_FLAG] = tick_count;
 }
 
 void updateDebugFlag(int debugMessage)
@@ -129,27 +138,37 @@ void updateDebugFlag(int debugMessage)
     core_buffer[DEBUG_FLAG] = debugMessage;
 }
 
+
+
 void traceTaskEvent(int srcID, int srcInstance, btf_trace_event_type type,
         int taskId, int taskInstance, btf_trace_event_name event_name, int data)
 {
-    int delay = 0;
-    unsigned int *btf_info;
     /* Lock the mutex before writing to the shared memory */
-    e_mutex_lock(0, 0, btf_data->mutex);
+    while(mutex[0] != 1)
+    {
+        /* Core to core synchronization */
+    }
+    mutex[0] = 0;
+    while((btf_data->core_write == 1))
+    {
+        /* Wait until previous task is completed */
+    }
+
     /* Add a delay to stabilize the mutex. Epiphany core does not have
      * a deterministic behavior if no delay is added */
-    for (delay = 0; delay < 500000; delay++);
-    btf_info[TIME_FLAG] = core_buffer[TICK_FLAG];
+    btf_info[TIME_FLAG] = tick_count;
     btf_info[SOURCE_FLAG] = srcID;
     btf_info[SOURCE_INSTANCE_FLAG] = srcInstance;
     btf_info[EVENT_TYPE_FLAG] = type;
-    btf_info[EVENT_TYPE_FLAG] = taskId;
-    btf_info[EVENT_TYPE_FLAG] = taskInstance;
-    btf_info[EVENT_TYPE_FLAG] = event_name;
-    btf_info[EVENT_TYPE_FLAG] = data;
+    btf_info[TARGET_FLAG] = taskId;
+    btf_info[TARGET_INSTANCE_FLAG] = taskInstance;
+    btf_info[EVENT_FLAG] = event_name;
+    btf_info[DATA_FLAG] = data;
+    btf_data->core_write = 1;
+    /* Wait until data has been read by the host */
+    while(btf_data->core_write == 1);
     /* Unlock mutex and wait for the host core to read the data */
-    e_mutex_unlock(0, 0, btf_data->mutex);
-    while(btf_data->rw_operation == 1);
+    mutex[0] = 1;
 }
 
 

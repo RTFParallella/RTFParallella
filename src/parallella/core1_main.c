@@ -42,9 +42,9 @@ int main(void) {
     shared_labels_init_core();
     /* create Amalthea task objects */
     AmaltheaTask t20ms = createAmaltheaTask(handler10msCore2, cIn10msCore2, cOut10msCore2,
-            10 * ts ,10 * ts , 7* ts, HW_CORE1_ID, 0, TASK10MS1_ID, 0);
+            10 * ts, 10 * ts, 7 * ts, HW_CORE1_ID, 0, TASK10MS1_ID, 1);
     AmaltheaTask t40ms = createAmaltheaTask(handler20msCore2, cIn20msCore2, cOut20msCore2,
-            20 * ts, 20 * ts, 10 * ts, HW_CORE1_ID, 0, TASK20MS1_ID, 0);
+            20 * ts, 20 * ts, 10 * ts, HW_CORE1_ID, 0, TASK20MS1_ID, 1);
     /* create RTOS task from templates */
     createRTOSTask(&t20ms, 2, 0);
     createRTOSTask(&t40ms, 1, 0);

@@ -14,6 +14,20 @@
 #ifndef SRC_PARALLELLA_RTFPARALLELLACONFIG_H_
 #define SRC_PARALLELLA_RTFPARALLELLACONFIG_H_
 
+
+
+/**
+ * Structure to ensure proper synchronization between host and epiphany cores
+ * and also within epiphany cores.
+ */
+typedef struct btf_trace_info_t
+{
+    int host_read;                         /**< To ensure that the mutex is initialized */
+    int core_write;                         /**< Read write operation between epiphany core and host */
+    unsigned int * addr;                              /**< Mutex declaration. Unused on host  */
+    unsigned int core_id;                   /**< BTF trace data buffer size which is to be read */
+} btf_trace_info;
+
 /* Shared DRAM start address*/
 #define SHARED_DRAM_START_ADDRESS                      0x8E000000
 
@@ -38,7 +52,7 @@
 
 #define BTF_TRACE_BUFFER_SIZE                                    8
 
-#define GLOBAL_SHARED_LABEL_OFFSET                               4
+#define GLOBAL_SHARED_LABEL_OFFSET                      sizeof(btf_trace_info)
 
 #define EPI_CORE_MUTEX_OFFSET                                   16
 
@@ -80,6 +94,16 @@ typedef enum entity_id_t
     HW_CORE0_ID = 256,
     HW_CORE1_ID
 } entity_id;
+
+
+/* Enum for entity type ID */
+typedef enum task_mutex_t
+{
+    /* 0 to 15 entity ID is reserved for TASKS. */
+    UNDEFINED = 0,
+    TASK_MUTEX_SIGNAL,
+    TASK_MUTEX_WAIT,
+} task_mutex;
 
 
 #endif /* SRC_PARALLELLA_RTFPARALLELLACONFIG_H_ */
