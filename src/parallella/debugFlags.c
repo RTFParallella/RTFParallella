@@ -154,6 +154,14 @@ void traceTaskEvent(int srcID, int srcInstance, btf_trace_event_type type,
         /* Wait until previous task is completed */
     }
 
+    if((type == TASK_EVENT) && (event_name == PROCESS_TERMINATE))
+    {
+        traceRunningTask(0);
+    }
+    else if ((type == TASK_EVENT) && (event_name == PROCESS_START))
+    {
+        traceRunningTask(taskId);
+    }
     /* Add a delay to stabilize the mutex. Epiphany core does not have
      * a deterministic behavior if no delay is added */
     btf_info[TIME_FLAG] = tick_count;

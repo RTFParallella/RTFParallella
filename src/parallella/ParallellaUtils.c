@@ -17,7 +17,7 @@
 
 void sleepTimerMs(int ticks, int taskNum){
     updateDebugFlag(ticks * 10);
-    int clock_cycle = (configCPU_CLOCK_HZ / execution_time_scale - 1000);
+    int clock_cycle = (configCPU_CLOCK_HZ / execution_time_scale - 50);
     int tick_count;
     int ts = get_time_scale_factor();
     int no_of_ticks = ts * ticks;
