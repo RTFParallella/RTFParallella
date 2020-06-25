@@ -130,6 +130,8 @@ static void print_usage(void)
     fprintf(stdout,"\t[-s|--scale]=<Timing scale used to generate the trace file in microseconds.>\n");
     fprintf(stdout,"\t[-d|--device]=<Device target on which the trace file is generated.>\n");
     fprintf(stdout,"\t[-h|--help]=<Print the help message.>\n");
+    fprintf(stdout,"Example:\n");
+    fprintf(stdout,"\t./host_main_example1 -t trace.btf -s 100 -m model.xml -d parallella\n");
     fflush(stdout);
 }
 
