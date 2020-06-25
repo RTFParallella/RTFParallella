@@ -49,7 +49,7 @@ void handler10ms(int src_id, int src_instance)
     updateDebugFlag(800);
     traceTaskEvent(src_id, src_instance, RUNNABLE_EVENT, RUNNABLE_HANDLER10MS0_ID,
             passes2, PROCESS_START, 0);
-    sleepTimerMs(2,2);
+    sleepTimerMs(3,2);
     traceTaskEvent(src_id, src_instance, RUNNABLE_EVENT, RUNNABLE_HANDLER10MS0_ID,
             passes2, PROCESS_TERMINATE, 0);
     passes2++;
@@ -86,7 +86,7 @@ void handler20msCore2(int src_id, int src_instance)
     updateDebugFlag(899);
     traceTaskEvent(src_id, src_instance, RUNNABLE_EVENT, RUNNABLE_HANDLER20MS1_ID,
             passes5, PROCESS_START, 0);
-    sleepTimerMs(7,5);
+    sleepTimerMs(9,5);
     traceTaskEvent(src_id, src_instance, RUNNABLE_EVENT, RUNNABLE_HANDLER20MS1_ID,
             passes5, PROCESS_TERMINATE, 0);
     passes5++;

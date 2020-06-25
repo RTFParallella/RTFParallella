@@ -35,6 +35,7 @@ static btf_trace_data core0_trace_data[CORE_STACK_SIZE];
 static btf_trace_data core1_trace_data[CORE_STACK_SIZE];
 static int8_t core0_stack_top = -1;
 static int8_t core1_stack_top = -1;
+static int scale_factor = 1;
 
 
 /*-------------------------CONST VARIABLES---------------------------*/
@@ -210,7 +211,7 @@ static int find_task_in_execution(btf_trace_data *data, int8_t stack_top, btf_tr
 
 
 /* Function to dump the BTF trace data on output trace file */
-static void dump_btf_trace_data(FILE *stream, unsigned int ticks,
+void dump_btf_trace_data(FILE *stream, unsigned int ticks,
                             unsigned int srcId, unsigned int srcInstance,
                             btf_trace_event_type type,
                             unsigned int target, unsigned int targetInstance,
@@ -222,8 +223,9 @@ static void dump_btf_trace_data(FILE *stream, unsigned int ticks,
     const unsigned char *event_name_string = event_name[event];
     if ((source_name != NULL) && (target_name != NULL))
     {
-        fprintf(stream,"%d,%s,%d,%s,%s,%d,%s,%d\n", ticks, source_name, srcInstance,
+        fprintf(stream,"%d,%s,%d,%s,%s,%d,%s,%d\n", (ticks * scale_factor * 1000) , source_name, srcInstance,
                  event_type_string, target_name, targetInstance, event_name_string, data);
+        fflush(stream);
     }
 }
 
@@ -274,50 +276,29 @@ static void process_btf_trace_data(FILE *stream, btf_trace_data *data, int8_t *t
         else if (data_buffer[EVENT_FLAG] == PROCESS_TERMINATE)
         {
             previousTask = data[*top_of_stack];
-            if (data_buffer[EVENT_TYPE_FLAG] == RUNNABLE_EVENT)
+            if((data_buffer[TARGET_FLAG] == previousTask.taskId)
+                    && (data_buffer[TARGET_INSTANCE_FLAG] == previousTask.taskInstance))
             {
-                if((data_buffer[SOURCE_FLAG] == previousTask.taskId)
-                        && (previousTask.eventState == PROCESS_TERMINATE)
-                        &&(previousTask.eventTypeId == TASK_EVENT))
-                {
-                    // The previous event is a TASK and associated to current runnable in terminated state.
-                    // pop the terminated task
-                    btf_trace_data terminated_task = pop_from_stack(data, top_of_stack);
-                    dump_btf_trace_data(stream, data_buffer[TIME_FLAG], data_buffer[SOURCE_FLAG],
-                            data_buffer[SOURCE_INSTANCE_FLAG], data_buffer[EVENT_TYPE_FLAG],
-                            data_buffer[TARGET_FLAG], data_buffer[TARGET_INSTANCE_FLAG],
-                            data_buffer[EVENT_FLAG], data_buffer[DATA_FLAG]);
-                    dump_btf_trace_data(stream, data_buffer[TIME_FLAG], terminated_task.srcId, terminated_task.srcInstance,
-                            terminated_task.eventTypeId, terminated_task.taskId, terminated_task.taskInstance,
-                            terminated_task.eventState, terminated_task.data);
-                   //pop the task and runnable start state.
-                    pop_from_stack(data, top_of_stack);
-                    pop_from_stack(data, top_of_stack);
-                    // Resume the previous tasks
-                    if (*top_of_stack >= 1)
-                    {
-                        previousTask = data[*top_of_stack];
-                        int8_t prevRunnable = *top_of_stack - 1;
-                        btf_trace_data runnableTask = data[prevRunnable];
-                        dump_btf_trace_data(stream, data_buffer[TIME_FLAG], previousTask.srcId, previousTask.srcInstance,
-                                previousTask.eventTypeId, previousTask.taskId, previousTask.taskInstance,
-                                PROCESS_RESUME, previousTask.data);
-                        dump_btf_trace_data(stream, data_buffer[TIME_FLAG], runnableTask.srcId, runnableTask.srcInstance,
-                                runnableTask.eventTypeId, runnableTask.taskId, runnableTask.taskInstance,
-                                PROCESS_RESUME, runnableTask.data);
-                        data[*top_of_stack].eventState = PROCESS_RESUME;
-                        data[prevRunnable].eventState = PROCESS_RESUME;
-                    }
-                }
-                else
-                {
-                    // Runnable event has no associated task in terminated state
-                    push_on_stack(data, top_of_stack, data_buffer);
-                }
+                dump_btf_trace_data(stream, data_buffer[TIME_FLAG], data_buffer[SOURCE_FLAG],
+                        data_buffer[SOURCE_INSTANCE_FLAG], data_buffer[EVENT_TYPE_FLAG],
+                        data_buffer[TARGET_FLAG], data_buffer[TARGET_INSTANCE_FLAG],
+                        data_buffer[EVENT_FLAG], data_buffer[DATA_FLAG]);
+                pop_from_stack(data, top_of_stack);
             }
-            else if(data_buffer[EVENT_TYPE_FLAG] == TASK_EVENT)
+
+            if ((*top_of_stack >= 1) && (data_buffer[EVENT_TYPE_FLAG] == TASK_EVENT))
             {
-                push_on_stack(data, top_of_stack, data_buffer);
+                previousTask = data[*top_of_stack - 1];
+                int8_t prevRunnable = *top_of_stack;
+                btf_trace_data runnableTask = data[prevRunnable];
+                dump_btf_trace_data(stream, data_buffer[TIME_FLAG], previousTask.srcId, previousTask.srcInstance,
+                        previousTask.eventTypeId, previousTask.taskId, previousTask.taskInstance,
+                        PROCESS_RESUME, previousTask.data);
+                dump_btf_trace_data(stream, data_buffer[TIME_FLAG], runnableTask.srcId, runnableTask.srcInstance,
+                        runnableTask.eventTypeId, runnableTask.taskId, runnableTask.taskInstance,
+                        PROCESS_RESUME, runnableTask.data);
+                data[*top_of_stack].eventState = PROCESS_RESUME;
+                data[prevRunnable].eventState = PROCESS_RESUME;
             }
         }
         else
@@ -409,6 +390,7 @@ int  parse_btf_trace_arguments(int argc, char **argv)
                  break;
              case 's' :
                  btf_header.timescale = atoi(optarg);
+                 scale_factor = btf_header.timescale;
                  is_time_scale_provided = BTF_TRACE_TRUE;
                  break;
              case 'h' :
@@ -423,13 +405,14 @@ int  parse_btf_trace_arguments(int argc, char **argv)
     /* Set the default time scale as us */
     if (is_time_unit_provided == BTF_TRACE_FALSE)
     {
-        strncpy((char *)btf_header.timeunit, (const char *)"us", sizeof(btf_header.timeunit));
+        strncpy((char *)btf_header.timeunit, (const char *)"ns", sizeof(btf_header.timeunit));
     }
 
     /* Set the default time scale as 100 which corresponds to 1 ms.  */
     if (is_time_scale_provided == BTF_TRACE_FALSE)
     {
         btf_header.timescale = 1000;
+        scale_factor = btf_header.timescale;
     }
 
     return btf_header.timescale;
@@ -607,19 +590,6 @@ void write_btf_trace_header_entity_table(FILE *stream)
 void write_btf_trace_data(FILE *stream, uint8_t core_id, unsigned int * data_buffer)
 {
     if (stream == NULL || (data_buffer == NULL))
-    {
-        return;
-    }
-    unsigned char * source_name = get_entity_name(data_buffer[SOURCE_FLAG]);
-
-    // Do not print idle tasks.
-    if (strcmp((const char *)source_name,"[idle]") == 0)
-    {
-        return;
-    }
-    uint8_t new_entry = update_entity_entry(data_buffer[TARGET_FLAG],
-                            data_buffer[TARGET_INSTANCE_FLAG], data_buffer[EVENT_FLAG]);
-    if (new_entry == BTF_TRACE_FALSE)
     {
         return;
     }

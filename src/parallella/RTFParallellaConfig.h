@@ -22,7 +22,7 @@
  */
 typedef struct btf_trace_info_t
 {
-    int host_read;                         /**< To ensure that the mutex is initialized */
+    int is_init;                            /**< To ensure that the mutex is initialized */
     int core_write;                         /**< Read write operation between epiphany core and host */
     unsigned int * addr;                              /**< Mutex declaration. Unused on host  */
     unsigned int core_id;                   /**< BTF trace data buffer size which is to be read */

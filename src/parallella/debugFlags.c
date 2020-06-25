@@ -27,8 +27,6 @@ static unsigned int *core_buffer;
 /* Mutex lock for core to core synchronization */
 static unsigned int *mutex;
 
-static unsigned int *task_sync;
-
 /* btf synchronization structure */
 static btf_trace_info *btf_data;
 
@@ -70,16 +68,16 @@ void init_mutex(unsigned int row, unsigned int col, unsigned int core_id)
      * the Epiphany cores */
     btf_data = (btf_trace_info *)allocate_shared_memory(0);
     unsigned int offset = (sizeof(btf_trace_info) / sizeof(int)) + SHM_LABEL_COUNT;
-    btf_info = (unsigned int *)allocate_shared_memory(offset);
-    mutex = allocate_shared_memory(offset + BTF_TRACE_BUFFER_SIZE);
-    if ((row == 0) && (col == 0))
+    mutex = (unsigned int *)allocate_shared_memory(offset);
+    btf_info = (unsigned int *)allocate_shared_memory(offset + 1);
+    if ((row == 1) && (col == 0))
     {
         mutex[0] = 1;
-        btf_data->host_read = 1;
+        btf_data->is_init = 1;
     }
     else
     {
-        while(btf_data->host_read == 0)
+        while(btf_data->is_init == 0)
         {
             /* Wait until the mutex has been initialized */
         }
@@ -102,8 +100,6 @@ void init_task_trace_buffer(void )
     {
         core_buffer[index] = 0;
     }
-    task_sync = allocate_epiphany_memory(10);
-    task_sync[0] = 6;
 }
 
 void traceRunningTask(unsigned taskNum)
@@ -172,6 +168,7 @@ void traceTaskEvent(int srcID, int srcInstance, btf_trace_event_type type,
     btf_info[TARGET_INSTANCE_FLAG] = taskInstance;
     btf_info[EVENT_FLAG] = event_name;
     btf_info[DATA_FLAG] = data;
+    btf_data->core_id = e_get_coreid();
     btf_data->core_write = 1;
     /* Wait until data has been read by the host */
     while(btf_data->core_write == 1);

@@ -35,6 +35,7 @@ unsigned int shared_label_core[EXEC_CORE_COUNT][DSHM_SEC_LABEL_COUNT];
 unsigned int shared_dram_start_address = SHARED_DRAM_START_OFFSET;
 
 
+
 static void construct_btf_trace_header(FILE *stream)
 {
     write_btf_trace_header_config(stream);
@@ -49,6 +50,36 @@ static void construct_btf_trace_header(FILE *stream)
     write_btf_trace_header_entity_type_table(stream);
 }
 
+
+static void parse_trace_data(FILE *trace)
+{
+    FILE *fp_temp = NULL;
+    unsigned int trace_data[BTF_TRACE_BUFFER_SIZE];
+    unsigned int active_row;
+    if (trace == NULL )
+    {
+        return;
+    }
+    fp_temp = fopen((const char *)"temp.txt", "r");
+    if (fp_temp == NULL)
+    {
+        exit(1);
+    }
+    while( fscanf(fp_temp, "%d %d %d %d %d %d %d %d %d\n"
+                    , &active_row, &trace_data[0], &trace_data[1], &trace_data[2],
+                    &trace_data[3], &trace_data[4], &trace_data[5], &trace_data[6],
+                    &trace_data[7]) != EOF )
+    {
+        write_btf_trace_data(trace, active_row, trace_data);
+    }
+    if (fp_temp != NULL)
+    {
+        fclose(fp_temp);
+        fp_temp = NULL;
+    }
+    //remove("temp.txt");
+
+}
 
 /* Entry point of the application running on the HOST Core. */
 int main(int argc, char *argv[])
@@ -66,11 +97,15 @@ int main(int argc, char *argv[])
     int index = 0;
     btf_trace_info trace_info;
 
-    trace_info.host_read = 0;
+    trace_info.is_init = 0;
     trace_info.core_write = 0;
     trace_info.addr = 0;
-    trace_info.core_id = 16;
+    trace_info.core_id = 0;
 
+    /* File pointer to store the BTF data which will be used for
+     * further processing. The file generated will be deleted after the processing is done */
+    FILE *fp_temp = NULL;
+    /* File pointer to store the  BTF trace file */
     FILE *fp_to_trace = NULL;
     int scale_factor = parse_btf_trace_arguments(argc, argv);
     char trace_file_path[512] = {0};
@@ -90,6 +125,12 @@ int main(int argc, char *argv[])
         fp_to_trace = stderr;
     }
     construct_btf_trace_header(fp_to_trace);
+
+    fp_temp = fopen((const char *)"temp.txt", "w+");
+    if (fp_temp == NULL)
+    {
+        exit(0);
+    }
 
     for (index = 0;index < EXEC_CORE_COUNT; index++)
     {
@@ -149,11 +190,11 @@ int main(int argc, char *argv[])
     /* reset the group */
     e_reset_group(&dev);
     /* load the group */
-    if (E_OK != e_load("core0_main.elf", &dev, 0, 0, E_FALSE))
+    if (E_OK != e_load("core0_main.elf", &dev, 0, 0, E_TRUE))
     {
         fprintf(stderr,"Error Loading the Epiphany Application on core with row=0 and col=0\n");
     }
-    if (E_OK != e_load("core1_main.elf", &dev, 1, 0, E_FALSE))
+    if (E_OK != e_load("core1_main.elf", &dev, 1, 0, E_TRUE))
     {
         fprintf(stderr,"Error Loading the Epiphany Application on core with row=1 and col=0\n");
     }
@@ -177,6 +218,9 @@ int main(int argc, char *argv[])
     char buffer2[LABEL_STRLEN] = {0};
 
     unsigned int btf_trace[BTF_TRACE_BUFFER_SIZE] = {0};
+    unsigned int core_id = 0;
+
+    /* Create a new temp file for storing the trace data */
     /* Loop over some random number, can be replaced with an infinite loop */
     for (pollLoopCounter = 0; pollLoopCounter <= 200000; pollLoopCounter++)
     {
@@ -184,32 +228,34 @@ int main(int argc, char *argv[])
                 &trace_info.core_write, sizeof(int));
         if (trace_info.core_write == 1)
         {
-            e_read(&emem, 0, 0, SHARED_BTF_DATA_OFFSET + sizeof(btf_trace_info) + 40,
-                    &btf_trace, sizeof(btf_trace));
-            trace_info.core_write = 0;
-            e_write(&emem, 0, 0, SHARED_BTF_DATA_OFFSET + offsetof(btf_trace_info, core_write),
-                    &trace_info.core_write, sizeof(int));
+            e_read(&emem, 0, 0, SHARED_BTF_DATA_OFFSET + offsetof(btf_trace_info, core_id),
+                    &trace_info.core_id, sizeof(int));
+            e_read(&emem, 0, 0, (SHARED_BTF_DATA_OFFSET + sizeof(btf_trace_info) +
+                                (SHM_LABEL_COUNT * sizeof(int)) + sizeof(int)),
+                                &btf_trace, sizeof(btf_trace));
+            unsigned int active_row = (trace_info.core_id ^ 0x808) >> 6;
+            //write_btf_trace_data(fp_to_trace, active_row, btf_trace);
+            fprintf(fp_temp,"%d %d %d %d %d %d %d %d %d\n", active_row, btf_trace[0],
+                    btf_trace[1], btf_trace[2], btf_trace[3], btf_trace[4],
+                    btf_trace[5], btf_trace[6], btf_trace[7]);
 
-/*            for(int i = 0; i < BTF_TRACE_BUFFER_SIZE; i++)
-            {
-                printf("%d ",btf_trace[i]);
-            }
-            printf("\n");*/
             e_read(&dev, 0, 0, ECORE_RTF_BUFFER_ADDR, ecore0, sizeof(ecore0));
+            e_read(&dev, 1, 0, ECORE_RTF_BUFFER_ADDR, ecore1, sizeof(ecore1));
             e_read(&dev, 0, 0, DSHM_LABEL_EPI_CORE_OFFSET, &shared_label_core[0],
                                 sizeof(shared_label_core_00));
-            e_read(&dev, 1, 0, ECORE_RTF_BUFFER_ADDR, ecore1, sizeof(ecore1));
             e_read(&dev, 1, 0, DSHM_LABEL_EPI_CORE_OFFSET, &shared_label_core[1],
                                 sizeof(shared_label_core_10));
             e_read(&emem, 0, 0, SHARED_BTF_DATA_OFFSET + sizeof(btf_trace_info) ,
                                 shared_label_to_read, sizeof(shared_label_to_read));
-
-            if((ecore1[6] != 0) || (ecore0[0] != 0))
+            trace_info.core_write = 0;
+            e_write(&emem, 0, 0, SHARED_BTF_DATA_OFFSET + offsetof(btf_trace_info, core_write),
+                    &trace_info.core_write, sizeof(int));
+            if((ecore1[6] != 0) || (ecore0[6] != 0))
             {
                 get_task_name(ecore0[6],buffer1);
                 get_task_name(ecore1[6],buffer2);
 
-                fprintf(stderr," %6d | %10s | %10s | ", ((ecore1[8] + 1) * scale_factor), buffer1, buffer2);
+                fprintf(stderr," %6d | %10s | %10s | ", ((ecore0[8]) * scale_factor), buffer1, buffer2);
 
                 for (index = 0; index < EXEC_CORE_COUNT; index++)
                 {
@@ -226,11 +272,19 @@ int main(int argc, char *argv[])
         }
     }
     fprintf(stderr,"----------------------------------------------\n");
+    if (fp_temp != NULL)
+    {
+        fclose(fp_temp);
+        fp_temp = NULL;
+    }
+    /* Parse the trace data and store the trace file */
+    parse_trace_data(fp_to_trace);
     if (fp_to_trace != NULL)
     {
         fclose(fp_to_trace);
         fp_to_trace = NULL;
     }
+
     e_close(&dev);
     e_finalize();
     fprintf(stderr,"RFTP demo complete \n ");
