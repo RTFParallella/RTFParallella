@@ -21,6 +21,27 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
+#define USE_DMA
+
+#ifdef USE_DMA
+
+typedef struct btf_trace_t
+{
+    unsigned int time;
+    unsigned int src;
+    unsigned int src_instance;
+    unsigned int event_type;
+    unsigned int target;
+    unsigned int target_instance;
+    unsigned int event;
+    unsigned int data;
+}btf_trace;
+
+
+static btf_trace trace;
+
+#endif /* End of USE_DMA */
+
 /* This buffer is used to store the legacy RTF trace. */
 static unsigned int *core_buffer;
 
@@ -30,8 +51,10 @@ static unsigned int *mutex;
 /* btf synchronization structure */
 static btf_trace_info *btf_data;
 
+
 /* This buffer is used to store the btf data */
 static unsigned int *btf_info;
+
 
 /* Variable to set the clock cycle per tick. */
 unsigned int execution_time_scale;
@@ -158,8 +181,19 @@ void traceTaskEvent(int srcID, int srcInstance, btf_trace_event_type type,
     {
         traceRunningTask(taskId);
     }
-    /* Add a delay to stabilize the mutex. Epiphany core does not have
-     * a deterministic behavior if no delay is added */
+    btf_data->core_id = e_get_coreid();
+#ifdef USE_DMA
+    trace.time = tick_count;
+    trace.src = srcID;
+    trace.src_instance = srcInstance;
+    trace.event_type = type;
+    trace.target = taskId;
+    trace.target_instance = taskInstance;
+    trace.event = event_name;
+    trace.data = data;
+    e_dma_copy(btf_info, &trace, sizeof(btf_trace));
+    e_dma_wait(E_DMA_0);
+#else
     btf_info[TIME_FLAG] = tick_count;
     btf_info[SOURCE_FLAG] = srcID;
     btf_info[SOURCE_INSTANCE_FLAG] = srcInstance;
@@ -168,7 +202,7 @@ void traceTaskEvent(int srcID, int srcInstance, btf_trace_event_type type,
     btf_info[TARGET_INSTANCE_FLAG] = taskInstance;
     btf_info[EVENT_FLAG] = event_name;
     btf_info[DATA_FLAG] = data;
-    btf_data->core_id = e_get_coreid();
+#endif
     btf_data->core_write = 1;
     /* Wait until data has been read by the host */
     while(btf_data->core_write == 1);

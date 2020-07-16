@@ -77,7 +77,7 @@ static void parse_trace_data(FILE *trace)
         fclose(fp_temp);
         fp_temp = NULL;
     }
-    //remove("temp.txt");
+    remove("temp.txt");
 
 }
 
@@ -234,7 +234,7 @@ int main(int argc, char *argv[])
                                 (SHM_LABEL_COUNT * sizeof(int)) + sizeof(int)),
                                 &btf_trace, sizeof(btf_trace));
             unsigned int active_row = (trace_info.core_id ^ 0x808) >> 6;
-            //write_btf_trace_data(fp_to_trace, active_row, btf_trace);
+
             fprintf(fp_temp,"%d %d %d %d %d %d %d %d %d\n", active_row, btf_trace[0],
                     btf_trace[1], btf_trace[2], btf_trace[3], btf_trace[4],
                     btf_trace[5], btf_trace[6], btf_trace[7]);

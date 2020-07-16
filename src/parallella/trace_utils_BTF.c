@@ -213,7 +213,7 @@ static int find_task_in_execution(btf_trace_data *data, int8_t stack_top, btf_tr
 
 
 /* Function to dump the BTF trace data on output trace file */
-void dump_btf_trace_data(FILE *stream, unsigned int ticks,
+static void dump_btf_trace_data(FILE *stream, unsigned int ticks,
                             unsigned int srcId, unsigned int srcInstance,
                             btf_trace_event_type type,
                             unsigned int target, unsigned int targetInstance,
