@@ -72,9 +72,9 @@ void generalizedRTOSTask(AmaltheaTask task){
     {
         traceTaskEvent(task.src_id, task.src_instance, TASK_EVENT, task.task_id,
                                 task.task_instance, PROCESS_START, 0);
-        task.cInHandler();
+        task.cInHandler(task.task_id, task.task_instance);
         task.taskHandler(task.task_id, task.task_instance);
-        task.cOutHandler();
+        task.cOutHandler(task.task_id, task.task_instance);
         traceTaskEvent(task.src_id, task.src_instance, TASK_EVENT, task.task_id,
                                 task.task_instance, PROCESS_TERMINATE, 0);
         vTaskDelayUntil( &xLastWakeTime, task.period);

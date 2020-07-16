@@ -393,7 +393,7 @@ int  parse_btf_trace_arguments(int argc, char **argv)
              case 's' :
                  btf_header.timescale = atoi(optarg);
                  scale_factor = btf_header.timescale;
-		 /* Accepted scale factor is 100us and 1000us */
+                 /* Accepted scale factor is 100us and 1000us */
                  if ((scale_factor == 100) || (scale_factor == 1000))
                  {
                      // No action needed.

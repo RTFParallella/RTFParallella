@@ -222,7 +222,7 @@ int main(int argc, char *argv[])
 
     /* Create a new temp file for storing the trace data */
     /* Loop over some random number, can be replaced with an infinite loop */
-    for (pollLoopCounter = 0; pollLoopCounter <= 200000; pollLoopCounter++)
+    for (pollLoopCounter = 0; pollLoopCounter <= 100000; pollLoopCounter++)
     {
         e_read(&emem, 0, 0, SHARED_BTF_DATA_OFFSET + offsetof(btf_trace_info, core_write),
                 &trace_info.core_write, sizeof(int));

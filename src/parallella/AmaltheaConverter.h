@@ -31,8 +31,8 @@ typedef struct AmaltheaTask_t
     unsigned int executionTime;
     unsigned int deadline;
     unsigned int period;
-    void(* cInHandler)();
-    void(* cOutHandler)();
+    void(* cInHandler)(int  src_id, int src_instance);
+    void(* cOutHandler)(int  src_id, int src_instance);
 }AmaltheaTask;
 
 
