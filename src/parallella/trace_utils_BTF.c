@@ -127,7 +127,7 @@ static void print_usage(void)
     fprintf(stdout, "Usage:\n");
     fprintf(stdout,"\t[-t|--trace-btf]=<Output trace file name.>\n");
     fprintf(stdout,"\t[-m|--model-file]=<Model file name used to generate the trace file.>\n");
-    fprintf(stdout,"\t[-s|--scale]=<Timing scale used to generate the trace file in microseconds.>\n");
+    fprintf(stdout,"\t[-s|--scale]=<Timing scale used to generate the trace file in microseconds. Accepted values are 100 and 1000.>\n");
     fprintf(stdout,"\t[-d|--device]=<Device target on which the trace file is generated.>\n");
     fprintf(stdout,"\t[-h|--help]=<Print the help message.>\n");
     fprintf(stdout,"Example:\n");
@@ -393,6 +393,16 @@ int  parse_btf_trace_arguments(int argc, char **argv)
              case 's' :
                  btf_header.timescale = atoi(optarg);
                  scale_factor = btf_header.timescale;
+		 /* Accepted scale factor is 100us and 1000us */
+                 if ((scale_factor == 100) || (scale_factor == 1000))
+                 {
+                     // No action needed.
+                 }
+                 else
+                 {
+                     print_usage();
+                     exit(EXIT_FAILURE);
+                 }
                  is_time_scale_provided = BTF_TRACE_TRUE;
                  break;
              case 'h' :
