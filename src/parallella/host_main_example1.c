@@ -28,6 +28,11 @@
 #include "model_enumerations.h"
 #include "trace_utils_BTF.h"
 
+#define CHUNK_SIZE 4096
+char file_buffer[CHUNK_SIZE + 32] ;    // 4Kb buffer, plus enough
+static int buffer_count = 0 ;
+
+
 unsigned int shared_label_to_read[SHM_LABEL_COUNT];
 unsigned int shared_label_core_00[DSHM_SEC_LABEL_COUNT];
 unsigned int shared_label_core_10[DSHM_SEC_LABEL_COUNT];
@@ -77,7 +82,7 @@ static void parse_trace_data(FILE *trace)
         fclose(fp_temp);
         fp_temp = NULL;
     }
-    remove("temp.txt");
+    //remove("temp.txt");
 
 }
 
@@ -88,18 +93,18 @@ int main(int argc, char *argv[])
     e_platform_t epiphany;
     e_epiphany_t dev;
     e_mem_t emem;
-    unsigned int ecore0[RTF_DEBUG_TRACE_COUNT];
-    unsigned int ecore1[RTF_DEBUG_TRACE_COUNT];
-    unsigned int labelVisual_perCore[EXEC_CORE_COUNT][DSHM_VISIBLE_LABEL_COUNT];
-    unsigned int prv_val_preCore[EXEC_CORE_COUNT][DSHM_VISIBLE_LABEL_COUNT];
-    unsigned int labelVisual_SHM[SHM_VISIBLE_LABEL_COUNT];
-    unsigned int prv_val_SHM[SHM_VISIBLE_LABEL_COUNT];
+    unsigned int ecore0[RTF_DEBUG_TRACE_COUNT] = {0};
+    unsigned int ecore1[RTF_DEBUG_TRACE_COUNT] = {0};
+    unsigned int labelVisual_perCore[EXEC_CORE_COUNT][DSHM_VISIBLE_LABEL_COUNT] = {{0, 0}, {0, 0}};
+    unsigned int prv_val_preCore[EXEC_CORE_COUNT][DSHM_VISIBLE_LABEL_COUNT] = {{0, 0}, {0, 0}};;
+    unsigned int labelVisual_SHM[SHM_VISIBLE_LABEL_COUNT] = {0};
+    unsigned int prv_val_SHM[SHM_VISIBLE_LABEL_COUNT] = {0};
     int index = 0;
     btf_trace_info trace_info;
 
-    trace_info.is_init = 0;
+    //trace_info.is_init = 0;
     trace_info.core_write = 0;
-    trace_info.addr = 0;
+    trace_info.offset = 0;
     trace_info.core_id = 0;
 
     /* File pointer to store the BTF data which will be used for
@@ -190,11 +195,11 @@ int main(int argc, char *argv[])
     /* reset the group */
     e_reset_group(&dev);
     /* load the group */
-    if (E_OK != e_load("core0_main.elf", &dev, 0, 0, E_TRUE))
+    if (E_OK != e_load("core0_main.elf", &dev, 0, 0, E_FALSE))
     {
         fprintf(stderr,"Error Loading the Epiphany Application on core with row=0 and col=0\n");
     }
-    if (E_OK != e_load("core1_main.elf", &dev, 1, 0, E_TRUE))
+    if (E_OK != e_load("core1_main.elf", &dev, 1, 0, E_FALSE))
     {
         fprintf(stderr,"Error Loading the Epiphany Application on core with row=1 and col=0\n");
     }
@@ -211,7 +216,7 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Error in writing to the shared dram buffer\n");
     }
 
-    e_read(&emem, 0, 0, SHARED_BTF_DATA_OFFSET, &trace_info, sizeof(btf_trace_info));
+    //e_read(&emem, 0, 0, SHARED_BTF_DATA_OFFSET, &trace_info, sizeof(btf_trace_info));
     e_start_group(&dev);
     int pollLoopCounter = 0;
     char buffer1[LABEL_STRLEN] = {0};
@@ -219,32 +224,43 @@ int main(int argc, char *argv[])
 
     unsigned int btf_trace[BTF_TRACE_BUFFER_SIZE] = {0};
     unsigned int core_id = 0;
-
+    unsigned int btf_data_start_offset = (SHARED_BTF_DATA_OFFSET + sizeof(btf_trace_info) +
+                                        (SHM_LABEL_COUNT * sizeof(int)) + sizeof(int));
     /* Create a new temp file for storing the trace data */
     /* Loop over some random number, can be replaced with an infinite loop */
     for (pollLoopCounter = 0; pollLoopCounter <= 100000; pollLoopCounter++)
     {
-        e_read(&emem, 0, 0, SHARED_BTF_DATA_OFFSET + offsetof(btf_trace_info, core_write),
-                &trace_info.core_write, sizeof(int));
+        e_read(&emem, 0, 0, SHARED_BTF_DATA_OFFSET , &trace_info, sizeof(btf_trace_info));
         if (trace_info.core_write == 1)
         {
-            e_read(&emem, 0, 0, SHARED_BTF_DATA_OFFSET + offsetof(btf_trace_info, core_id),
-                    &trace_info.core_id, sizeof(int));
-            e_read(&emem, 0, 0, (SHARED_BTF_DATA_OFFSET + sizeof(btf_trace_info) +
-                                (SHM_LABEL_COUNT * sizeof(int)) + sizeof(int)),
+            e_read(&emem, 0, 0, (btf_data_start_offset + (trace_info.offset * BTF_TRACE_BUFFER_SIZE * sizeof(int))),
                                 &btf_trace, sizeof(btf_trace));
             unsigned int active_row = (trace_info.core_id ^ 0x808) >> 6;
-
-            fprintf(fp_temp,"%d %d %d %d %d %d %d %d %d\n", active_row, btf_trace[0],
+/*            fprintf(fp_temp,"%d %d %d %d %d %d %d %d %d\n", active_row, btf_trace[0],
+                    btf_trace[1], btf_trace[2], btf_trace[3], btf_trace[4],
+                    btf_trace[5], btf_trace[6], btf_trace[7]);*/
+            buffer_count += sprintf( &file_buffer[buffer_count], "%d %d %d %d %d %d %d %d %d\n", active_row, btf_trace[0],
                     btf_trace[1], btf_trace[2], btf_trace[3], btf_trace[4],
                     btf_trace[5], btf_trace[6], btf_trace[7]);
 
-            e_read(&dev, 0, 0, ECORE_RTF_BUFFER_ADDR, ecore0, sizeof(ecore0));
-            e_read(&dev, 1, 0, ECORE_RTF_BUFFER_ADDR, ecore1, sizeof(ecore1));
-            e_read(&dev, 0, 0, DSHM_LABEL_EPI_CORE_OFFSET, &shared_label_core[0],
-                                sizeof(shared_label_core_00));
-            e_read(&dev, 1, 0, DSHM_LABEL_EPI_CORE_OFFSET, &shared_label_core[1],
-                                sizeof(shared_label_core_10));
+            if( buffer_count >= CHUNK_SIZE )
+            {
+                fwrite( file_buffer, buffer_count, 1, fp_temp ) ;
+                buffer_count = 0 ;
+            }
+
+            if (active_row == 0)
+            {
+                e_read(&dev, 0, 0, ECORE_RTF_BUFFER_ADDR, ecore0, sizeof(ecore0));
+                e_read(&dev, 0, 0, DSHM_LABEL_EPI_CORE_OFFSET, &shared_label_core[0],
+                                    sizeof(shared_label_core_00));
+            }
+            else
+            {
+                e_read(&dev, 1, 0, ECORE_RTF_BUFFER_ADDR, ecore1, sizeof(ecore1));
+                e_read(&dev, 1, 0, DSHM_LABEL_EPI_CORE_OFFSET, &shared_label_core[1],
+                                    sizeof(shared_label_core_10));
+            }
             e_read(&emem, 0, 0, SHARED_BTF_DATA_OFFSET + sizeof(btf_trace_info) ,
                                 shared_label_to_read, sizeof(shared_label_to_read));
             trace_info.core_write = 0;
@@ -270,6 +286,11 @@ int main(int argc, char *argv[])
                 fprintf(stderr,"\n");
             }
         }
+    }
+    // Write remainder
+    if( buffer_count > 0 )
+    {
+        fwrite( file_buffer, buffer_count, 1, fp_temp );
     }
     fprintf(stderr,"----------------------------------------------\n");
     if (fp_temp != NULL)

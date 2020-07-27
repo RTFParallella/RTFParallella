@@ -24,7 +24,7 @@ void sleepTimerMs(int ticks, int taskNum){
     for (tick_count = 0;tick_count < no_of_ticks; tick_count++)
     {
         taskENTER_CRITICAL();
-        traceRunningTask(taskNum);
+        //traceRunningTask(taskNum);
         e_wait(E_CTIMER_0,clock_cycle);
         taskEXIT_CRITICAL();
     }

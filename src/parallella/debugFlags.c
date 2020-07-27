@@ -21,7 +21,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
-#define USE_DMA
+//#define USE_DMA
 
 #ifdef USE_DMA
 
@@ -37,24 +37,15 @@ typedef struct btf_trace_t
     unsigned int data;
 }btf_trace;
 
-
-static btf_trace trace;
-
 #endif /* End of USE_DMA */
+
+e_mutex_t m SECTION(".data_bank3");
+
+#define MUTEX_ROW        1
+#define MUTEX_COL        0
 
 /* This buffer is used to store the legacy RTF trace. */
 static unsigned int *core_buffer;
-
-/* Mutex lock for core to core synchronization */
-static unsigned int *mutex;
-
-/* btf synchronization structure */
-static btf_trace_info *btf_data;
-
-
-/* This buffer is used to store the btf data */
-static unsigned int *btf_info;
-
 
 /* Variable to set the clock cycle per tick. */
 unsigned int execution_time_scale;
@@ -62,6 +53,11 @@ unsigned int execution_time_scale;
 static unsigned int scale_factor;
 
 static unsigned int tick_count;
+
+#ifndef USE_DMA
+static unsigned int *btf_info;
+static btf_trace_info *btf_data;
+#endif
 
 unsigned int get_time_scale_factor(void)
 {
@@ -87,25 +83,11 @@ static void get_execution_time_scale(void)
 
 void init_mutex(unsigned int row, unsigned int col, unsigned int core_id)
 {
-    /* The BTF trace data starts at 0th offset of the shared memory seen by
-     * the Epiphany cores */
+#ifndef USE_DMA
+    unsigned int btf_offset = (sizeof(btf_trace_info) / sizeof(int)) + SHM_LABEL_COUNT;
     btf_data = (btf_trace_info *)allocate_shared_memory(0);
-    unsigned int offset = (sizeof(btf_trace_info) / sizeof(int)) + SHM_LABEL_COUNT;
-    mutex = (unsigned int *)allocate_shared_memory(offset);
-    btf_info = (unsigned int *)allocate_shared_memory(offset + 1);
-    if ((row == 1) && (col == 0))
-    {
-        mutex[0] = 1;
-        btf_data->is_init = 1;
-    }
-    else
-    {
-        while(btf_data->is_init == 0)
-        {
-            /* Wait until the mutex has been initialized */
-        }
-    }
-
+    btf_info = (unsigned int *)allocate_shared_memory(btf_offset + 1);
+#endif
 }
 
 /*
@@ -162,16 +144,31 @@ void updateDebugFlag(int debugMessage)
 void traceTaskEvent(int srcID, int srcInstance, btf_trace_event_type type,
         int taskId, int taskInstance, btf_trace_event_name event_name, int data)
 {
-    /* Lock the mutex before writing to the shared memory */
-    while(mutex[0] != 1)
-    {
-        /* Core to core synchronization */
-    }
-    mutex[0] = 0;
-    while((btf_data->core_write == 1))
-    {
-        /* Wait until previous task is completed */
-    }
+    unsigned int btf_offset = (sizeof(btf_trace_info) / sizeof(int)) + SHM_LABEL_COUNT;
+    unsigned int active_row = 0;
+    unsigned int offset = 0;
+    unsigned int * trace_buf_addr = NULL;
+
+#ifdef USE_DMA
+    unsigned int *btf_info = NULL;
+    btf_trace trace;
+    btf_trace_info btf_data;
+    /* The BTF trace data starts at 0th offset of the shared memory seen by
+     * the Epiphany cores */
+    unsigned int *btf_data_ptr = (unsigned int *)allocate_shared_memory(0);
+    btf_info = (unsigned int *)allocate_shared_memory(btf_offset + 1);
+#endif
+
+
+    e_mutex_lock(MUTEX_ROW, MUTEX_COL, &m);
+    /* Wait until data has been read by the host */
+#ifdef USE_DMA
+    do{
+        e_dma_copy(&btf_data, btf_data_ptr, sizeof(btf_trace_info));
+    }while(btf_data.core_write == 1);
+#else
+    while(btf_data->core_write == 1);
+#endif
 
     if((type == TASK_EVENT) && (event_name == PROCESS_TERMINATE))
     {
@@ -181,8 +178,14 @@ void traceTaskEvent(int srcID, int srcInstance, btf_trace_event_type type,
     {
         traceRunningTask(taskId);
     }
-    btf_data->core_id = e_get_coreid();
+
 #ifdef USE_DMA
+    btf_data.core_id = e_get_coreid();
+    active_row = (e_get_coreid() ^ 0x808) >> 6;
+    offset = BTF_TRACE_BUFFER_SIZE * active_row;
+    btf_data.offset = active_row;
+    trace_buf_addr = btf_info + offset;
+    e_dma_wait(E_DMA_1);
     trace.time = tick_count;
     trace.src = srcID;
     trace.src_instance = srcInstance;
@@ -191,23 +194,29 @@ void traceTaskEvent(int srcID, int srcInstance, btf_trace_event_type type,
     trace.target_instance = taskInstance;
     trace.event = event_name;
     trace.data = data;
-    e_dma_copy(btf_info, &trace, sizeof(btf_trace));
-    e_dma_wait(E_DMA_0);
+    e_dma_copy(trace_buf_addr, &trace, sizeof(btf_trace));
+    e_dma_wait(E_DMA_1);
+    btf_data.core_write = 1;
+    e_dma_copy(btf_data_ptr, &btf_data, sizeof(btf_trace_info));
 #else
-    btf_info[TIME_FLAG] = tick_count;
-    btf_info[SOURCE_FLAG] = srcID;
-    btf_info[SOURCE_INSTANCE_FLAG] = srcInstance;
-    btf_info[EVENT_TYPE_FLAG] = type;
-    btf_info[TARGET_FLAG] = taskId;
-    btf_info[TARGET_INSTANCE_FLAG] = taskInstance;
-    btf_info[EVENT_FLAG] = event_name;
-    btf_info[DATA_FLAG] = data;
-#endif
+    btf_data->core_id = e_get_coreid();
+    active_row = (e_get_coreid() ^ 0x808) >> 6;
+    offset = BTF_TRACE_BUFFER_SIZE * active_row;
+    btf_data->offset = active_row;
+    trace_buf_addr = btf_info + offset;
+    trace_buf_addr[TIME_FLAG] = tick_count;
+    trace_buf_addr[SOURCE_FLAG] = srcID;
+    trace_buf_addr[SOURCE_INSTANCE_FLAG] = srcInstance;
+    trace_buf_addr[EVENT_TYPE_FLAG] = type;
+    trace_buf_addr[TARGET_FLAG] = taskId;
+    trace_buf_addr[TARGET_INSTANCE_FLAG] = taskInstance;
+    trace_buf_addr[EVENT_FLAG] = event_name;
+    trace_buf_addr[DATA_FLAG] = data;
     btf_data->core_write = 1;
-    /* Wait until data has been read by the host */
-    while(btf_data->core_write == 1);
+#endif
+
     /* Unlock mutex and wait for the host core to read the data */
-    mutex[0] = 1;
+    e_mutex_unlock(MUTEX_ROW, MUTEX_COL, &m);
 }
 
 
