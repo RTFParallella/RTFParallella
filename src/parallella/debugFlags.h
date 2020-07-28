@@ -81,6 +81,8 @@ void updateTick(void);
  */
 void updateDebugFlag(int debugMessage);
 
+void signalHost(void);
+
 void traceTaskEvent(int srcID, int srcInstance, btf_trace_event_type type,
         int taskId, int taskInstance, btf_trace_event_name event_name, int data);
 

@@ -21,9 +21,15 @@ void sleepTimerMs(int ticks, int taskNum){
     int tick_count;
     int ts = get_time_scale_factor();
     int no_of_ticks = ts * ticks;
+    int is_signal_sent = 0;
     for (tick_count = 0;tick_count < no_of_ticks; tick_count++)
     {
         taskENTER_CRITICAL();
+        if(is_signal_sent == 0){
+            signalHost();
+            is_signal_sent = 1;
+        }
+
         //traceRunningTask(taskNum);
         e_wait(E_CTIMER_0,clock_cycle);
         taskEXIT_CRITICAL();

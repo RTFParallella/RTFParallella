@@ -29,7 +29,7 @@
 #include "trace_utils_BTF.h"
 
 #define CHUNK_SIZE 4096
-char file_buffer[CHUNK_SIZE + 32] ;    // 4Kb buffer, plus enough
+char file_buffer[CHUNK_SIZE + 256] ;    // 4Kb buffer, plus enough
 static int buffer_count = 0 ;
 
 
@@ -222,8 +222,9 @@ int main(int argc, char *argv[])
     char buffer1[LABEL_STRLEN] = {0};
     char buffer2[LABEL_STRLEN] = {0};
 
-    unsigned int btf_trace[BTF_TRACE_BUFFER_SIZE] = {0};
+    unsigned int btf_trace[BTF_TRACE_BUFFER_SIZE * 6] = {0};
     unsigned int core_id = 0;
+    unsigned char btf_data_index = 0;
     unsigned int btf_data_start_offset = (SHARED_BTF_DATA_OFFSET + sizeof(btf_trace_info) +
                                         (SHM_LABEL_COUNT * sizeof(int)) + sizeof(int));
     /* Create a new temp file for storing the trace data */
@@ -233,15 +234,27 @@ int main(int argc, char *argv[])
         e_read(&emem, 0, 0, SHARED_BTF_DATA_OFFSET , &trace_info, sizeof(btf_trace_info));
         if (trace_info.core_write == 1)
         {
-            e_read(&emem, 0, 0, (btf_data_start_offset + (trace_info.offset * BTF_TRACE_BUFFER_SIZE * sizeof(int))),
-                                &btf_trace, sizeof(btf_trace));
-            unsigned int active_row = (trace_info.core_id ^ 0x808) >> 6;
-/*            fprintf(fp_temp,"%d %d %d %d %d %d %d %d %d\n", active_row, btf_trace[0],
-                    btf_trace[1], btf_trace[2], btf_trace[3], btf_trace[4],
-                    btf_trace[5], btf_trace[6], btf_trace[7]);*/
-            buffer_count += sprintf( &file_buffer[buffer_count], "%d %d %d %d %d %d %d %d %d\n", active_row, btf_trace[0],
-                    btf_trace[1], btf_trace[2], btf_trace[3], btf_trace[4],
-                    btf_trace[5], btf_trace[6], btf_trace[7]);
+            e_read(&emem, 0, 0, SHARED_BTF_DATA_OFFSET , &trace_info, sizeof(btf_trace_info));
+#if 0
+            fprintf(stdout, "%d %d %d %d\n", trace_info.core_id, trace_info.is_init, trace_info.offset, trace_info.core_write);
+            trace_info.core_write = 0;
+            e_write(&emem, 0, 0, SHARED_BTF_DATA_OFFSET + offsetof(btf_trace_info, core_write),
+                    &trace_info.core_write, sizeof(int));
+#else
+            e_read(&emem, 0, 0, (btf_data_start_offset + (trace_info.offset * sizeof(int))),
+                                &btf_trace, BTF_TRACE_BUFFER_SIZE * sizeof(int) * trace_info.is_init);
+
+
+            for(btf_data_index = 0; btf_data_index < trace_info.is_init; btf_data_index++)
+            {
+                uint16_t offset = btf_data_index * BTF_TRACE_BUFFER_SIZE;
+                buffer_count += sprintf( &file_buffer[buffer_count], "%d %d %d %d %d %d %d %d %d\n",
+                        trace_info.core_id, btf_trace[offset],
+                        btf_trace[offset + 1], btf_trace[offset+2], btf_trace[offset+3],
+                        btf_trace[offset+4], btf_trace[offset+5], btf_trace[offset+6],
+                        btf_trace[offset+7]);
+            }
+
 
             if( buffer_count >= CHUNK_SIZE )
             {
@@ -249,7 +262,7 @@ int main(int argc, char *argv[])
                 buffer_count = 0 ;
             }
 
-            if (active_row == 0)
+            if (trace_info.core_id == 0)
             {
                 e_read(&dev, 0, 0, ECORE_RTF_BUFFER_ADDR, ecore0, sizeof(ecore0));
                 e_read(&dev, 0, 0, DSHM_LABEL_EPI_CORE_OFFSET, &shared_label_core[0],
@@ -285,6 +298,7 @@ int main(int argc, char *argv[])
                 }
                 fprintf(stderr,"\n");
             }
+#endif
         }
     }
     // Write remainder
