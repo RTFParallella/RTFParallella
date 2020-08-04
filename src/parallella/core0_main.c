@@ -16,7 +16,6 @@
 #include "e_lib.h"
 
 #include "AmaltheaConverter.h"
-#include "c2c.h"
 #include "debugFlags.h"
 #include "shared_comms.h"
 #include "taskCode.h"
@@ -31,10 +30,7 @@
 //---------------------------------------------
 int main(void) {
     /* initialize output buffer for debug messages */
-    unsigned int row, col, core_id;
-    e_coords_from_coreid(e_get_coreid(), &row, &col);
-    core_id = ((row * 4) + col);
-    init_mutex(row, col, core_id);
+    init_btf_mem_section();
     init_task_trace_buffer();
     int ts = get_time_scale_factor();
     init_mem_sections();

@@ -38,8 +38,7 @@ static unsigned int* sec1_global_pointer;
 
 void init_mem_sections(void)
 {
-    int offset = GLOBAL_SHARED_LABEL_OFFSET / sizeof(int);
-    sec1_global_pointer = allocate_shared_memory(offset);
+    sec1_global_pointer = allocate_shared_memory(SHARED_LABEL_OFFSET/sizeof(int));
     for (int index = 0; index < SHM_LABEL_COUNT; index++)
     {
         sec1_global_pointer[index] = 0;

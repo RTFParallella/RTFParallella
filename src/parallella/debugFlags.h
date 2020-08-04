@@ -35,7 +35,7 @@
 
 unsigned int get_time_scale_factor(void);
 
-void init_mutex(unsigned int row, unsigned int col, unsigned int core_id);
+void init_btf_mem_section(void);
 
 /**
  * initialize output buffer in core memory

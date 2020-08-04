@@ -16,24 +16,21 @@
 
 unsigned int *outbuf_dstr_shared[SHM_LABEL_COUNT];
 
+
+
 /**
  * This buffer is assigned to stored the RTF parallella legacy trace info. Data bank
- * 3 is used to store the information on each epiphany core. It starts at 0x6000 offset
+ * 3 is used to store the information on each epiphany core. It starts at 0x7000 offset
  * on each epiphany core. Any change in this buffer addressing must be followed with
  * the correct offset set in host application to get the correct values.
  */
-static unsigned int epi_core_buffer[32] __attribute__((section(".data_bank3")));
-
-
 unsigned int *allocate_epiphany_memory(unsigned int offset)
 {
     unsigned int *epi_core_addr = 0;
-    /* Ensure that the start address is 0x6000 at data bank 3 of each core */
-    if (epi_core_buffer == (unsigned int *)ECORE_RTF_BUFFER_ADDR)
-    {
-        /* Add offset to get the address */
-        epi_core_addr = (epi_core_buffer + offset);
-    }
+    /* Ensure that the start address is 0x7000 at data bank 3 of each core */
+    unsigned int *epi_core_buffer = (unsigned int *)ECORE_RTF_BUFFER_ADDR;
+    /* Add offset to get the address */
+    epi_core_addr = (epi_core_buffer + offset);
     return (unsigned int *)epi_core_addr;
 }
 

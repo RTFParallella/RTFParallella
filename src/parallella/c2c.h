@@ -20,7 +20,6 @@
 #define DSHM_SEC_LABEL_COUNT            10
 
 
-
 /**
  * defines a distributed shared memory section
  *

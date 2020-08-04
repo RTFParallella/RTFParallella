@@ -13,27 +13,22 @@
 
 #include <e_lib.h>
 #include "shared_comms.h"
-#include "RTFParallellaConfig.h"
 
-/**
- * The shared DRAM memory offset starts at 0x8F000018. This address space is accessible
- * by the Epiphany cores as well as Host. The actual DRAM starts at 0x8F000000. The first
- * 20 bytes are reserved by the FreeRTOS. The next 4 bytes is used to store the time scale.
- * The next 44 bytes will be used to store the BTF trace information. The rest of the memory
- * can be used for storing the shared labels.
- */
-static unsigned int shdram_start_addr[SHM_DEFINED_SPACE] SECTION("shared_dram");
 
 
 unsigned int *allocate_shared_memory(unsigned int offset)
 {
     unsigned int *dram_addr = 0;
-    /* Ensure that the start address is 0x8F000018 */
-    if (shdram_start_addr == (unsigned int *)SHARED_DRAM_SECTION)
-    {
-        /* Add offset to get the address */
-        dram_addr = (shdram_start_addr + offset);
-    }
+    /**
+     * The shared DRAM memory offset starts at 0x8F000018. This address space is accessible
+     * by the Epiphany cores as well as Host. The actual DRAM starts at 0x8F000000. The first
+     * 20 bytes are reserved by the FreeRTOS. The next 4 bytes is used to store the time scale.
+     * The next 44 bytes will be used to store the BTF trace information. The rest of the memory
+     * can be used for storing the shared labels.
+     */
+    unsigned int *shdram_start_addr = (unsigned int *)SHARED_DRAM_SECTION;
+    /* Add offset to get the address */
+    dram_addr = (shdram_start_addr + offset);
     return (unsigned int *)dram_addr;
 }
 

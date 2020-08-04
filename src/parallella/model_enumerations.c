@@ -44,7 +44,7 @@ static const char DSHM_sec1_enum [DSHM_LABEL_COUNT][LABEL_STRLEN] =
     "DSH_labelJ"
 };
 
-static const char task_enum [EXEC_TASK_COUNT +1][LABEL_STRLEN] =
+static const char task_enum [][LABEL_STRLEN] =
 {
     "[idle]",
     "Task5ms0",
@@ -145,6 +145,11 @@ void generate_signal_entity_table(void)
 
 void generate_hw_entity_table(void)
 {
-    store_entity_entry(HW_CORE0_ID, CORE_EVENT, hw_enum[0]);
-    store_entity_entry(HW_CORE1_ID, CORE_EVENT, hw_enum[1]);
+    int index = 0;
+    int core_id = HW_CORE0_ID;
+    int hw_count = sizeof(hw_enum)/sizeof(hw_enum[0]);
+    for(index = 0; index < hw_count; index++) {
+        store_entity_entry(core_id, CORE_EVENT, hw_enum[index]);
+        core_id++;
+    }
 }

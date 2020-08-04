@@ -21,15 +21,12 @@
 #include <e-loader.h>
 
 #include "RTFParallellaConfig.h"
-#include "c2c.h"
-#include "debugFlags.h"
-#include "shared_comms.h"
 #include "host_utils.h"
 #include "model_enumerations.h"
 #include "trace_utils_BTF.h"
 
 #define CHUNK_SIZE 4096
-char file_buffer[CHUNK_SIZE + 256] ;    // 4Kb buffer, plus enough
+char file_buffer[CHUNK_SIZE + 256];
 static int buffer_count = 0 ;
 
 
@@ -82,8 +79,7 @@ static void parse_trace_data(FILE *trace)
         fclose(fp_temp);
         fp_temp = NULL;
     }
-    //remove("temp.txt");
-
+    remove("temp.txt");
 }
 
 /* Entry point of the application running on the HOST Core. */
@@ -96,13 +92,13 @@ int main(int argc, char *argv[])
     unsigned int ecore0[RTF_DEBUG_TRACE_COUNT] = {0};
     unsigned int ecore1[RTF_DEBUG_TRACE_COUNT] = {0};
     unsigned int labelVisual_perCore[EXEC_CORE_COUNT][DSHM_VISIBLE_LABEL_COUNT] = {{0, 0}, {0, 0}};
-    unsigned int prv_val_preCore[EXEC_CORE_COUNT][DSHM_VISIBLE_LABEL_COUNT] = {{0, 0}, {0, 0}};;
+    unsigned int prv_val_preCore[EXEC_CORE_COUNT][DSHM_VISIBLE_LABEL_COUNT] = {{0, 0}, {0, 0}};
     unsigned int labelVisual_SHM[SHM_VISIBLE_LABEL_COUNT] = {0};
     unsigned int prv_val_SHM[SHM_VISIBLE_LABEL_COUNT] = {0};
     int index = 0;
     btf_trace_info trace_info;
 
-    //trace_info.is_init = 0;
+    trace_info.is_init = 0;
     trace_info.core_write = 0;
     trace_info.offset = 0;
     trace_info.core_id = 0;
@@ -216,7 +212,6 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Error in writing to the shared dram buffer\n");
     }
 
-    //e_read(&emem, 0, 0, SHARED_BTF_DATA_OFFSET, &trace_info, sizeof(btf_trace_info));
     e_start_group(&dev);
     int pollLoopCounter = 0;
     char buffer1[LABEL_STRLEN] = {0};
@@ -225,8 +220,7 @@ int main(int argc, char *argv[])
     unsigned int btf_trace[BTF_TRACE_BUFFER_SIZE * 6] = {0};
     unsigned int core_id = 0;
     unsigned char btf_data_index = 0;
-    unsigned int btf_data_start_offset = (SHARED_BTF_DATA_OFFSET + sizeof(btf_trace_info) +
-                                        (SHM_LABEL_COUNT * sizeof(int)) + sizeof(int));
+    unsigned int btf_data_start_offset = (SHARED_BTF_DATA_OFFSET + sizeof(btf_trace_info));
     /* Create a new temp file for storing the trace data */
     /* Loop over some random number, can be replaced with an infinite loop */
     for (pollLoopCounter = 0; pollLoopCounter <= 100000; pollLoopCounter++)
@@ -274,8 +268,7 @@ int main(int argc, char *argv[])
                 e_read(&dev, 1, 0, DSHM_LABEL_EPI_CORE_OFFSET, &shared_label_core[1],
                                     sizeof(shared_label_core_10));
             }
-            e_read(&emem, 0, 0, SHARED_BTF_DATA_OFFSET + sizeof(btf_trace_info) ,
-                                shared_label_to_read, sizeof(shared_label_to_read));
+            e_read(&emem, 0, 0, 0x1000 , shared_label_to_read, sizeof(shared_label_to_read));
             trace_info.core_write = 0;
             e_write(&emem, 0, 0, SHARED_BTF_DATA_OFFSET + offsetof(btf_trace_info, core_write),
                     &trace_info.core_write, sizeof(int));
@@ -284,7 +277,7 @@ int main(int argc, char *argv[])
                 get_task_name(ecore0[6],buffer1);
                 get_task_name(ecore1[6],buffer2);
 
-                fprintf(stderr," %6d | %10s | %10s | ", ((ecore0[8]) * scale_factor), buffer1, buffer2);
+                fprintf(stderr," %6d | %10s | %10s | ", ((ecore0[8] * scale_factor)), buffer1, buffer2);
 
                 for (index = 0; index < EXEC_CORE_COUNT; index++)
                 {

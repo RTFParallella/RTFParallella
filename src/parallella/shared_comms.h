@@ -16,6 +16,7 @@
 
 #include <stdlib.h>
 #include <stdint.h>
+#include "RTFParallellaConfig.h"
 
 
 #define shared_mem_section	0x01001000
@@ -34,11 +35,6 @@
  * TODO
  * add support for larger labels as combination of smaller ones
  */
-typedef enum {
-    UINT_8,
-    UINT_16,
-    UINT_32
-} TYPE;
 
 
 /**
