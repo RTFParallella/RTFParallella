@@ -10,6 +10,19 @@
  *   Contributors:
  *        Dortmund University of Applied Sciences and Arts - initial API and implementation
  *******************************************************************************/
+
+/**
+ * @file trace_utils_BTF.c
+ * @author Anand Prakash
+ * @date 23 May 2020
+ * @brief This file declares and implement the BTF trace framework.
+ *
+ * It consists of functions used to generate the trace information of the tasks, runnables
+ * shared label access and hardware info in the BTF trace format.
+ *
+ * @see https://wiki.eclipse.org/images/e/e6/TA_BTF_Specification_2.1.3_Eclipse_Auto_IWG.pdf
+ */
+
 #include <getopt.h>
 #include <time.h>
 #include "trace_utils_BTF.h"
@@ -72,7 +85,12 @@ static int16_t find_first_free_index(void);
 static void get_trace_timestamp(uint8_t *buffer);
 static uint8_t update_entity_entry(unsigned int id, unsigned int instance, unsigned int event_state);
 static void process_btf_trace_data(FILE *stream, btf_trace_data *data, int8_t *top_of_stack, unsigned int *data_buffer);
-
+static void push_on_stack(btf_trace_data *data, int8_t *top_of_stack, unsigned int *data_buffer);
+static btf_trace_data pop_from_stack(btf_trace_data *data, int8_t *top_of_stack);
+static int find_task_in_execution(btf_trace_data *data, int8_t stack_top, btf_trace_event_type type);
+static void dump_btf_trace_data(FILE *stream, unsigned int ticks, unsigned int srcId, unsigned int srcInstance,
+                            btf_trace_event_type type, unsigned int target, unsigned int targetInstance,
+                            btf_trace_event_name event, unsigned int data);
 
 /* Function to get the first free available index */
 static int16_t find_first_free_index(void)
@@ -157,7 +175,7 @@ static uint8_t update_entity_entry(unsigned int id, unsigned int instance, unsig
 }
 
 /* Function to push any entity event on core stack */
-void push_on_stack(btf_trace_data *data, int8_t *top_of_stack, unsigned int *data_buffer)
+static void push_on_stack(btf_trace_data *data, int8_t *top_of_stack, unsigned int *data_buffer)
 {
     int8_t stack_top = *top_of_stack;
     if(stack_top >= CORE_STACK_SIZE - 1)
@@ -177,7 +195,7 @@ void push_on_stack(btf_trace_data *data, int8_t *top_of_stack, unsigned int *dat
 }
 
 /* Function to pop any entity event on core stack */
-btf_trace_data pop_from_stack(btf_trace_data *data, int8_t *top_of_stack)
+static btf_trace_data pop_from_stack(btf_trace_data *data, int8_t *top_of_stack)
 {
     btf_trace_data task = {0};
     int8_t stack_top = *top_of_stack;
@@ -236,6 +254,7 @@ static void process_btf_trace_data(FILE *stream, btf_trace_data *data, int8_t *t
 {
     if (*top_of_stack == -1)
     {
+        // Stack is empty.Push on stack
         push_on_stack(data, top_of_stack, data_buffer);
         dump_btf_trace_data(stream, data_buffer[TIME_FLAG], data_buffer[SOURCE_FLAG],
                 data_buffer[SOURCE_INSTANCE_FLAG], data_buffer[EVENT_TYPE_FLAG],
@@ -277,6 +296,7 @@ static void process_btf_trace_data(FILE *stream, btf_trace_data *data, int8_t *t
         }
         else if (data_buffer[EVENT_FLAG] == PROCESS_TERMINATE)
         {
+            //Get the previous task and dump on the trace file if the task ID and instance match
             previousTask = data[*top_of_stack];
             if((data_buffer[TARGET_FLAG] == previousTask.taskId)
                     && (data_buffer[TARGET_INSTANCE_FLAG] == previousTask.taskInstance))
@@ -290,6 +310,7 @@ static void process_btf_trace_data(FILE *stream, btf_trace_data *data, int8_t *t
 
             if ((*top_of_stack >= 1) && (data_buffer[EVENT_TYPE_FLAG] == TASK_EVENT))
             {
+                // Check if there is any task in preempt or suspend state. Resume them.
                 previousTask = data[*top_of_stack - 1];
                 int8_t prevRunnable = *top_of_stack;
                 btf_trace_data runnableTask = data[prevRunnable];
@@ -420,7 +441,7 @@ int  parse_btf_trace_arguments(int argc, char **argv)
         strncpy((char *)btf_header.timeunit, (const char *)"ns", sizeof(btf_header.timeunit));
     }
 
-    /* Set the default time scale as 100 which corresponds to 1 ms.  */
+    /* Set the default time scale as 1000 which corresponds to 1 ms.  */
     if (is_time_scale_provided == BTF_TRACE_FALSE)
     {
         btf_header.timescale = 1000;
@@ -475,7 +496,7 @@ void store_entity_entry(entity_id typeId, btf_trace_event_type type, const char 
  * @param[in] stream  : File pointer to the stream where the data has to be
  *                      written.
  *
- * @return            : Void
+ * @return            : void
  */
 void write_btf_trace_header_config(FILE *stream)
 {
@@ -495,14 +516,20 @@ void write_btf_trace_header_config(FILE *stream)
 }
 
 /**
- * Function to write entity type in BTF header data
+ * @brief This function to write entity type in BTF header data.
+ *
+ * The function defines what kinds of entities are supported in the BTF
+ * trace generated. It consists of entity type such as Tasks, Signals, Runnables
+ * along with their IDs.
+ * Refer to below link for more details:
+ * https://wiki.eclipse.org/images/e/e6/TA_BTF_Specification_2.1.3_Eclipse_Auto_IWG.pdf
  *
  * Arguments:
- * @in_param stream  : File pointer to the stream where the data has to be
- *                     written.
- * @in_param type    : Type of the entity i.e. TASK, RUNNABLE, STIMULUS etc..
+ * @param[in] stream  : File pointer to the stream where the data has to be
+ *                      written.
+ * @param[in] type    : Type of the entity i.e. TASK, RUNNABLE, STIMULUS etc..
  *
- * Return: void
+ * @return: void
  */
 void write_btf_trace_header_entity_type(FILE *stream, btf_trace_event_type type)
 {
@@ -521,14 +548,19 @@ void write_btf_trace_header_entity_type(FILE *stream, btf_trace_event_type type)
 
 
 /**
- * Function to write entity type in BTF header data
+ * @brief  This function writes the entity type table in the BTF header.
+ *
+ * The function writes the list of tasks, runnables, shared labels, cores in a
+ * tabular format. It consists of the tasks, runnables and shared labels executed
+ * on the specified cores along with their IDs.
+ * Refer to below link for more details:
+ * https://wiki.eclipse.org/images/e/e6/TA_BTF_Specification_2.1.3_Eclipse_Auto_IWG.pdf
  *
  * Arguments:
- * @in_param stream  : File pointer to the stream where the data has to be
- *                     written.
- * @in_param type    : Type of the entity i.e. TASK, RUNNABLE, STIMULUS etc..
+ * @param[in] stream  : File pointer to the stream where the data has to be
+ *                      written.
  *
- * Return: void
+ * @return: void
  */
 void write_btf_trace_header_entity_type_table(FILE *stream)
 {
@@ -556,14 +588,18 @@ void write_btf_trace_header_entity_type_table(FILE *stream)
 
 
 /**
- * Function to write entity type in BTF header data
+ * @brief Function to write entity type in BTF header data
+ *
+ * The function writes the list of tasks, runnables, shared labels, cores in a
+ * tabular format. It combines the entity type and entity type table.
+ * Refer to below link for more details:
+ * https://wiki.eclipse.org/images/e/e6/TA_BTF_Specification_2.1.3_Eclipse_Auto_IWG.pdf
  *
  * Arguments:
- * @in_param stream  : File pointer to the stream where the data has to be
+ * @param[in] stream  : File pointer to the stream where the data has to be
  *                     written.
- * @in_param type    : Type of the entity i.e. TASK, RUNNABLE, STIMULUS etc..
  *
- * Return: void
+ * @return: void
  */
 void write_btf_trace_header_entity_table(FILE *stream)
 {
@@ -589,15 +625,20 @@ void write_btf_trace_header_entity_table(FILE *stream)
 }
 
 /**
- * Function to write the data section of the BTF
+ * @brief Function to write the data section of the BTF
+ *
+ * The function is responsible for writing the BTF trace data section in
+ * CSV format which can be interpreted by the trace visualizing tools such as
+ * Eclipse trace compass. Currently the support is provided for only two cores.
+ * However, this can be extended further for multiple cores.
  *
  * Arguments:
- * @in_param stream        : File pointer to the stream where the data has to be
+ * @param[in] stream        : File pointer to the stream where the data has to be
  *                            written.
- * @in_param core_id       : Core ID on which the task operations are performed
- * @in_param data_buffer   : Data buffer containing the BTF trace information.
+ * @param[in] core_id       : Core ID on which the task operations are performed
+ * @param[in] data_buffer   : Data buffer containing the BTF trace information.
  *
- * Return: void
+ * @return: void
  */
 void write_btf_trace_data(FILE *stream, uint8_t core_id, unsigned int * data_buffer)
 {

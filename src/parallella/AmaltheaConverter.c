@@ -70,15 +70,22 @@ void generalizedRTOSTask(AmaltheaTask task){
     TickType_t xLastWakeTime = xTaskGetTickCount();
     for (;;)
     {
+#ifndef CDGEN_BTF_TRACE
         traceTaskEvent(task.src_id, task.src_instance, TASK_EVENT, task.task_id,
                                 task.task_instance, PROCESS_START, 0);
-        task.cInHandler(task.task_id, task.task_instance);
+        task.cInHandler();
         task.taskHandler(task.task_id, task.task_instance);
-        task.cOutHandler(task.task_id, task.task_instance);
+        task.cOutHandler();
         traceTaskEvent(task.src_id, task.src_instance, TASK_EVENT, task.task_id,
                                 task.task_instance, PROCESS_TERMINATE, 0);
         vTaskDelayUntil( &xLastWakeTime, task.period);
         task.task_instance++;
+#else
+        task.cInHandler();
+        task.taskHandler(task.src_id, task.src_instance);
+        task.cOutHandler();
+        vTaskDelayUntil( &xLastWakeTime, task.period);
+#endif
     }
 }
 

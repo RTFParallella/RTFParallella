@@ -14,6 +14,14 @@
 #ifndef SRC_PARALLELLA_RTFPARALLELLACONFIG_H_
 #define SRC_PARALLELLA_RTFPARALLELLACONFIG_H_
 
+/**
+ * @file RTFParallellaConfig.h
+ * @author Anand Prakash
+ * @date 19 June 2020
+ * @brief This file declares the macros and structures used on Epiphany core to get the trace information,
+ *
+ */
+
 
 /* Shared DRAM start address*/
 #define SHARED_DRAM_START_ADDRESS                      0x8E000000
@@ -27,10 +35,10 @@
 /* Allocate 4KB of shared DRAM for data exchange between host and epiphany cores */
 #define SHARED_DRAM_SIZE                               0x00002000
 
-#define RTF_DEBUG_TRACE_COUNT                               10
+#define RTF_DEBUG_TRACE_COUNT                                  10
 
 /* First five address is used by FreeRTOS porting on Epiphany on shared dram see port.c file. */
-#define INPUT_TIMESCALE_OFFSET                              20
+#define INPUT_TIMESCALE_OFFSET                                 20
 
 #define SHARED_BTF_DATA_OFFSET                         (INPUT_TIMESCALE_OFFSET + 4)
 
@@ -52,7 +60,14 @@
 #define DSHM_LABEL_EPI_CORE_OFFSET                              0x7040
 
 
+
+#define MUTEX_ROW        1
+#define MUTEX_COL        0
+#define RING_BUFFER_SIZE 6
+
+
 extern unsigned int execution_time_scale;
+
 
 
 /**
@@ -61,7 +76,7 @@ extern unsigned int execution_time_scale;
  */
 typedef struct btf_trace_info_t
 {
-    int is_init;                            /**< To ensure that the mutex is initialized */
+    int length;                            /**< To ensure that the mutex is initialized */
     unsigned int offset;                    /**< Mutex declaration. Unused on host  */
     unsigned int core_id;                   /**< BTF trace data buffer size which is to be read */
     unsigned int core_write;                /**< Read write operation between epiphany core and host */
@@ -101,9 +116,9 @@ typedef enum entity_id_t
 
 
 typedef enum {
-    UINT_8,
-    UINT_16,
-    UINT_32
+    UINT_8,                    /**< unsigned char type */
+    UINT_16,                   /**< unsigned short type */
+    UINT_32                    /**< unsigned int type */
 } TYPE;
 
 

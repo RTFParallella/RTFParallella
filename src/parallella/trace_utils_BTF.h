@@ -14,6 +14,15 @@
 #ifndef SRC_PARALLELLA_TRACE_UTILS_BTF_H_
 #define SRC_PARALLELLA_TRACE_UTILS_BTF_H_
 
+/**
+ * @file trace_utils_BTF.h
+ * @author Anand Prakash
+ * @date 23 May 2020
+ * @brief This header file defines the functions and structures used in BTF trace framework.
+ *
+ * @see https://wiki.eclipse.org/images/e/e6/TA_BTF_Specification_2.1.3_Eclipse_Auto_IWG.pdf
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -82,32 +91,32 @@ typedef struct btf_trace_header_config_t
 /* BTF structure for storing the entity configuration */
 typedef struct btf_trace_entity_entry_t
 {
-    uint16_t entity_id;                 /* Entity ID to get the entity name */
-    int16_t instance;                   /* Current instance of the entity */
-    btf_trace_event_name state;         /* Current state of the entity */
-    btf_trace_event_type entity_type;   /* Entity type to get the source*/
-    uint8_t entity_name[64];            /* Entity name */
+    uint16_t entity_id;                 /**< Entity ID to get the entity name */
+    int16_t instance;                   /**< Current instance of the entity */
+    btf_trace_event_name state;         /**< Current state of the entity */
+    btf_trace_event_type entity_type;   /**< Entity type to get the source*/
+    uint8_t entity_name[64];            /**< Entity name */
 
 } btf_trace_entity_entry;
 
 /* Structure to hold BTF trace data in task stack for processing */
 typedef struct btf_trace_data_t
 {
-    int32_t ticks;                     /* Not used currently */
-    int32_t srcId;                     /* Source Id */
-    int32_t srcInstance;               /* Instance of the source */
-    int32_t eventTypeId;               /* Type of event Runnable , Task etc.. */
-    int32_t taskId;                    /* Task Id */
-    int32_t taskInstance;              /* Instance of the task */
-    int32_t eventState;                /* State of the event */
-    int32_t data;                      /* Notes */
+    int32_t ticks;                     /**< Tick count */
+    int32_t srcId;                     /**< Source Id */
+    int32_t srcInstance;               /**< Instance of the source */
+    int32_t eventTypeId;               /**< Type of event Runnable , Task etc.. */
+    int32_t taskId;                    /**< Task Id */
+    int32_t taskInstance;              /**< Instance of the task */
+    int32_t eventState;                /**< State of the event */
+    int32_t data;                      /**< Notes */
 } btf_trace_data;
 
 /* Entity table structure */
 typedef struct btf_trace_entity_table_t
 {
-    uint16_t is_occupied;                 /* If 0, entry is available else not available */
-    btf_trace_entity_entry entity_data;   /* Entity details */
+    uint16_t is_occupied;                 /**< If 0, entry is available else not available */
+    btf_trace_entity_entry entity_data;   /**< Entity details */
 } btf_trace_entity_table;
 
 /* Function to get the trace file path from current working directory */

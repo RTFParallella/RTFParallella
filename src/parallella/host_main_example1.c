@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
     int index = 0;
     btf_trace_info trace_info;
 
-    trace_info.is_init = 0;
+    trace_info.length = 0;
     trace_info.core_write = 0;
     trace_info.offset = 0;
     trace_info.core_id = 0;
@@ -230,16 +230,16 @@ int main(int argc, char *argv[])
         {
             e_read(&emem, 0, 0, SHARED_BTF_DATA_OFFSET , &trace_info, sizeof(btf_trace_info));
 #if 0
-            fprintf(stdout, "%d %d %d %d\n", trace_info.core_id, trace_info.is_init, trace_info.offset, trace_info.core_write);
+            fprintf(stdout, "%d %d %d %d\n", trace_info.core_id, trace_info.length, trace_info.offset, trace_info.core_write);
             trace_info.core_write = 0;
             e_write(&emem, 0, 0, SHARED_BTF_DATA_OFFSET + offsetof(btf_trace_info, core_write),
                     &trace_info.core_write, sizeof(int));
 #else
             e_read(&emem, 0, 0, (btf_data_start_offset + (trace_info.offset * sizeof(int))),
-                                &btf_trace, BTF_TRACE_BUFFER_SIZE * sizeof(int) * trace_info.is_init);
+                                &btf_trace, BTF_TRACE_BUFFER_SIZE * sizeof(int) * trace_info.length);
 
 
-            for(btf_data_index = 0; btf_data_index < trace_info.is_init; btf_data_index++)
+            for(btf_data_index = 0; btf_data_index < trace_info.length; btf_data_index++)
             {
                 uint16_t offset = btf_data_index * BTF_TRACE_BUFFER_SIZE;
                 buffer_count += sprintf( &file_buffer[buffer_count], "%d %d %d %d %d %d %d %d %d\n",

@@ -21,13 +21,8 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
-//#define USE_DMA
 
 static e_mutex_t m;
-
-#define MUTEX_ROW        1
-#define MUTEX_COL        0
-#define RING_BUFFER_SIZE 6
 
 /* This buffer is used to store the legacy RTF trace. */
 static unsigned int *core_buffer;
@@ -41,10 +36,9 @@ static unsigned int tick_count;
 
 static unsigned char buffer_offset;
 
-#ifndef USE_DMA
 static unsigned int *btf_info;
+
 static btf_trace_info *btf_data;
-#endif
 
 unsigned int get_time_scale_factor(void)
 {
@@ -70,12 +64,10 @@ static void get_execution_time_scale(void)
 
 void init_btf_mem_section(void)
 {
-#ifndef USE_DMA
     unsigned int offset = SHARED_BTF_DATA_OFFSET/sizeof(int);
     unsigned int btf_offset = (sizeof(btf_trace_info) / sizeof(int)) + offset;
     btf_data = (btf_trace_info *)allocate_shared_memory(offset);
     btf_info = (unsigned int *)allocate_shared_memory(btf_offset);
-#endif
 }
 
 /*
@@ -137,7 +129,7 @@ void signalHost(void)
     }while(btf_data_info.core_write == 1);
     btf_data_info.offset = BTF_TRACE_BUFFER_SIZE * (active_row * RING_BUFFER_SIZE);
     btf_data_info.core_id = active_row;
-    btf_data_info.is_init = buffer_offset;
+    btf_data_info.length = buffer_offset;
     btf_data_info.core_write = 1;
     e_dma_copy(btf_data, &btf_data_info, sizeof(btf_trace_info));
     e_mutex_unlock(MUTEX_ROW, MUTEX_COL, &m);

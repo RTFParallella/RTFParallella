@@ -52,40 +52,40 @@ void init_DSHM_sections(void){
 }
 
 //-------
-void cIn5ms(int  src_id, int src_instance){
+void cIn5ms(){
     label5_10_00_copy1 = label5_10_00;
     shared_label_2 = 97 + passes1;
 }
-void cIn10ms(int  src_id, int src_instance){
+void cIn10ms(){
 
 }
-void cIn20ms(int  src_id, int src_instance){
+void cIn20ms(){
 
 }
 
-void cIn10msCore2(int  src_id, int src_instance){
+void cIn10msCore2(){
     shared_label_1 = read_DSHM_section(sec1_core_00,0);
 }
-void cIn20msCore2(int  src_id, int src_instance){
+void cIn20msCore2(){
     shared_label_10 = read_shm_section(sec1_global_pointer,0);
 }
 
 //-------
-void cOut5ms(int  src_id, int src_instance){
+void cOut5ms(){
     label5_10_00 = label5_10_00_copy1;
     write_DSHM_section(sec1_core_10,0,shared_label_2);
 }
-void cOut10ms(int  src_id, int src_instance)
+void cOut10ms()
 {
     write_shm_section(sec1_global_pointer,0,3);
 }
-void cOut20ms(int  src_id, int src_instance){
+void cOut20ms(){
 
 }
-void cOut10msCore2(int  src_id, int src_instance){
+void cOut10msCore2(){
     shared_label_1++;
     write_shm_section(sec1_global_pointer,1,shared_label_1);
 }
-void cOut20msCore2(int  src_id, int src_instance){
+void cOut20msCore2(){
     write_shm_section(sec1_global_pointer,2,shared_label_10 + 1);
 }

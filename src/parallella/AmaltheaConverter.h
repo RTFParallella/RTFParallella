@@ -14,6 +14,9 @@
 #ifndef SRC_PARALLELLA_AMALTHEACONVERTER_H_
 #define SRC_PARALLELLA_AMALTHEACONVERTER_H_
 
+
+#include "RTFParallellaConfig.h"
+
 #define PLATFORM_WORD_LENGTH 32
 
 #define numTasks 3
@@ -31,8 +34,9 @@ typedef struct AmaltheaTask_t
     unsigned int executionTime;
     unsigned int deadline;
     unsigned int period;
-    void(* cInHandler)(int  src_id, int src_instance);
-    void(* cOutHandler)(int  src_id, int src_instance);
+    void(* cInHandler)();
+    void(* cOutHandler)();
+
 }AmaltheaTask;
 
 

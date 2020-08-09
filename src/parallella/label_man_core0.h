@@ -23,17 +23,17 @@ void init_DSHM_sections(void);
 //declare cIn/Out operations
 //to be set up from the amalthea model during
 //code generation
-void cIn5ms(int  src_id, int src_instance);
-void cIn10ms(int  src_id, int src_instance);
-void cIn20ms(int  src_id, int src_instance);
-void cIn10msCore2(int  src_id, int src_instance);
-void cIn20msCore2(int  src_id, int src_instance);
+void cIn5ms();
+void cIn10ms();
+void cIn20ms();
+void cIn10msCore2();
+void cIn20msCore2();
 //-------
-void cOut5ms(int  src_id, int src_instance);
-void cOut10ms(int  src_id, int src_instance);
-void cOut20ms(int  src_id, int src_instance);
-void cOut10msCore2(int  src_id, int src_instance);
-void cOut20msCore2(int  src_id, int src_instance);
+void cOut5ms();
+void cOut10ms();
+void cOut20ms();
+void cOut10msCore2();
+void cOut20msCore2();
 
 
 
