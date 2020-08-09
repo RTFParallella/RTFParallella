@@ -351,8 +351,8 @@
 > 	switch (interrupt_mode) {
 > 	case E_TIMER0_INT:
 > 		vSetupTimer();
-> 		updateTick();
 > 		xTaskIncrementTick();
+>               updateTick();
 > 		vTaskSwitchContext();
 > 		break;
 > 	case E_SW_EXCEPTION: //triggered extrenally for error injection. Must be that high prority
