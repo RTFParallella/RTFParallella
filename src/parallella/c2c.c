@@ -11,18 +11,14 @@
  *        Dortmund University of Applied Sciences and Arts - initial API and implementation
  *******************************************************************************/
 
+
 #include "RTFParallellaConfig.h"
 #include "c2c.h"
 
 unsigned int *outbuf_dstr_shared[SHM_LABEL_COUNT];
 
-
-
 /**
- * This buffer is assigned to stored the RTF parallella legacy trace info. Data bank
- * 3 is used to store the information on each epiphany core. It starts at 0x7000 offset
- * on each epiphany core. Any change in this buffer addressing must be followed with
- * the correct offset set in host application to get the correct values.
+ * Provide the epiphany memory section based on the offset data.
  */
 unsigned int *allocate_epiphany_memory(unsigned int offset)
 {
@@ -34,7 +30,12 @@ unsigned int *allocate_epiphany_memory(unsigned int offset)
     return (unsigned int *)epi_core_addr;
 }
 
-void shared_labels_init_core(){
+
+/**
+ * Initiate the shared label section, this function will assign addresses to labels in a section,
+ * and initialize those labels to 0
+ */
+void shared_labels_init_core(void){
     /* shared buffer in core memory */
     outbuf_dstr_shared[0] = (unsigned int *) DSHM_LABEL_EPI_CORE_OFFSET;
     /* initialize buffer */
@@ -45,6 +46,10 @@ void shared_labels_init_core(){
 
 }
 
+
+/**
+ * Write a value to a label in a distributed shared memory section
+ */
 void shared_label_write_core (unsigned row,unsigned col,int label_indx,int payload)
 {
     unsigned int *addr;
@@ -55,6 +60,9 @@ void shared_label_write_core (unsigned row,unsigned col,int label_indx,int paylo
 }
 
 
+/**
+ * Initialize the distributed shared label section.
+ */
 void DSHM_section_init(DSHM_section sec)
 {
     unsigned int *addr;
@@ -67,6 +75,9 @@ void DSHM_section_init(DSHM_section sec)
 }
 
 
+/**
+ * Write data to a specific label in a distributed shared memory section
+ */
 void write_DSHM_section (DSHM_section sec,int label_indx,int payload)
 {
     unsigned int *addr;
@@ -76,6 +87,9 @@ void write_DSHM_section (DSHM_section sec,int label_indx,int payload)
     addr[label_indx] = payload;
 }
 
+/**
+ * Read data from a specific label in a distributed shared memory section
+ */
 unsigned int read_DSHM_section (DSHM_section sec, int label_indx)
 {
     unsigned int *addr;
@@ -86,6 +100,9 @@ unsigned int read_DSHM_section (DSHM_section sec, int label_indx)
 }
 
 
+/**
+ * Read a value of a label in a distributed shared memory section.
+ */
 unsigned int shared_label_read_core (unsigned row, unsigned col, int label_indx)
 {
     unsigned int *addr;
@@ -95,7 +112,9 @@ unsigned int shared_label_read_core (unsigned row, unsigned col, int label_indx)
     return (unsigned int)*addr;
 }
 
-
+/**
+ * Get the absolute base memory address of a core.
+ */
 unsigned int get_base_address_core(int row, int col)
 {
     uint32_t base_addr = 0x80800000;

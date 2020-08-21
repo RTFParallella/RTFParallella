@@ -15,7 +15,9 @@
 #include "shared_comms.h"
 
 
-
+/**
+ * The function provides the pointer to the global address to the shared DRAM memory.
+ */
 unsigned int *allocate_shared_memory(unsigned int offset)
 {
     unsigned int *dram_addr = 0;
@@ -32,7 +34,11 @@ unsigned int *allocate_shared_memory(unsigned int offset)
     return (unsigned int *)dram_addr;
 }
 
-//The current SHM access API
+
+
+/**
+ * Function to initialize the shared memory area.
+ */
 void* shm_section_init (SHM_section sec){
     unsigned size_in_bytes = 0;
     typedef unsigned int* cast_type;
@@ -72,11 +78,19 @@ void* shm_section_init (SHM_section sec){
     return retval;
 }
 
+
+/**
+ * Read data from a specific label in a shared memory section.
+ */
 int read_shm_section ( unsigned int* x, unsigned indx)
 {
     return (int) x[indx];
 }
 
+
+/**
+ * Write data to a specific label in a shared memory section.
+ */
 void write_shm_section (unsigned int* x, unsigned indx, int payload)
 {
     x[indx] = payload;

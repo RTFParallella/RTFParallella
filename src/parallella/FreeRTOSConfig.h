@@ -12,6 +12,13 @@
  *******************************************************************************/
 #ifndef FREERTOS_CONFIG_H
 #define FREERTOS_CONFIG_H
+/**
+ * @file FreeRTOSConfig.h
+ * @author Mahmoud Bazzal, Anand Prakash
+ * @date 15 April,  2020
+ * @brief This file declares the macros and structures used on FreeRTOS Configuration.
+ *
+ */
 
 #include "RTFParallellaConfig.h"
 

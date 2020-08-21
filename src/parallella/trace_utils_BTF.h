@@ -18,7 +18,9 @@
  * @file trace_utils_BTF.h
  * @author Anand Prakash
  * @date 23 May 2020
- * @brief This header file defines the functions and structures used in BTF trace framework.
+ * @brief This file declares and implement the BTF trace framework. It
+ * consists of functions used to generate the trace information of the tasks, runnables
+ * shared label access and hardware info in the BTF trace format.
  *
  * @see https://wiki.eclipse.org/images/e/e6/TA_BTF_Specification_2.1.3_Eclipse_Auto_IWG.pdf
  */
@@ -49,31 +51,31 @@
 /* Enum for event type ID */
 typedef enum btf_trace_event_type_t
 {
-    TASK_EVENT,
-    INT_SERVICE_ROUTINE_EVENT,
-    RUNNABLE_EVENT,
-    INS_BLOCK_EVENT,
-    STIMULUS_EVENT,
-    ECU_EVENT,
-    PROCESSOR_EVENT,
-    CORE_EVENT,
-    SCHEDULER_EVENT,
-    SIGNAL_EVENT,
-    SEMAPHORE_EVENT,
-    SIMULATION_EVENT
+    TASK_EVENT,                        /**< BTF Task Event*/
+    INT_SERVICE_ROUTINE_EVENT,         /**< BTF ISR Event*/
+    RUNNABLE_EVENT,                    /**< BTF Runnable Event*/
+    INS_BLOCK_EVENT,                   /**< BTF INS Block Event*/
+    STIMULUS_EVENT,                    /**< BTF Stimulus Event*/
+    ECU_EVENT,                         /**< BTF ECU Event*/
+    PROCESSOR_EVENT,                   /**< BTF Processor Event*/
+    CORE_EVENT,                        /**< BTF Hardware Core Event*/
+    SCHEDULER_EVENT,                   /**< BTF Scheduler Event*/
+    SIGNAL_EVENT,                      /**< BTF Signal Event for reading/writing labels*/
+    SEMAPHORE_EVENT,                   /**< BTF Semaphore Event*/
+    SIMULATION_EVENT                   /**< BTF Simulation Event*/
 } btf_trace_event_type;
 
 /* Enum for event name */
 typedef enum btf_trace_event_name_t
 {
-    INIT = -1,
-    PROCESS_START,
-    PROCESS_TERMINATE,
-    PROCESS_PREEMPT,
-    PROCESS_SUSPEND,
-    PROCESS_RESUME,
-    SIGNAL_READ,
-    SIGNAL_WRITE
+    INIT = -1,            /**< Dummy Init Event name*/
+    PROCESS_START,        /**< Starting a process/task/runnable*/
+    PROCESS_TERMINATE,    /**< Terminating a process/task/runnable*/
+    PROCESS_PREEMPT,      /**< Preempt a process/task*/
+    PROCESS_SUSPEND,      /**< Suspend a runnable event*/
+    PROCESS_RESUME,       /**< Resume a process/task/runnable*/
+    SIGNAL_READ,          /**< Read event for signal/label*/
+    SIGNAL_WRITE          /**< Write signal for signal/label*/
 } btf_trace_event_name;
 
 
@@ -119,28 +121,132 @@ typedef struct btf_trace_entity_table_t
     btf_trace_entity_entry entity_data;   /**< Entity details */
 } btf_trace_entity_table;
 
-/* Function to get the trace file path from current working directory */
+/**
+ * @brief Function to get the file name of the trace file along with the
+ * absolute path.
+ *
+ * Arguments:
+ * @param[inout] trace_file_path  : Pointer to the buffer where the BTF trace file path
+ *                                  is stored.
+ *
+ * @return: void
+ */
 void get_btf_trace_file_path(char *trace_file_path);
 
-/* Function to parse the command line arguments for generating the BTF trace file. */
+/**
+ * @brief Parse the command line arguments for generating the BTF trace file
+ *
+ * The provided parameters are used to configure the trace file required to
+ * be generated. For example the trace file path, model file used to generate the
+ * trace, device name and time scale.
+ *
+ * Arguments:
+ * @param[in] argc  : The count for the number of arguments passed
+ * @param[in] argv  : Pointer to the list of arguments
+ *
+ * @return: The integer value of the timescale used for the task execution.
+ */
 int parse_btf_trace_arguments(int argc, char **argv);
 
-/* Function to write the trace header config */
+/**
+ * @brief This function is responsible for writing the BTF trace header information.
+ *
+ * Function to write BTF header data to the trace file. It writes the version, creator,
+ * input model file, time scale and timestamp section of the header file. It also writes
+ * the entity table, type table and entity type table used in the task model.
+ *
+ * Arguments:
+ * @param[in] stream  : File pointer to the stream where the data has to be
+ *                      written.
+ *
+ * @return            : void
+ */
 void write_btf_trace_header_config(FILE *stream);
 
-/* Function to write entity type to trace file */
+/**
+ * @brief This function to write entity type in BTF header data.
+ *
+ * The function defines what kinds of entities are supported in the BTF
+ * trace generated. It consists of entity type such as Tasks, Signals, Runnables
+ * along with their IDs.
+ * Refer to below link for more details:
+ * https://wiki.eclipse.org/images/e/e6/TA_BTF_Specification_2.1.3_Eclipse_Auto_IWG.pdf
+ *
+ * Arguments:
+ * @param[in] stream  : File pointer to the stream where the data has to be
+ *                      written.
+ * @param[in] type    : Type of the entity i.e. TASK, RUNNABLE, STIMULUS etc..
+ *
+ * @return: void
+ */
 void write_btf_trace_header_entity_type(FILE *stream, btf_trace_event_type type);
 
-/* Function to write the entity table in the header section */
+/**
+ * @brief Function to write entity type in BTF header data
+ *
+ * The function writes the list of tasks, runnables, shared labels, cores in a
+ * tabular format. It combines the entity type and entity type table.
+ * Refer to below link for more details:
+ * https://wiki.eclipse.org/images/e/e6/TA_BTF_Specification_2.1.3_Eclipse_Auto_IWG.pdf
+ *
+ * Arguments:
+ * @param[in] stream  : File pointer to the stream where the data has to be
+ *                     written.
+ *
+ * @return: void
+ */
 void write_btf_trace_header_entity_table(FILE *stream);
 
-/* Function to write the entity type table in the BTF header section */
+/**
+ * @brief  This function writes the entity type table in the BTF header.
+ *
+ * The function writes the list of tasks, runnables, shared labels, cores in a
+ * tabular format. It consists of the tasks, runnables and shared labels executed
+ * on the specified cores along with their IDs.
+ * Refer to below link for more details:
+ * https://wiki.eclipse.org/images/e/e6/TA_BTF_Specification_2.1.3_Eclipse_Auto_IWG.pdf
+ *
+ * Arguments:
+ * @param[in] stream  : File pointer to the stream where the data has to be
+ *                      written.
+ *
+ * @return: void
+ */
 void write_btf_trace_header_entity_type_table(FILE *stream);
 
-/* Function to store the entry for all the entities */
+/**
+ * @brief This function is used to store the entity information of all the
+ * tasks, runnables and labels.
+ *
+ * Store the entity metadata which can be used to generate the entity
+ * type and entity type table. Also this table entry is used to decode the
+ * tasks and runnables information received from the Parallella framework.
+ *
+ * Arguments:
+ * @param[in] typeId  : Unique entity type ID
+ * @param[in] type    : Entity type..e.g TASK, RUNNABLE etc..
+ * @param[in] name    : Entity name
+ *
+ * @return: void
+ */
 void store_entity_entry(entity_id typeId, btf_trace_event_type type, const char *name);
 
-/* Function to write the data section of the BTF */
+/**
+ * @brief Function to write the data section of the BTF
+ *
+ * The function is responsible for writing the BTF trace data section in
+ * CSV format which can be interpreted by the trace visualizing tools such as
+ * Eclipse trace compass. Currently the support is provided for only two cores.
+ * However, this can be extended further for multiple cores.
+ *
+ * Arguments:
+ * @param[in] stream        : File pointer to the stream where the data has to be
+ *                            written.
+ * @param[in] core_id       : Core ID on which the task operations are performed
+ * @param[in] data_buffer   : Data buffer containing the BTF trace information.
+ *
+ * @return: void
+ */
 void write_btf_trace_data(FILE *stream, uint8_t core_id, unsigned int * data_buffer);
 
 #endif /* SRC_PARALLELLA_TRACE_UTILS_BTF_H_ */

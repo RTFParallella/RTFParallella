@@ -11,18 +11,6 @@
  *        Dortmund University of Applied Sciences and Arts - initial API and implementation
  *******************************************************************************/
 
-/**
- * @file trace_utils_BTF.c
- * @author Anand Prakash
- * @date 23 May 2020
- * @brief This file declares and implement the BTF trace framework.
- *
- * It consists of functions used to generate the trace information of the tasks, runnables
- * shared label access and hardware info in the BTF trace format.
- *
- * @see https://wiki.eclipse.org/images/e/e6/TA_BTF_Specification_2.1.3_Eclipse_Auto_IWG.pdf
- */
-
 #include <getopt.h>
 #include <time.h>
 #include "trace_utils_BTF.h"
@@ -332,14 +320,8 @@ static void process_btf_trace_data(FILE *stream, btf_trace_data *data, int8_t *t
 }
 
 /**
- * @brief Function to get the file name of the trace file along with the
+ * Function to get the file name of the trace file along with the
  * absolute path.
- *
- * Arguments:
- * @param[inout] trace_file_path  : Pointer to the buffer where the BTF trace file path
- *                                  is stored.
- *
- * @return: void
  */
 void get_btf_trace_file_path(char *trace_file_path)
 {
@@ -364,17 +346,7 @@ void get_btf_trace_file_path(char *trace_file_path)
 }
 
 /**
- * @brief Parse the command line arguments for generating the BTF trace file
- *
- * The provided parameters are used to configure the trace file required to
- * be generated. For example the trace file path, model file used to generate the
- * trace, device name and time scale.
- *
- * Arguments:
- * @param[in] argc  : The count for the number of arguments passed
- * @param[in] argv  : Pointer to the list of arguments
- *
- * @return: The integer value of the timescale used for the task execution.
+ * Parse the command line arguments for generating the BTF trace file
  */
 int  parse_btf_trace_arguments(int argc, char **argv)
 {
@@ -455,19 +427,8 @@ int  parse_btf_trace_arguments(int argc, char **argv)
 
 
 /**
- * @brief This function is used to store the entity information of all the
+ * This function is used to store the entity information of all the
  * tasks, runnables and labels.
- *
- * Store the entity metadata which can be used to generate the entity
- * type and entity type table. Also this table entry is used to decode the
- * tasks and runnables information received from the Parallella framework.
- *
- * Arguments:
- * @param[in] typeId  : Unique entity type ID
- * @param[in] type    : Entity type..e.g TASK, RUNNABLE etc..
- * @param[in] name    : Entity name
- *
- * @return: void
  */
 void store_entity_entry(entity_id typeId, btf_trace_event_type type, const char *name)
 {
@@ -486,17 +447,7 @@ void store_entity_entry(entity_id typeId, btf_trace_event_type type, const char 
 
 
 /**
- * @brief This function is responsible for writing the BTF trace header information.
- *
- * Function to write BTF header data to the trace file. It writes the version, creator,
- * input model file, time scale and timestamp section of the header file. It also writes
- * the entity table, type table and entity type table used in the task model.
- *
- * Arguments:
- * @param[in] stream  : File pointer to the stream where the data has to be
- *                      written.
- *
- * @return            : void
+ * This function is responsible for writing the BTF trace header information.
  */
 void write_btf_trace_header_config(FILE *stream)
 {
@@ -516,20 +467,7 @@ void write_btf_trace_header_config(FILE *stream)
 }
 
 /**
- * @brief This function to write entity type in BTF header data.
- *
- * The function defines what kinds of entities are supported in the BTF
- * trace generated. It consists of entity type such as Tasks, Signals, Runnables
- * along with their IDs.
- * Refer to below link for more details:
- * https://wiki.eclipse.org/images/e/e6/TA_BTF_Specification_2.1.3_Eclipse_Auto_IWG.pdf
- *
- * Arguments:
- * @param[in] stream  : File pointer to the stream where the data has to be
- *                      written.
- * @param[in] type    : Type of the entity i.e. TASK, RUNNABLE, STIMULUS etc..
- *
- * @return: void
+ * This function to write entity type in BTF header data.
  */
 void write_btf_trace_header_entity_type(FILE *stream, btf_trace_event_type type)
 {
@@ -548,19 +486,7 @@ void write_btf_trace_header_entity_type(FILE *stream, btf_trace_event_type type)
 
 
 /**
- * @brief  This function writes the entity type table in the BTF header.
- *
- * The function writes the list of tasks, runnables, shared labels, cores in a
- * tabular format. It consists of the tasks, runnables and shared labels executed
- * on the specified cores along with their IDs.
- * Refer to below link for more details:
- * https://wiki.eclipse.org/images/e/e6/TA_BTF_Specification_2.1.3_Eclipse_Auto_IWG.pdf
- *
- * Arguments:
- * @param[in] stream  : File pointer to the stream where the data has to be
- *                      written.
- *
- * @return: void
+ * This function writes the entity type table in the BTF header.
  */
 void write_btf_trace_header_entity_type_table(FILE *stream)
 {
@@ -588,18 +514,7 @@ void write_btf_trace_header_entity_type_table(FILE *stream)
 
 
 /**
- * @brief Function to write entity type in BTF header data
- *
- * The function writes the list of tasks, runnables, shared labels, cores in a
- * tabular format. It combines the entity type and entity type table.
- * Refer to below link for more details:
- * https://wiki.eclipse.org/images/e/e6/TA_BTF_Specification_2.1.3_Eclipse_Auto_IWG.pdf
- *
- * Arguments:
- * @param[in] stream  : File pointer to the stream where the data has to be
- *                     written.
- *
- * @return: void
+ * Function to write entity type in BTF header data
  */
 void write_btf_trace_header_entity_table(FILE *stream)
 {
@@ -625,20 +540,7 @@ void write_btf_trace_header_entity_table(FILE *stream)
 }
 
 /**
- * @brief Function to write the data section of the BTF
- *
- * The function is responsible for writing the BTF trace data section in
- * CSV format which can be interpreted by the trace visualizing tools such as
- * Eclipse trace compass. Currently the support is provided for only two cores.
- * However, this can be extended further for multiple cores.
- *
- * Arguments:
- * @param[in] stream        : File pointer to the stream where the data has to be
- *                            written.
- * @param[in] core_id       : Core ID on which the task operations are performed
- * @param[in] data_buffer   : Data buffer containing the BTF trace information.
- *
- * @return: void
+ * Function to write the data section of the BTF
  */
 void write_btf_trace_data(FILE *stream, uint8_t core_id, unsigned int * data_buffer)
 {

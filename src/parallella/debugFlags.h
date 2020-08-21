@@ -14,6 +14,17 @@
 #ifndef SRC_PARALLELLA_DEBUGFLAGS_H_
 #define SRC_PARALLELLA_DEBUGFLAGS_H_
 
+/**
+ * @file debugFlags.h
+ * @author Mahmoud Bazzal, Anand Prakash
+ * @date 10 April 2020
+ * @brief This file declares the debug trace of the application running on Epiphany core.The
+ * debug trace consists in two forms. One is the visual form which is the legacy
+ * RTFParallella trace and can be seen while executing the application on Adapteva Parallella.
+ * The other is the BTF trace dump which can be viewed on Eclipse Trace Compass.
+ *
+ */
+
 #include "trace_utils_BTF.h"
 
 #define cnt_address     0x3000
@@ -32,57 +43,112 @@
 
 
 
-
+/**
+ * @brief Get the time scaling factor for tick count
+ *
+ *
+ * @return : Scale factor
+ *
+ */
 unsigned int get_time_scale_factor(void);
+
+/**
+ * @brief Initialize memory section for storing BTR trace data and metadata
+ *
+ * The function does not take any arguments. It initializes the BTF memory section
+ * from the shared memory area.
+ * @return : void
+ *
+ */
 
 void init_btf_mem_section(void);
 
 /**
- * initialize output buffer in core memory
+ * @brief Initialize output buffer in core memory
  *
- * Arguments:
+ * The function initializes the epiphany core memory section for dumping the legacy
+ * RTParallella trace.
+ *
+ * @return : void
+ *
  *
  */
 void init_task_trace_buffer(void );
 
 /**
- * write the index of the running task to output buffer
+ * @brief Write the index of the running task to output buffer
  *
- * Arguments:
- * taskNum            :    index of the task
+ * The function writes the ID of the current task in execution to the Epiphany core memory
+ *
+ * @param[in] taskNum            :    index of the task
+ *
+ * @return : void
  *
  */
 void traceRunningTask(unsigned taskNum);
 
 /**
- * write the task instance (job) to output buffer
+ * @brief write the task instance (job) to output buffer
  *
- * Arguments:
- * taskNum            :    index of the task
- * currentPasses    :    instance of task (job number)
+ * The function writes the task instance number  of the current task in
+ * execution to the Epiphany core memory.
+ *
+ * @param[in] taskNum            :    index of the task
+ * @param[in] currentPasses    :    instance of task (job number)
  *
  */
 void traceTaskPasses(unsigned taskNum, int currentPasses);
 
 /**
- * update RTOS tick value in output buffer
+ * @brief Update RTOS tick value in output buffer
  *
- * Arguments:
+ * @return : void
  *
  */
 void updateTick(void);
 
 /**
- * Write a custom value to the output buffer for code coverage debugging
+ * @brief Write a custom value to the output buffer for code coverage debugging
  *
- * Arguments:
- * debugMessage            :    message to be written
  *
+ * @param[in] debugMessage            :    message to be written
+ *
+ *@return : void
  */
 void updateDebugFlag(int debugMessage);
 
+
+/**
+ * @brief Signal the host core to read the memory.
+ *
+ * The function locks the shared memory address using the epiphany mutex implementation.
+ * It waits until wait the host core processor has read the data.
+ * It then dumps the BTF trace metadata to the shared memory and and unlock the mutex.
+ * DMA channel 1 is used to dump the trace metadata.
+ *
+ * @return : void
+ *
+ */
 void signalHost(void);
 
+
+/**
+ * @brief Write the BTF trace data
+ *
+ * The function dumps the BTF trace data to the shared memory..
+ * DMA channel 1 is used to dump the trace data.
+ *
+ * @param[in] srcID          : Source ID of the task.
+ * @param[in] srcInstance    : Source instance of the task.
+ * @param[in] type           : Event type.
+ * @param[in] taskId         : Task Id.
+ * @param[in] taskInstance   : Task instance.
+ * @param[in] event_name     : Name of the event.
+ * @param[in] data           : Notes or shared label value
+ *
+ * @return : void
+ *
+ */
 void traceTaskEvent(int srcID, int srcInstance, btf_trace_event_type type,
         int taskId, int taskInstance, btf_trace_event_name event_name, int data);
 

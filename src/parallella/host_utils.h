@@ -11,6 +11,14 @@
  *        Dortmund University of Applied Sciences and Arts - initial API and implementation
  *******************************************************************************/
 
+/**
+ * @file host_utils.h
+ * @author Mahmoud Bazzal, Anand Prakash
+ * @date 24 May 2020
+ * @brief This file is used to define the utility functions for the host core application.
+ *
+ */
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -25,24 +33,15 @@
 
 #define READ_PRECISION_US 1000
 
-#define MEM_TYPE_SHM 	0
-#define MEM_TYPE_DSHM 	1
+#define MEM_TYPE_SHM     0
+#define MEM_TYPE_DSHM     1
 
-typedef struct{
-	unsigned row;
-	unsigned col;
-	unsigned num_visible_labels;
+typedef struct labelVisual_t {
+    unsigned row;                   /**< Row ID of the hardware core */
+    unsigned col;                   /**< Column ID of the hardware core */
+    unsigned num_visible_labels;    /**< Number of visual labels */
 }LabelVisual;
 
-/**
- * read a value of a label in a distributed shared memory section
- *
- * Arguments:
- * row			:	absolute row number of the core
- * col			:	absolute column number of the core
- * label_indx	:	index of the target shared label
- *
- */
 void array_init(unsigned array[],unsigned array_size);
 
 void user_config_print_legend(LabelVisual core_config,unsigned array[]);

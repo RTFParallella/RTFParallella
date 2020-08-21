@@ -11,6 +11,7 @@
  *        Dortmund University of Applied Sciences and Arts - initial API and implementation
  *******************************************************************************/
 
+
 #include <e-lib.h>
 #include "RTFParallellaConfig.h"
 #include "debugFlags.h"
@@ -21,15 +22,16 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
-
+/**< Mutex declaration for synchronization within cores */
 static e_mutex_t m;
 
-/* This buffer is used to store the legacy RTF trace. */
+/**< This buffer is used to store the legacy RTF trace. */
 static unsigned int *core_buffer;
 
 /* Variable to set the clock cycle per tick. */
 unsigned int execution_time_scale;
 
+/**< Time scale factor per tick */
 static unsigned int scale_factor;
 
 static unsigned int tick_count;
@@ -119,6 +121,8 @@ void updateDebugFlag(int debugMessage)
     core_buffer[DEBUG_FLAG] = debugMessage;
 }
 
+
+/** Signal the host to read the BTF trace metadata */
 void signalHost(void)
 {
     btf_trace_info btf_data_info;
@@ -136,6 +140,8 @@ void signalHost(void)
     buffer_offset = 0;
 }
 
+
+/* Dump the BTF trace event */
 void traceTaskEvent(int srcID, int srcInstance, btf_trace_event_type type,
         int taskId, int taskInstance, btf_trace_event_name event_name, int data)
 {

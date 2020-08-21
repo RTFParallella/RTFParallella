@@ -14,6 +14,15 @@
 #ifndef SRC_PARALLELLA_PARALLELLAUTILS_H_
 #define SRC_PARALLELLA_PARALLELLAUTILS_H_
 
+/**
+ * @file ParallellaUtils.h
+ * @author Mahmoud Bazzal, Anand Prakash
+ * @date 20 May 2020
+ * @brief This file declares the sleep timer function to simulate the time taken by each task to complete
+ * its processing on the hardware core.
+ *
+ */
+
 #include "e_lib.h"
 /* FreeRTOS imports */
 #include "FreeRTOS.h"
@@ -25,12 +34,15 @@
 #define _1US 700
 
 /**
- * sleep for a multiple of milliseconds
+ * @brief Sleep for a multiple of milliseconds
  *
- * Arguments:
- * ticks		:	number of milliseconds to sleep
- * taskNum		:	index of task invoking this function (used for tracing during sleep)
+ * It makes the task to sleep for the provided millisecond. This is used to simulate the computation
+ * time taken by the task in a real scenario.
  *
+ * @param[in] ticks        :    number of milliseconds to sleep
+ * @param[in] taskNum      :    index of task invoking this function (used for tracing during sleep)
+ *
+ * @return : void
  */
 void sleepTimerMs(int ticks,int taskNum);
 

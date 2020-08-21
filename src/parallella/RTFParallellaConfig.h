@@ -76,9 +76,9 @@ extern unsigned int execution_time_scale;
  */
 typedef struct btf_trace_info_t
 {
-    int length;                            /**< To ensure that the mutex is initialized */
-    unsigned int offset;                    /**< Mutex declaration. Unused on host  */
-    unsigned int core_id;                   /**< BTF trace data buffer size which is to be read */
+    int length;                            /**< To define the length of BTF packets to be read */
+    unsigned int offset;                    /**< Defines the offset location in memory area */
+    unsigned int core_id;                   /**< Epiphany core id */
     unsigned int core_write;                /**< Read write operation between epiphany core and host */
 } btf_trace_info;
 
@@ -96,7 +96,7 @@ typedef enum entity_id_t
     TASK20MS1_ID,
 
 
-    /* 16 to 64 entity ID reserved for RUNNABLES */
+    /* 16 to 63 entity ID reserved for RUNNABLES */
     RUNNABLE_HANDLER5MS0_ID = 16,
     RUNNABLE_HANDLER10MS0_ID,
     RUNNABLE_HANDLER20MS0_ID,

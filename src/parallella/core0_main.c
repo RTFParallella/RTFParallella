@@ -11,6 +11,7 @@
  *        Dortmund University of Applied Sciences and Arts - initial API and implementation
  *******************************************************************************/
 
+
 /* Epiphany imports */
 #include <stdlib.h>
 #include "e_lib.h"

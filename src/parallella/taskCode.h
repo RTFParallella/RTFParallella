@@ -13,6 +13,14 @@
 
 #ifndef SRC_PARALLELLA_TASKCODE_H_
 #define SRC_PARALLELLA_TASKCODE_H_
+
+/**
+ * @file taskCode.h
+ * @author Mahmoud Bazzal, Anand Prakash
+ * @date 24 May 2020
+ * @brief This file is used to define the functions for implementing tasks handlers.
+ *
+ */
 #include "c2c.h"
 #include "ParallellaUtils.h"
 #include "shared_comms.h"
