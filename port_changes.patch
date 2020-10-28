@@ -1,0 +1,17 @@
+diff --git a/FreeRTOS/Source/portable/GCC/Epiphany/port.c b/FreeRTOS/Source/portable/GCC/Epiphany/port.c
+index 7433bc762..7da50dd71 100755
+--- a/FreeRTOS/Source/portable/GCC/Epiphany/port.c
++++ b/FreeRTOS/Source/portable/GCC/Epiphany/port.c
+@@ -230,9 +230,9 @@ void vInterruptCentral( void ) {
+     switch (interrupt_mode) {
+         case E_TIMER0_INT:
+             vSetupTimer();
+-            if( xTaskIncrementTick() != pdFALSE ) {
+-                vTaskSwitchContext();
+-            }
++             xTaskIncrementTick();
++	     updateTick(); 
++             vTaskSwitchContext();
+             break;
+         case E_SW_EXCEPTION: //triggered extrenally for error injection. Must be that high prority
+             injectErrors();

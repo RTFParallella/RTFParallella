@@ -14,56 +14,115 @@
 #ifndef SRC_PARALLELLA_MODEL_ENUMERATIONS_H_
 #define SRC_PARALLELLA_MODEL_ENUMERATIONS_H_
 
+/**
+ * @file model_enumerations.h
+ * @author Mahmoud Bazzal, Anand Prakash
+ * @date 20 May 2020
+ * @brief This file declares and implements the entity table for BTF trace generation. It
+ * consists of functions used to store the entities in the tracing framework which is
+ * used to generate the BTF trace.
+ *
+ */
 
-#define	SHM_section1_label_count 	10
 
-#define	DSHM_section1_label_count	10
+#define SHM_LABEL_COUNT                   10
 
-#define label_str_len				10
+#define DSHM_LABEL_COUNT                  10
 
-#define task_count					5
+#define LABEL_STRLEN                      32
 
-#define core_count					2
+#define EXEC_TASK_COUNT                    5
 
-#define SHM_visible_label_count		2
+#define EXEC_CORE_COUNT                    2
 
-#define DSHM_visible_label_count	2
+#define SHM_VISIBLE_LABEL_COUNT            2
+
+#define DSHM_VISIBLE_LABEL_COUNT           2
 
 /**
- * Get the string name of DRAM shared label
+ * @brief Get the string name of DRAM shared label
  *
- * Arguments:
- * index			:	shared label index in the shared memory section
- * *str				:	pointer to buffer string that holds the name
+ * @param[in]     index            :    shared label index in the shared memory section
+ * @param[inout]  *str             :    pointer to buffer string that holds the name
+ *
+ * @return : void
  */
 void get_SHM_label_name (int index,char *str);
 
 /**
- * Get the string name of distributed shared label (on a core)
+ * @brief Get the string name of distributed shared label (on a core)
  *
- * Arguments:
- * index			:	shared label index in the memory section
- * *str				:	pointer to buffer string that holds the name
+ * @param[in]      index            :    shared label index in the memory section
+ * @param[inout]   *str             :    pointer to buffer string that holds the name
+ *
+ * @return : void
  */
 void get_DSHM_label_name(int index,char *str);
 
 /**
- * Get the string name of the task being run
+ * @brief Get the string name of the task being run
  *
- * Arguments:
- * index			:	task index in the task_enum array
- * *str				:	pointer to buffer string that holds the name
+ * @param[in]    index    :    task index in the task_enum array
+ * @param[inout] *str     :    pointer to buffer string that holds the name
+ *
+ * @return : void
  */
 void get_task_name(int index,char *str);
 
 /**
- * Get the indices of required labels to show in either shared memory or distributed shared memory
+ * @brief Get the indices of required labels to show in either shared memory or distributed shared memory
  *
- * Arguments:
- * array			:	array buffer that holds the indices
- * mem_type			:	the memory type of indices requested (MEM_TYPE_SHM or MEM_TYPE_DSHM)
+ * @param[inout]     array     :    array buffer that holds the indices
+ * @param[in]        mem_type  :    the memory type of indices requested (MEM_TYPE_SHM or MEM_TYPE_DSHM)
+ *
+ * @return : void
  */
 void get_visible_label_index(unsigned array[],unsigned mem_type);
+
+
+/**
+ * @brief Generate the BTF trace entity entry for all the tasks
+ *
+ * The function is used to store all the tasks entities
+ * used in the tasks execution on a heterogeneous platform which is used to
+ * generate the BTF header and data section.
+ *
+ * @return: void
+ */
+void generate_task_entity_table(void);
+
+/**
+ * @brief Generate the BTF trace entity entry for all the runnables
+ *
+ * The function is used to store all the runnable entities
+ * used in the tasks execution on a heterogeneous platform which is used to
+ * generate the BTF header and data section.
+ *
+ * @return: void
+ */
+void generate_runnable_entity_table(void);
+
+/**
+ * @brief Generate the BTF trace entity entry for all the label/signal entities
+ *
+ * The function is used to store all the shared and distributed label entities
+ * used in the tasks execution on a heterogeneous platform which is used to
+ * generate the BTF header and data section.
+ *
+ * @return: void
+ */
+void generate_signal_entity_table(void);
+
+/**
+ * @brief Generate the BTF trace entity entry for all the hardware entities
+ *
+ * The function is used to store all the hardware entities used in the tasks
+ * execution on a heterogeneous platform which is used to generate the BTF
+ * header and data section.
+ *
+ * @return: void
+ */
+void generate_hw_entity_table(void);
 
 
 #endif /* SRC_PARALLELLA_MODEL_ENUMERATIONS_H_ */

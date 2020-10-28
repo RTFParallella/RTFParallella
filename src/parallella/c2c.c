@@ -11,128 +11,114 @@
  *        Dortmund University of Applied Sciences and Arts - initial API and implementation
  *******************************************************************************/
 
+
+#include "RTFParallellaConfig.h"
 #include "c2c.h"
 
-#include "e-lib.h"
+unsigned int *outbuf_dstr_shared[SHM_LABEL_COUNT];
 
-dstr_mem_sec_1_label_type *outbuf_dstr_shared[10];
-//e_mem_t emem_dst[16];
-int core_write_mutex=0;
-
-void shared_labels_init_core(){
-	//shared buffer in core memory
-	outbuf_dstr_shared[0] = (dstr_mem_sec_1_label_type *) dstr_mem_offset_sec_1;
-	/*for (int i=1;i<dstr_mem_sec_1_label_count;i++){
-		outbuf_dstr_shared[i] = outbuf_dstr_shared[i-1] + 1;
-	}
-	outbuf_dstr_shared[1] = outbuf_dstr_shared[0] + 1;
-	outbuf_dstr_shared[2] = outbuf_dstr_shared[1] + 1;
-	outbuf_dstr_shared[3] = outbuf_dstr_shared[2] + 1;
-	outbuf_dstr_shared[4] = outbuf_dstr_shared[3] + 1;
-	outbuf_dstr_shared[5] = outbuf_dstr_shared[4] + 1;
-	outbuf_dstr_shared[6] = outbuf_dstr_shared[5] + 1;
-	outbuf_dstr_shared[7] = outbuf_dstr_shared[6] + 1;
-	outbuf_dstr_shared[8] = outbuf_dstr_shared[7] + 1;*/
-	//initialize buffer
-	int i;
-	for (i=0;i<9;i++){
-		*outbuf_dstr_shared[i] =0;
-	}
-	/*int emem;
-	//define distributed memory section in Epi range
-	e_alloc(&emem[1], dstr_mem_offset_sec_1 , sizeof(outbuf_dstr_shared));*/
-
-}
-
-uint8_t shared_label_write_core	(unsigned row,unsigned col,int label_indx,int payload){
-	unsigned int *addr;
-	unsigned int* addr_base;
-	addr_base = get_base_address_core(row,col);
-	addr = (unsigned int*) ((unsigned ) addr_base | (unsigned)outbuf_dstr_shared[label_indx]);
-	*addr = payload;
+/**
+ * Provide the epiphany memory section based on the offset data.
+ */
+unsigned int *allocate_epiphany_memory(unsigned int offset)
+{
+    unsigned int *epi_core_addr = 0;
+    /* Ensure that the start address is 0x7000 at data bank 3 of each core */
+    unsigned int *epi_core_buffer = (unsigned int *)ECORE_RTF_BUFFER_ADDR;
+    /* Add offset to get the address */
+    epi_core_addr = (epi_core_buffer + offset);
+    return (unsigned int *)epi_core_addr;
 }
 
 
-void DSHM_section_init(DSHM_section sec){
-	unsigned int *addr;
-	unsigned int* addr_base;
-	addr_base = get_base_address_core(sec.row,sec.col);
-	addr = (unsigned int*) ((unsigned ) addr_base | (unsigned)sec.base_addr);
-	for (int i = 0;i<sec.label_count;i++){
-		addr[i] = 256;
-	}
+/**
+ * Initiate the shared label section, this function will assign addresses to labels in a section,
+ * and initialize those labels to 0
+ */
+void shared_labels_init_core(void){
+    /* shared buffer in core memory */
+    outbuf_dstr_shared[0] = (unsigned int *) DSHM_LABEL_EPI_CORE_OFFSET;
+    /* initialize buffer */
+    int index;
+    for (index = 0; index < SHM_LABEL_COUNT; index++){
+        *outbuf_dstr_shared[index] = 0;
+    }
+
 }
 
 
-uint8_t write_DSHM_section	(DSHM_section sec,int label_indx,int payload){
-	unsigned int *addr;
-	unsigned int* addr_base;
-	addr_base = get_base_address_core(sec.row,sec.col);
-	addr = (unsigned int*) ((unsigned ) addr_base | (unsigned)sec.base_addr);
-	addr[label_indx] = payload;
-}
-
-unsigned int read_DSHM_section (DSHM_section sec, int label_indx){
-	unsigned int *addr;
-	unsigned int* addr_base;
-	addr_base = get_base_address_core(sec.row,sec.col);
-	addr = (unsigned int*) ((unsigned ) addr_base | (unsigned)sec.base_addr);
-	return addr[label_indx];
+/**
+ * Write a value to a label in a distributed shared memory section
+ */
+void shared_label_write_core (unsigned row,unsigned col,int label_indx,int payload)
+{
+    unsigned int *addr;
+    unsigned int* addr_base;
+    addr_base = (unsigned int *)get_base_address_core(row,col);
+    addr = (unsigned int*) ((unsigned ) addr_base | (unsigned)outbuf_dstr_shared[label_indx]);
+    *addr = payload;
 }
 
 
-
-
-
-unsigned int shared_label_read_core (unsigned row, unsigned col, int label_indx){
-	unsigned int *addr;
-	unsigned int* addr_base;
-	addr_base = get_base_address_core(row,col);
-	addr = (unsigned int*) ((unsigned ) addr_base | (unsigned)outbuf_dstr_shared[label_indx]);
-	return addr;
+/**
+ * Initialize the distributed shared label section.
+ */
+void DSHM_section_init(DSHM_section sec)
+{
+    unsigned int *addr;
+    unsigned int* addr_base;
+    addr_base = (unsigned int *)get_base_address_core(sec.row,sec.col);
+    addr = (unsigned int*) ((unsigned ) addr_base | (unsigned)sec.base_addr);
+    for (int i = 0;i<sec.label_count;i++){
+        addr[i] = 0;
+    }
 }
 
 
-unsigned int get_base_address_core(int row, int col){
-	if(row ==0 ){
-		if (col == 0){
-			return 0x80800000;
-		} else if (col ==1){
-			return 0x80900000;
-		}else if (col == 2){
-			return 0x80A00000;
-		}else if (col == 3){
-			return 0x80B00000;
-		}
-	} else if(row ==1 ){
-		if (col == 0){
-			return 0x84800000;
-		} else if (col ==1){
-			return 0x84900000;
-		}else if (col == 2){
-			return 0x84A00000;
-		}else if (col == 3){
-			return 0x84B00000;
-		}
-	} else if(row ==2 ){
-		if (col == 0){
-			return 0x88800000;
-		} else if (col ==1){
-			return 0x88900000;
-		}else if (col == 2){
-			return 0x88A00000;
-		}else if (col == 3){
-			return 0x88B00000;
-		}
-	} else if(row ==3 ){
-		if (col == 0){
-			return 0x8C800000;
-		} else if (col ==1){
-			return 0x8C900000;
-		}else if (col == 2){
-			return 0x8CA00000;
-		}else if (col == 3){
-			return 0x8CB00000;
-		}
-	}
+/**
+ * Write data to a specific label in a distributed shared memory section
+ */
+void write_DSHM_section (DSHM_section sec,int label_indx,int payload)
+{
+    unsigned int *addr;
+    unsigned int* addr_base;
+    addr_base = (unsigned int *)get_base_address_core(sec.row,sec.col);
+    addr = (unsigned int*) ((unsigned ) addr_base | (unsigned)sec.base_addr);
+    addr[label_indx] = payload;
+}
+
+/**
+ * Read data from a specific label in a distributed shared memory section
+ */
+unsigned int read_DSHM_section (DSHM_section sec, int label_indx)
+{
+    unsigned int *addr;
+    unsigned int* addr_base;
+    addr_base = (unsigned int *)get_base_address_core(sec.row,sec.col);
+    addr = (unsigned int*) ((unsigned ) addr_base | (unsigned)sec.base_addr);
+    return addr[label_indx];
+}
+
+
+/**
+ * Read a value of a label in a distributed shared memory section.
+ */
+unsigned int shared_label_read_core (unsigned row, unsigned col, int label_indx)
+{
+    unsigned int *addr;
+    unsigned int* addr_base;
+    addr_base = (unsigned int *)get_base_address_core(row,col);
+    addr = (unsigned int*) ((unsigned ) addr_base | (unsigned)outbuf_dstr_shared[label_indx]);
+    return (unsigned int)*addr;
+}
+
+/**
+ * Get the absolute base memory address of a core.
+ */
+unsigned int get_base_address_core(int row, int col)
+{
+    uint32_t base_addr = 0x80800000;
+    uint32_t col_shift = (uint32_t)((col << 20) | 0);
+    uint32_t row_shift = (uint32_t)(((row * 4) << 24) | 0);
+    return (base_addr | col_shift | row_shift);
 }

@@ -126,11 +126,11 @@ environment/project/cdt.managedbuild.toolchain.gnu.cross.base.1605716264/SSH_AUT
 environment/project/cdt.managedbuild.toolchain.gnu.cross.base.1605716264/SSH_AUTH_SOCK/operation=append
 environment/project/cdt.managedbuild.toolchain.gnu.cross.base.1605716264/SSH_AUTH_SOCK/value=/run/user/1000/keyring/ssh
 environment/project/cdt.managedbuild.toolchain.gnu.cross.base.1605716264/USER/delimiter=\:
-environment/project/cdt.managedbuild.toolchain.gnu.cross.base.1605716264/USER/operation=append
-environment/project/cdt.managedbuild.toolchain.gnu.cross.base.1605716264/USER/value=mahmoud
+environment/project/cdt.managedbuild.toolchain.gnu.cross.base.1605716264/USER/operation=replace
+environment/project/cdt.managedbuild.toolchain.gnu.cross.base.1605716264/USER/value=anand\:anand
 environment/project/cdt.managedbuild.toolchain.gnu.cross.base.1605716264/USERNAME/delimiter=\:
-environment/project/cdt.managedbuild.toolchain.gnu.cross.base.1605716264/USERNAME/operation=append
-environment/project/cdt.managedbuild.toolchain.gnu.cross.base.1605716264/USERNAME/value=mahmoud
+environment/project/cdt.managedbuild.toolchain.gnu.cross.base.1605716264/USERNAME/operation=replace
+environment/project/cdt.managedbuild.toolchain.gnu.cross.base.1605716264/USERNAME/value=anand
 environment/project/cdt.managedbuild.toolchain.gnu.cross.base.1605716264/WINDOWPATH/delimiter=\:
 environment/project/cdt.managedbuild.toolchain.gnu.cross.base.1605716264/WINDOWPATH/operation=append
 environment/project/cdt.managedbuild.toolchain.gnu.cross.base.1605716264/WINDOWPATH/value=2

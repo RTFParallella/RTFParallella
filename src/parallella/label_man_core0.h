@@ -14,8 +14,14 @@
 #ifndef SRC_PARALLELLA_LABEL_MAN_CORE0_H_
 #define SRC_PARALLELLA_LABEL_MAN_CORE0_H_
 
-#include "shared_comms.h"
-#include "c2c.h"
+/**
+ * @file label_man_core0.h
+ * @author Mahmoud Bazzal, Anand Prakash
+ * @date 24 May 2020
+ * @brief This file is used to define the functions for implementing the cIn and cOut handler and
+ * reading and writing of shared and distributed labels and signals.
+ *
+ */
 
 #define num_unique_sections 1
 
